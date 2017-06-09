@@ -13,13 +13,14 @@ import java.util.Set;
  */
 
 public interface IDistributionLogic {
-    @NonNull Set<QCMember> allocateContent(@NonNull Set<QCMember> members,
+    @NonNull Set<QCMember> allocateContent(int handSize,
+                                           @NonNull Set<QCMember> members,
                                            @NonNull List<Pair<String, String>> content);
 
     @NonNull Set<QCMember> updateForCorrectMove(@NonNull QCMember asker,
                                                 @NonNull QCMember answerer,
                                                 @NonNull String answer,
-                                                @NonNull Set<QCMember> members,
+                                                @NonNull List<QCMember> members,
                                                 @NonNull List<Pair<String, String>> content);
 
     @NonNull Set<QCMember> updateForBadMove(@NonNull QCMember asker,

@@ -183,12 +183,12 @@ public class GameEngine implements IGameEngine {
     }
 
     @Override public void allocateContent() {
-        mMembers = mDistributionLogic.allocateContent(mMembers, mContent);
+        mMembers = mDistributionLogic.allocateContent(4, mMembers, mContent);
     }
 
     @Override
     public void updatePlayersForCorrectStatus(@NonNull QCMember asker, @NonNull QCMember answerer, @NonNull String answer) {
-        mMembers = mDistributionLogic.updateForCorrectMove(asker, answerer, answer, mMembers, mContent);
+        mMembers = mDistributionLogic.updateForCorrectMove(asker, answerer, answer, new ArrayList<>(mMembers), mContent);
     }
 
     @Override
