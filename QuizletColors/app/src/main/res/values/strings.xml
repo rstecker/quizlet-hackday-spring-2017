@@ -1,0 +1,22 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Quizlet Colors</string>
+
+    <!-- Device setup/conditions text -->
+
+    <string name="bluetooth_denied">You wont turn on Bluetooth. How do you expect this game to work?</string>
+    <string name="bluetooth_approved">Bluetooth enabled</string>
+    <string name="permission_denied">You wont grant the permissions we need. How do you expect this game to work?</string>
+    <string name="permission_approved">Thank you</string>
+    <string name="discoverability_denied">Allowing Discoverability is required to be a Host</string>
+
+    <!-- Lobby text -->
+
+    <string name="host_button">Start Hosting</string>
+    <string name="host_button_discoverable">…Hosting…</string>
+    <string name="host_discoverable_toast">Host mode starting (enabled for %1$d seconds)</string>
+
+
+    <string name="join_button">Join Game</string>
+    <string name="join_button_looking">…Looking…</string>
+
+</resources>

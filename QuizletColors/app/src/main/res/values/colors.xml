@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="transparent">#00000000</color>
+
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+
+    <color name="text_color">#3F51B5</color>
+    <color name="text_color_inverted">#fefeff</color>
+
+    <color name="background_color">#bff9d8</color>
+    <color name="background_color_accent">#FF4081</color>
+    <color name="background_color_active">#830856</color>
+    <color name="background_color_high_contrast">#ffffff</color>
+</resources>
