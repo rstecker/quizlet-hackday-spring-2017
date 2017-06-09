@@ -129,21 +129,21 @@ public class GameEngine implements IGameEngine {
                 return pair.first;
             }
         }
-        throw new IllegalStateException("Unable to find question for answer '"+answer+"'");
+        throw new IllegalStateException("Unable to find question for answer '" + answer + "'");
     }
 
     @NonNull @Override public String getAnswerForPlayer(@NonNull QCMember member) {
         String question = member.question();
         if (question == null) {
-            throw new IllegalStateException("Player is not asking a question : "+member);
+            throw new IllegalStateException("Player is not asking a question : " + member);
         }
         for (Pair<String, String> pair : mContent) {
-            System.out.print("looking for "+pair.first+" : "+pair.second+"\n");
+            System.out.print("looking for " + pair.first + " : " + pair.second + "\n");
             if (question.equals(pair.first)) {
                 return pair.second;
             }
         }
-        throw new IllegalStateException("Unable to find answer for question '"+question+"', asked by player "+member);
+        throw new IllegalStateException("Unable to find answer for question '" + question + "', asked by player " + member);
     }
 
     @NonNull @Override public List<QCMember> getPlayersWithAnswer(@NonNull String answer) {
@@ -153,7 +153,7 @@ public class GameEngine implements IGameEngine {
             if (options == null) {
                 continue;
             }
-            for(String option : options) {
+            for (String option : options) {
                 if (answer.equals(option)) {
                     result.add(member);
                 }
@@ -183,16 +183,16 @@ public class GameEngine implements IGameEngine {
     }
 
     @Override public void allocateContent() {
-        mMembers = mDistributionLogic.allocateContent(4, mMembers, mContent);
+        mMembers = new HashSet<>(mDistributionLogic.allocateContent(4, new ArrayList<>(mMembers), mContent));
     }
 
     @Override
     public void updatePlayersForCorrectStatus(@NonNull QCMember asker, @NonNull QCMember answerer, @NonNull String answer) {
-        mMembers = mDistributionLogic.updateForCorrectMove(asker, answerer, answer, new ArrayList<>(mMembers), mContent);
+        mMembers = new HashSet<>(mDistributionLogic.updateForCorrectMove(asker, answerer, answer, new ArrayList<>(mMembers), mContent));
     }
 
     @Override
     public void updatePlayersForBadMove(@NonNull QCMember asker, @NonNull QCMember answerer, @NonNull String providedAnswer, @NonNull String correctAnswer, @NonNull List<QCMember> othersAtFault, @NonNull List<QCMember> askersOfAnswer) {
-        mMembers = mDistributionLogic.updateForBadMove(asker, answerer, providedAnswer, correctAnswer, othersAtFault, askersOfAnswer, mMembers, mContent);
+        mMembers = new HashSet<>(mDistributionLogic.updateForBadMove(asker, answerer, providedAnswer, correctAnswer, othersAtFault, askersOfAnswer, new ArrayList<>(mMembers), mContent));
     }
 }
