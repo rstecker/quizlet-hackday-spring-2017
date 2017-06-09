@@ -84,7 +84,7 @@ public class HostService extends Service implements IServerService {
 
 
     private Handler getHandler() {
-        return new CommsHandler(mIncomingMsgs::onNext, mIncomingMsgs::onComplete);
+        return new CommsHandler(mIncomingMsgs::onNext, () -> mIncomingMsgs.onNext(""));//mIncomingMsgs::onComplete); mIncomingMsgs::onComplete);
     }
     //region interface methods
 

@@ -6,11 +6,13 @@
     android:layout_height="match_parent"
     tools:context="sixarmstudios.quizletcolors.StartActivity">
 
-    <TextView
-        android:id="@+id/hello_world"
+    <EditText
+        android:id="@+id/username_text_field"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:hint="@string/username_hint"
+        android:minHeight="@dimen/min_tap_target_size"
+        android:minWidth="@dimen/min_tap_target_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -22,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/host_button"
-        app:layout_constraintBottom_toBottomOf="@id/hello_world"
+        app:layout_constraintBottom_toBottomOf="@id/username_text_field"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +38,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hello_world" />
+        app:layout_constraintTop_toBottomOf="@id/username_text_field" />
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -87,6 +89,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/join_game"
-        app:layout_constraintTop_toTopOf="@id/hello_world" />
+        app:layout_constraintTop_toTopOf="@id/username_text_field" />
 
 </android.support.constraint.ConstraintLayout>

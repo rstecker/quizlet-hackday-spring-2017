@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,8 @@ import com.example.bluetooth.core.IBluetoothPlayerListener;
 import com.example.bluetooth.server.HostService;
 import com.example.bluetooth.server.IServerService;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -43,6 +46,7 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
     public static final int LAYOUT_ID = R.layout.activity_start;
     public static final String TAG = StartActivity.class.getSimpleName();
 
+    @BindView(R.id.username_text_field) EditText mUsernameField;
     @BindView(R.id.hosting_debug) TextView mDebugHost;
     @BindView(R.id.joining_debug) TextView mDebugJoin;
     @BindView(R.id.start_hosting) CheckedTextView mHostButton;
@@ -64,9 +68,14 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
     }
 
 
+    List<String> mockUsernames = Arrays.asList("Bob", "Joe", "Sam", "Kelly", "Jude", "Karen",
+            "Rebecca", "Miguel", "Amy", "Matt", "Amanda", "Damien", "Ankush", "Lindsey", "Lisa",
+            "Suko", "Trisha", "Kathleen", "Ilkay", "Brenda");
+
     @Override
     protected void onStart() {
         super.onStart();
+        mUsernameField.setText(mockUsernames.get((int) (Math.random() * ((mockUsernames.size() - 1) + 1))));
         // if I only JUST bind, the service dies when we background :'(
         // TODO : inspect these flags, I bet we want a different ont
 //        bindService(new Intent(this, ModelRetrievalService.class), mModelConnection, Context.BIND_AUTO_CREATE);
@@ -135,6 +144,7 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
     //endregion
 
     // region TEMP UI stuff (should be spun out somewhere else later)
+
     @OnClick(R.id.start_hosting)
     public void handleStartHostingClick() {
         if (mServerBound) {
@@ -211,7 +221,7 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
                             (t) -> {
                                 mServerService.sendMsg("Tick tock, I've seen " + msgCount);
                             },
-                            (e) -> Log.e(TAG, "Ping back error "+e));
+                            (e) -> Log.e(TAG, "Ping back error " + e));
 
             mServerService.getMessageUpdates()
                     .scan(

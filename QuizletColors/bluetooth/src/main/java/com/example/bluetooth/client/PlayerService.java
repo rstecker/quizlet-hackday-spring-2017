@@ -82,7 +82,7 @@ public class PlayerService extends Service implements IClientService {
     }
 
     private Handler getHandler() {
-        return new CommsHandler(mIncomingMsgs::onNext, mIncomingMsgs::onComplete);
+        return new CommsHandler(mIncomingMsgs::onNext, () -> mIncomingMsgs.onNext(""));//mIncomingMsgs::onComplete);
     }
     //region interface methods
 

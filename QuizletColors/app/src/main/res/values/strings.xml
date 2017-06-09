@@ -11,6 +11,8 @@
 
     <!-- Lobby text -->
 
+    <string name="username_hint">Enter username</string>
+
     <string name="host_button">Start Hosting</string>
     <string name="host_button_discoverable">…Hosting…</string>
     <string name="host_discoverable_toast">Host mode starting (enabled for %1$d seconds)</string>
