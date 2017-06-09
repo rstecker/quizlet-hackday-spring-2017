@@ -10,8 +10,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import sixarmstudios.quizletcolors.logic.GameEngine;
-import sixarmstudios.quizletcolors.logic.IGameEngine;
+import sixarmstudios.quizletcolors.logic.engine.GameEngine;
+import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;

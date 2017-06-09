@@ -1,4 +1,4 @@
-package sixarmstudios.quizletcolors.logic;
+package sixarmstudios.quizletcolors.logic.engine;
 
 
 import android.support.annotation.NonNull;

@@ -1,5 +1,6 @@
 package com.example.myapplication.bluetooth;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.immutables.value.Value;
@@ -29,9 +30,29 @@ public abstract class QCPlayerMessage {
     @Nullable public abstract QCMove move();
 
 
-    @ParcelFactory
-    public static QCPlayerMessage build() {
+    public static @NonNull QCPlayerMessage build(@NonNull Action action, @NonNull GameState state) {
         return ImmutableQCPlayerMessage.builder()
+                .action(action)
+                .state(state)
+                .build();
+    }
+
+    public static @NonNull QCPlayerMessage build(@NonNull Action action, @NonNull GameState state, @NonNull String username) {
+        return ImmutableQCPlayerMessage.builder()
+                .action(action)
+                .state(state)
+                .username(username)
+                .build();
+    }
+
+    @ParcelFactory
+    public static @NonNull QCPlayerMessage build(@NonNull Action action, @NonNull GameState state,
+                                                 @NonNull String username, @NonNull QCMove move) {
+        return ImmutableQCPlayerMessage.builder()
+                .action(action)
+                .state(state)
+                .username(username)
+                .move(move)
                 .build();
     }
 

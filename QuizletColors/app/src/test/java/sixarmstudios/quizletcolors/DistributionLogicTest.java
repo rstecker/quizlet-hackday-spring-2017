@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import sixarmstudios.quizletcolors.logic.DistributionLogic;
-import sixarmstudios.quizletcolors.logic.IDistributionLogic;
+import sixarmstudios.quizletcolors.logic.engine.DistributionLogic;
+import sixarmstudios.quizletcolors.logic.engine.IDistributionLogic;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -167,5 +167,7 @@ public class DistributionLogicTest {
         // others at fault got a new answer option
         assertTrue(member4.question().equals(allocatedSet.get(3).question()));
         assertFalse(member4.options().equals(allocatedSet.get(3).options()));
+
+        // TODO : verify everyone's questions can be answered and that the new options were not previously on the board
     }
 }
