@@ -34,7 +34,7 @@ public class LobbyLogic implements ILobbyLogic {
             case PLAYER_MOVE:
                 return mEngine.generateBaseLobbyMessage(QCGameMessage.Action.INVALID_STATE);
             default:
-                throw new UnsupportedOperationException("Unable to handle : " + message.action());
+                throw new UnsupportedOperationException("Unable to lobby logic handle : " + message.action());
         }
     }
 

@@ -3,6 +3,10 @@ package com.example.myapplication.bluetooth;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.immutables.value.Value;
 import org.parceler.Parcel;
 import org.parceler.ParcelFactory;
@@ -15,6 +19,7 @@ import java.util.List;
 
 @Parcel(value = Parcel.Serialization.VALUE, implementations = ImmutableQCMember.class)
 @Value.Immutable
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class QCMember {
 
     public enum Reaction {
@@ -30,22 +35,25 @@ public abstract class QCMember {
         CORRECT_ANSWER_PROVIDED
     }
 
-    public abstract String username();
+    @JsonProperty("username") public abstract String username();
 
-    @Nullable public abstract String color();
+    @JsonProperty("color") @Nullable public abstract String color();
 
-    @Nullable public abstract String question();
+    @JsonProperty("question") @Nullable public abstract String question();
 
-    @Nullable public abstract List<String> options();
+    @JsonProperty("options") @Nullable public abstract List<String> options();
 
-    @Value.Auxiliary @Nullable public abstract Reaction reaction();
+    @JsonProperty("reaction") @Value.Auxiliary @Nullable public abstract Reaction reaction();
 
+    @JsonCreator
     @ParcelFactory
-    public static QCMember build(@NonNull String username,
-                                 @Nullable String color,
-                                 @Nullable String question,
-                                 @Nullable List<String> options,
-                                 @Nullable Reaction reaction) {
+    public static QCMember build(
+            @JsonProperty("username") @NonNull String username,
+            @JsonProperty("color") @Nullable String color,
+            @JsonProperty("question") @Nullable String question,
+            @JsonProperty("options") @Nullable List<String> options,
+            @JsonProperty("reaction") @Nullable Reaction reaction
+    ) {
         return ImmutableQCMember.builder()
                 .color(color)
                 .username(username)
@@ -54,12 +62,16 @@ public abstract class QCMember {
                 .reaction(reaction)
                 .build();
     }
-    public static QCMember build(@NonNull String username,
-                                 @Nullable String color,
-                                 @Nullable String question,
-                                 @Nullable List<String> options) {
+
+    public static QCMember build(
+            @NonNull String username,
+            @Nullable String color,
+            @Nullable String question,
+            @Nullable List<String> options
+    ) {
         return build(username, color, question, options, Reaction.NONE);
     }
+
     public static QCMember build(@NonNull String username) {
         return ImmutableQCMember.builder()
                 .username(username)

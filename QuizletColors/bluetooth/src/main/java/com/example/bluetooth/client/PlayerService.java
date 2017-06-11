@@ -12,21 +12,28 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.bluetooth.core.BluetoothPlayerStuff;
+import com.example.bluetooth.core.BluetoothStuff;
 import com.example.bluetooth.core.CommsHandler;
 import com.example.bluetooth.core.IBluetoothPlayerListener;
 
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.processors.BehaviorProcessor;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
+
+import static com.example.bluetooth.core.BluetoothTalker.INIT_MSG;
 
 /**
  * Created by rebeccastecker on 6/7/17.
  */
 
-public class PlayerService extends Service implements IClientService {
+public class PlayerService extends Service implements IClientService, BluetoothStuff.MessageFifo {
     public static final String TAG = PlayerService.class.getSimpleName();
     private final IBinder mBinder = new LocalBinder();
 
     BluetoothPlayerStuff mBluetoothStuff;
+    Subject<String> mOutgoingMsgs = BehaviorSubject.create();
     BehaviorProcessor<String> mIncomingMsgs = BehaviorProcessor.create();
 
     public static Intent createStartIntent(Context context) {
@@ -84,7 +91,7 @@ public class PlayerService extends Service implements IClientService {
     private Handler getHandler() {
         return new CommsHandler(mIncomingMsgs::onNext, () -> mIncomingMsgs.onNext(""));//mIncomingMsgs::onComplete);
     }
-    //region interface methods
+    //region IClientService interface methods
 
     @Override
     public void startLooking(IBluetoothPlayerListener listener) {
@@ -100,12 +107,12 @@ public class PlayerService extends Service implements IClientService {
     @Override
     public void connectToServer(BluetoothDevice device) {
         Log.i(TAG, "Totes going to do something with this now... " + device.getAddress());
-        mBluetoothStuff.connectToHostDevice(this, device);
+        mBluetoothStuff.connectToHostDevice(this, device, this);
     }
 
     @Override
     public void sendMsg(String msg) {
-        mBluetoothStuff.sendMessage(msg);
+        mOutgoingMsgs.onNext(msg);
     }
 
     @Override
@@ -115,8 +122,19 @@ public class PlayerService extends Service implements IClientService {
 
     @Override
     public Flowable<String> getMessageUpdates() {
-        return mIncomingMsgs;
+        return mIncomingMsgs
+                .filter((msg) -> {
+                    if (msg.equals(INIT_MSG)) {
+                        Log.i(TAG, "Init message received, connection established");
+                        return false;
+                    }
+                    return true;
+                });
     }
     //endregion
 
+    @Override public Observable<String> getOutgoingMsgs() {
+        Log.v(TAG, "Outgoing messages now being looked at");
+        return mOutgoingMsgs;
+    }
 }

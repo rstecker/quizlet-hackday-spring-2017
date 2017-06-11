@@ -1,5 +1,11 @@
 apply plugin: 'com.android.library'
 
+repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -52,7 +58,8 @@ dependencies {
     annotationProcessor "org.parceler:parceler:1.1.6"
 
     // JSON parsing
-    provided "com.fasterxml.jackson.core:jackson-databind:2.7.5"
-    provided "com.fasterxml.jackson.core:jackson-core:2.7.5"
-    provided "com.fasterxml.jackson.core:jackson-annotations:2.7.5"
+
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
 }

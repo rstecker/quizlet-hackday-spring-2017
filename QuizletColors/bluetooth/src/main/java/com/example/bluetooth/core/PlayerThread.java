@@ -31,7 +31,9 @@ class PlayerThread extends Thread {
         try {
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
+            Log.v(TAG, "Waiting for socket to connect");
             mSocket.connect();
+            Log.v(TAG, "Socket connected");
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {

@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import static com.example.bluetooth.core.BluetoothTalker.INIT_MSG;
+
 /**
  * Created by rebeccastecker on 6/8/17.
  */
@@ -45,6 +47,7 @@ public class BluetoothPlayerStuff extends BluetoothStuff {
     private boolean mIsRegistered = false;
     private final IBluetoothPlayerListener mPlayerListener;
     private BluetoothTalker mTalker;
+    private MessageFifo mMessageFifo;
 
     public BluetoothPlayerStuff(IBluetoothPlayerListener listener, Handler handler) {
         super(listener, handler);
@@ -63,8 +66,9 @@ public class BluetoothPlayerStuff extends BluetoothStuff {
     /**
      * Kicks off a {@link PlayerThread} to manage the connection to an external targeted device
      */
-    public void connectToHostDevice(Context context, BluetoothDevice device) {
+    public void connectToHostDevice(Context context, BluetoothDevice device, MessageFifo messageFifo) {
         new PlayerThread(this, device).start();
+        mMessageFifo = messageFifo;
         // Cancel discovery because it otherwise slows down the connection.
         shutDownDiscovery();
     }
@@ -89,9 +93,13 @@ public class BluetoothPlayerStuff extends BluetoothStuff {
 
     @Override
     void handleEstablishedConnection(BluetoothSocket socket) {
+        Log.v(TAG, "Player connection established");
         mTalker = new BluetoothTalker(mHandler, socket);
         mTalker.start();
-        mTalker.write("sharks!");
+        mTalker.write(INIT_MSG);
+        mMessageFifo.getOutgoingMsgs().subscribe(
+                this::sendMessage,
+                (e) -> Log.e(TAG, "Error sending Player msgs to Talker : " + e));
     }
 
     private void shutDownDiscovery() {
@@ -100,7 +108,8 @@ public class BluetoothPlayerStuff extends BluetoothStuff {
         }
     }
 
-    public void sendMessage(@NonNull String msg) {
+    private void sendMessage(@NonNull String msg) {
+        Log.v(TAG, "Sending player message to talker : " +msg);
         mTalker.write(msg);
     }
 

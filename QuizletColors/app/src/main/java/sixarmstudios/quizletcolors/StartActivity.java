@@ -3,13 +3,10 @@ package sixarmstudios.quizletcolors;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,12 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.bluetooth.client.IClientService;
 import com.example.bluetooth.client.PlayerService;
 import com.example.bluetooth.core.IBluetoothHostListener;
 import com.example.bluetooth.core.IBluetoothPlayerListener;
 import com.example.bluetooth.server.HostService;
-import com.example.bluetooth.server.IServerService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,17 +29,21 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import sixarmstudios.quizletcolors.connections.HostServiceConnection;
+import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
 
 public class StartActivity extends Activity implements IBluetoothHostListener, IBluetoothPlayerListener {
-    public static final int REQUEST_ENABLE_BT = 10;
-    public static final int REQUEST_PERMISSIONS_CODE = 11;
-    public static final int REQUEST_DISCOVERABLE_CODE = 12;
     @LayoutRes
     public static final int LAYOUT_ID = R.layout.activity_start;
     public static final String TAG = StartActivity.class.getSimpleName();
+
+    public static final int REQUEST_ENABLE_BT = 10;
+    public static final int REQUEST_PERMISSIONS_CODE = 11;
+    public static final int REQUEST_DISCOVERABLE_CODE = 12;
+
+    private static final String PLAYER_STATE_KEY = "player_state";
 
     @BindView(R.id.username_text_field) EditText mUsernameField;
     @BindView(R.id.hosting_debug) TextView mDebugHost;
@@ -52,11 +51,16 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
     @BindView(R.id.start_hosting) CheckedTextView mHostButton;
     @BindView(R.id.join_option_list) LinearLayout mJoinList;
 
-    boolean mModelBound = false;
-    IServerService mServerService;
-    boolean mServerBound = false;
-    IClientService mClientService;
-    boolean mClientBound = false;
+
+    public enum PlayerState {
+        UNKNOWN,
+        HOST,
+        PLAYER
+    }
+
+    private PlayerState mPlayerState = PlayerState.UNKNOWN;
+    private HostServiceConnection mHostConnection = new HostServiceConnection();
+    private PlayerServiceConnection mPlayerConnection = new PlayerServiceConnection();
 
     // region Lifecycle stuff
     @Override
@@ -67,6 +71,15 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
         mJoinList.removeAllViews();
     }
 
+    @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mPlayerState = (PlayerState) savedInstanceState.get(PLAYER_STATE_KEY);
+    }
+
+    @Override protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(PLAYER_STATE_KEY, mPlayerState);
+    }
 
     List<String> mockUsernames = Arrays.asList("Bob", "Joe", "Sam", "Kelly", "Jude", "Karen",
             "Rebecca", "Miguel", "Amy", "Matt", "Amanda", "Damien", "Ankush", "Lindsey", "Lisa",
@@ -78,26 +91,22 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
         mUsernameField.setText(mockUsernames.get((int) (Math.random() * ((mockUsernames.size() - 1) + 1))));
         // if I only JUST bind, the service dies when we background :'(
         // TODO : inspect these flags, I bet we want a different ont
-//        bindService(new Intent(this, ModelRetrievalService.class), mModelConnection, Context.BIND_AUTO_CREATE);
-        bindService(new Intent(this, HostService.class), mServerConnection, Context.BIND_AUTO_CREATE);
-        bindService(new Intent(this, PlayerService.class), mClientConnection, Context.BIND_AUTO_CREATE);
+        if (mPlayerState == PlayerState.HOST || mPlayerState == PlayerState.UNKNOWN) {
+            bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
+        }
+        if (mPlayerState == PlayerState.PLAYER || mPlayerState == PlayerState.UNKNOWN) {
+            bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        // Unbind from the service
-//        if (mModelBound) {
-//            unbindService(mModelConnection);
-//            mModelBound = false;
-//        }
-        if (mServerBound) {
-            unbindService(mServerConnection);
-            mServerBound = false;
+        if (mHostConnection.isBound()) {
+            mHostConnection.unbindService(this);
         }
-        if (mClientBound) {
-            unbindService(mClientConnection);
-            mClientBound = false;
+        if (mPlayerConnection.isBound()) {
+            mPlayerConnection.unbindService(this);
         }
     }
 
@@ -147,8 +156,24 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
 
     @OnClick(R.id.start_hosting)
     public void handleStartHostingClick() {
-        if (mServerBound) {
-            mDebugHost.setText("Hosting as : " + mServerService.startHosting(this) + "\n" + mDebugHost.getText());
+        mPlayerState = PlayerState.HOST;
+        if (mPlayerConnection.isBound()) {
+            mPlayerConnection.unbindService(this);
+        }
+        if (mHostConnection.isBound()) {
+            String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
+            mDebugHost.setText("You are hosting at " + hostName);
+            mHostConnection.getLobbyStateUpdates().subscribe(
+                    (msg) -> {
+                        mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.\nYou are the host.");
+                    },
+                    (e) -> {
+                        Log.e(TAG, "Received error from Player service : " + e);
+                    },
+                    () -> {
+                        mDebugJoin.setText("Connection ended");
+                    }
+            );
         } else {
             Log.e(TAG, "Wanted to be a Host but we're not server bound yet");
         }
@@ -156,8 +181,12 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
 
     @OnClick(R.id.join_game)
     public void handleJoinGameClick() {
-        if (mClientBound) {
-            mClientService.startLooking(this);
+        mPlayerState = PlayerState.PLAYER;
+        if (mHostConnection.isBound()) {
+            mHostConnection.unbindService(this);
+        }
+        if (mPlayerConnection.isBound()) {
+            mPlayerConnection.startLooking(this);
         } else {
             Log.e(TAG, "Wanted to be a Player but we're not server bound yet");
         }
@@ -194,95 +223,24 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
             mJoinList.addView(v);
         }
         v.setOnClickListener((view) -> {
-            if (mClientBound) {
-                mClientService.connectToServer(device);
+            if (mPlayerConnection.isBound()) {
+                mJoinList.removeAllViews();
+                mPlayerConnection.connectToServer(device, mUsernameField.getText().toString());
+                mPlayerConnection.getLobbyStateUpdates().subscribe(
+                        (msg) -> {
+                            mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.");
+                        },
+                        (e) -> {
+                            Log.e(TAG, "Received error from Player service : " + e);
+                        },
+                        () -> {
+                            mDebugJoin.setText("Connection ended");
+                        }
+                );
             }
         });
     }
 
-    //endregion
-
-    /**
-     * Defines callbacks for service binding, passed to bindService()
-     */
-    private ServiceConnection mServerConnection = new ServiceConnection() {
-
-        int msgCount = 0;
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            HostService.LocalBinder binder = (HostService.LocalBinder) service;
-            mServerService = binder.getService();
-            mServerService.getMessageUpdates()
-                    .take(1)
-                    .flatMap((s) -> Flowable.interval(2, TimeUnit.SECONDS))
-                    .subscribe(
-                            (t) -> {
-                                mServerService.sendMsg("Tick tock, I've seen " + msgCount);
-                            },
-                            (e) -> Log.e(TAG, "Ping back error " + e));
-
-            mServerService.getMessageUpdates()
-                    .scan(
-                            (s1, s2) -> {
-                                ++msgCount;
-                                String newString = "[" + msgCount + "] " + s2 + "\n" + s1;
-                                return newString.substring(0, Math.min(300, newString.length()));
-                            })
-                    .subscribe(
-                            (text) -> {
-                                mDebugHost.setText(text);
-                            },
-                            (e) -> {
-                                Log.e(TAG, "Received error from server service : " + e);
-                            },
-                            () -> {
-                                mDebugHost.setText("Connection shut down : " + msgCount);
-                            }
-                    );
-            mServerBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mServerBound = false;
-        }
-    };
-
-    /**
-     * Defines callbacks for service binding, passed to bindService()
-     */
-    private ServiceConnection mClientConnection = new ServiceConnection() {
-
-        int msgCount = 0;
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
-            mClientService = binder.getService();
-            mClientService.getMessageUpdates().subscribe(
-                    (msg) -> {
-                        mDebugJoin.setText(++msgCount + "] " + msg);
-                        mClientService.sendMsg("Mama, I heard you : " + msgCount);
-                    },
-                    (e) -> {
-                        Log.e(TAG, "Received error from client service : " + e);
-                    },
-                    () -> {
-                        mDebugJoin.setText("Connection shut down : " + msgCount);
-                    });
-            mClientBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mClientBound = false;
-        }
-    };
-
-    //region IBluetoothClientListener implementation
 
     @Override
     public void onDeviceFound(@NonNull BluetoothDevice device, @Nullable String name, int bondState, @NonNull String address) {

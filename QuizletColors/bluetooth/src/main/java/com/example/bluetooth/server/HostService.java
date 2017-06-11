@@ -20,6 +20,8 @@ import java.io.IOException;
 import io.reactivex.Flowable;
 import io.reactivex.processors.BehaviorProcessor;
 
+import static com.example.bluetooth.core.BluetoothTalker.INIT_MSG;
+
 /**
  * Created by rebeccastecker on 6/7/17.
  */
@@ -113,12 +115,21 @@ public class HostService extends Service implements IServerService {
 
     @Override
     public void sendMsg(@NonNull String msg) {
-        mBluetoothStuff.broadcastMessage(msg);
+        if (mBluetoothStuff != null) {
+            mBluetoothStuff.broadcastMessage(msg);
+        }
     }
 
     @Override
     public @NonNull Flowable<String> getMessageUpdates() {
-        return mIncomingMsgs;
+        return mIncomingMsgs
+                .filter((msg) -> {
+                    if (msg.equals(INIT_MSG)) {
+                        Log.i(TAG, "Init message received, connection established");
+                        return false;
+                    }
+                    return true;
+                });
     }
     //endregion
 }

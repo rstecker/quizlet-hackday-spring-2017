@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.example.bluetooth.core.BluetoothTalker.INIT_MSG;
 
 /**
  * Created by rebeccastecker on 6/8/17.
@@ -49,8 +52,9 @@ public class BluetoothHostStuff extends BluetoothStuff {
     @Override void handleEstablishedConnection(BluetoothSocket socket) {
         BluetoothTalker talker = new BluetoothTalker(mHandler, socket);
         talker.start();
+        talker.write(INIT_MSG);
         mPlayers.put(socket, talker);
-        talker.write("sharks!");
+        Log.v(TAG, "Host connection established. There are now "+getConnectionCount()+" players connected");
     }
 
     public int getConnectionCount() {

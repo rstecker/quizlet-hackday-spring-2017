@@ -45,19 +45,10 @@ public class CommsHandler extends Handler {
         String text = new String(resultArray, StandardCharsets.UTF_8);
         if (msg.what == BluetoothTalker.MessageConstants.MESSAGE_WRITE) {
             Log.v(TAG, "we just wrote... [" + length + "] '" + text + "'");
-//                    mIncomingMsgs.onNext(text);
         } else if (msg.what == BluetoothTalker.MessageConstants.MESSAGE_READ) {
             Log.i(TAG, "we just read... [" + length + "] '" + text + "'");
             Log.i(TAG, "    >>r " + Arrays.toString((byte[]) msg.obj));
             mMessageListener.update(text);
-//            sendMsg("I heard you : " + Math.random() + "!");
-//                    mReadTxt.setText(++ri + "] " + text);
-//                    if (mServerBound && mServerService.isConnected()) {
-//                        mServerService.sendMsg("I heard you : " + Math.random() + "!");
-//                    } else if (mClientBound && mClientService.isConnected()) {
-//                        mClientService.sendMsg("I heard you : " + Math.random() + "!");
-//                    }
-//                    mBluetoothStuff.mTalker.write();
         } else if (msg.what == BluetoothTalker.MessageConstants.MESSAGE_END) {
             Log.i(TAG, "Received an end msg");
             mEndListener.end();

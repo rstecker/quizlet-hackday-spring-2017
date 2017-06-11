@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -20,6 +26,10 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/NOTICE' // It is not include NOTICE file
+        exclude 'META-INF/LICENSE' // It is not include LICENSE file
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -45,6 +55,11 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxjava:2.0.8'
 
     compile 'org.apache.commons:commons-lang3:3.4'
+
+    // JSON parsing
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
 
     compile project(path: ':bluetooth')
     compile project(path: ':models')

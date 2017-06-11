@@ -33,8 +33,10 @@ public class PlayerEngine implements IPlayerEngine {
         switch (message.state()) {
             case PLAYING:
                 handleGameUpdate(message);
+                break;
             case LOBBY:
                 handleLobbyUpdate(message);
+                break;
             default:
                 throw new UnsupportedOperationException("Unable to handle engine state : " + message.state());
         }
@@ -72,6 +74,7 @@ public class PlayerEngine implements IPlayerEngine {
             case REJECT_REQUEST:
             case INVALID_STATE:
                 mLobbyState.onNext(extractLobbyState(message));
+                break;
 
             case LOBBY_CANCEL:
             case LOBBY_KICK:
@@ -93,6 +96,7 @@ public class PlayerEngine implements IPlayerEngine {
             case INVALID_STATE:
             case OUT_OF_SYNC:
                 mBoardState.onNext(extractBoardState(message));
+                break;
 
             case BAD_ANSWER:
             case WRONG_USER:
@@ -100,6 +104,7 @@ public class PlayerEngine implements IPlayerEngine {
                 // TODO : these should have extra UI associated with them. They may or may not change
                 //      OUR board state but it does indicate something is going on...
                 mBoardState.onNext(extractBoardState(message));
+                break;
 
             case LOBBY_WELCOME:
             case ACCEPT_REQUEST:

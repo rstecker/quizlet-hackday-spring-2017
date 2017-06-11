@@ -36,7 +36,9 @@ class HostThread extends Thread {
                 Note that when accept() returns the BluetoothSocket, the socket is already
                 connected. Therefore, you shouldn't call connect(), as you do from the client side.
                  */
+                Log.v(TAG, "Waiting for server socket to accept");
                 socket = mmServerSocket.accept();
+                Log.v(TAG, "Server socket accepted");
             } catch (IOException e) {
                 Log.e(TAG, "Socket's accept() method failed", e);
                 break;

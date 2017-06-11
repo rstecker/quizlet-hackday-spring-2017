@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
  */
 
 public class BluetoothTalker extends Thread {
+    public static final String INIT_MSG = "hello";
     public static final String TAG = BluetoothTalker.class.getSimpleName();
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;

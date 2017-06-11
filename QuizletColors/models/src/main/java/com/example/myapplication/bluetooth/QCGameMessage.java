@@ -4,6 +4,11 @@ package com.example.myapplication.bluetooth;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.immutables.value.Value;
 import org.parceler.Parcel;
 import org.parceler.ParcelFactory;
@@ -19,7 +24,35 @@ import java.util.Set;
  */
 @Parcel(value = Parcel.Serialization.VALUE, implementations = ImmutableQCGameMessage.class)
 @Value.Immutable
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class QCGameMessage {
+
+    @JsonCreator
+    @ParcelFactory
+    public static QCGameMessage build(
+            @JsonProperty("action") Action action,
+            @JsonProperty("state") GameState state,
+            @JsonProperty("members") List<QCMember> members,
+            @JsonProperty("question") String question,
+            @JsonProperty("provided_answer") String providedAnswer,
+            @JsonProperty("provided_color") String providedColor,
+            @JsonProperty("answerer_color") String answererColor,
+            @JsonProperty("correct_answer") String correctAnswer,
+            @JsonProperty("answered_question") String answeredQuestion
+    ) {
+        return ImmutableQCGameMessage.builder()
+                .action(action)
+                .state(state)
+                .members(members)
+                .question(question)
+                .providedAnswer(providedAnswer)
+                .providedColor(providedColor)
+                .answererColor(answererColor)
+                .correctAnswer(correctAnswer)
+                .answeredQuestion(answeredQuestion)
+                .build();
+    }
 
     public enum Action {
         LOBBY_WELCOME,
@@ -39,33 +72,33 @@ public abstract class QCGameMessage {
 
     }
 
-    public abstract Action action();
+    @JsonProperty("action") public abstract Action action();
 
-    public abstract GameState state();
+    @JsonProperty("state") public abstract GameState state();
 
     /**
      * The "Host" is always the first member in the list
      */
-    public abstract List<QCMember> members();
+    @JsonProperty("members") public abstract List<QCMember> members();
 
     // region default/good user action responses
 
     /**
      * this is always the "correct" question to the offered answer
      */
-    @Nullable public abstract String question();
+    @JsonProperty("question") @Nullable public abstract String question();
 
     /**
      * this is always the PROVIDED answer, which may or may not be correct
      */
-    @Nullable public abstract String providedAnswer();
+    @JsonProperty("provided_answer") @Nullable public abstract String providedAnswer();
 
     /**
      * this is the color the user TRIED to submit to (regardless if correct or not)
      */
-    @Nullable public abstract String providedColor();
+    @JsonProperty("provided_color") @Nullable public abstract String providedColor();
 
-    @Nullable public abstract String answererColor();
+    @JsonProperty("answerer_color") @Nullable public abstract String answererColor();
     // endregion
 
     // region Users messed up submitting an answer, here's the right stuff
@@ -73,29 +106,20 @@ public abstract class QCGameMessage {
     /**
      * this is the "correct" answer (null in the event the user got it right)
      */
-    @Nullable public abstract String correctAnswer();
+    @JsonProperty("correct_answer") @Nullable public abstract String correctAnswer();
 
     /**
      * this is the question to the answer the user provided (null in the event the user got it right, see {@link #question()})
      */
-    @Nullable public abstract String answeredQuestion();
-
-    /**
-     * this is the list of colors who had questions matching the provided answer. May be null if the
-     * {@link #action()} doesn't make sense or empty if this is an graded response but no one actually
-     * was actively asking the question at the time
-     */
-    @Nullable public abstract Set<String> correctColors();
+    @JsonProperty("answered_question") @Nullable public abstract String answeredQuestion();
     // endregion
 
-    @ParcelFactory
     public static QCGameMessage build(Action action, GameState state) {
         return ImmutableQCGameMessage.builder()
                 .action(action)
                 .state(state)
                 .build();
     }
-
 
     public QCGameMessage addMember(QCMember member) {
         int index = members().indexOf(member);
@@ -147,8 +171,7 @@ public abstract class QCGameMessage {
             }
         }
         if (answer.equals(providedAnswer()) && question.equals(question())
-                && correctAnswer() == null && answeredQuestion() == null
-                && correctColors.equals(correctColors())) {
+                && correctAnswer() == null && answeredQuestion() == null) {
             return this;
         }
         return ImmutableQCGameMessage.builder()
@@ -157,7 +180,6 @@ public abstract class QCGameMessage {
                 .question(question)
                 .correctAnswer(null)
                 .answeredQuestion(null)
-                .correctColors(correctColors)
                 .build();
     }
 
@@ -180,8 +202,7 @@ public abstract class QCGameMessage {
             }
         }
         if (answer.equals(providedAnswer()) && question.equals(question())
-                && correctAnswer.equals(correctAnswer()) && correctQuestion.equals(answeredQuestion())
-                && correctColors.equals(correctColors())) {
+                && correctAnswer.equals(correctAnswer()) && correctQuestion.equals(answeredQuestion())) {
             return this;
         }
         return ImmutableQCGameMessage.builder()
@@ -190,7 +211,6 @@ public abstract class QCGameMessage {
                 .question(question)
                 .correctAnswer(correctAnswer)
                 .answeredQuestion(correctQuestion)
-                .correctColors(correctColors)
                 .build();
 
     }

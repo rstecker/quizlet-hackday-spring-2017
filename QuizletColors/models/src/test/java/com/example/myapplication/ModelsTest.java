@@ -6,7 +6,7 @@ import com.example.myapplication.bluetooth.QCMember;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -41,5 +41,8 @@ public class ModelsTest {
         assertEquals(member1, msg2.members().get(0));
         assertEquals(member2, msg2.members().get(1));
         assertEquals(member3, msg2.members().get(2));
+
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.writeValueAsBytes(msg2);
     }
 }
