@@ -28,7 +28,7 @@ import static com.example.bluetooth.core.BluetoothTalker.INIT_MSG;
  * Created by rebeccastecker on 6/7/17.
  */
 
-public class PlayerService extends Service implements IClientService, BluetoothStuff.MessageFifo {
+public class PlayerService extends Service implements IClientService {
     public static final String TAG = PlayerService.class.getSimpleName();
     private final IBinder mBinder = new LocalBinder();
 
@@ -107,7 +107,7 @@ public class PlayerService extends Service implements IClientService, BluetoothS
     @Override
     public void connectToServer(BluetoothDevice device) {
         Log.i(TAG, "Totes going to do something with this now... " + device.getAddress());
-        mBluetoothStuff.connectToHostDevice(this, device, this);
+        mBluetoothStuff.connectToHostDevice(this, device);
     }
 
     @Override
@@ -126,15 +126,11 @@ public class PlayerService extends Service implements IClientService, BluetoothS
                 .filter((msg) -> {
                     if (msg.equals(INIT_MSG)) {
                         Log.i(TAG, "Init message received, connection established");
+                        mBluetoothStuff.pipeThroughIncomingMessages(mOutgoingMsgs);
                         return false;
                     }
                     return true;
                 });
     }
     //endregion
-
-    @Override public Observable<String> getOutgoingMsgs() {
-        Log.v(TAG, "Outgoing messages now being looked at");
-        return mOutgoingMsgs;
-    }
 }

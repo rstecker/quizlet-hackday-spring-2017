@@ -15,16 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.reactivex.Observable;
-
 /**
  * Backs both the {@link HostService} and the {@link PlayerService}
  * on the lower Bluetooth level
  */
 public abstract class BluetoothStuff {
-    public interface MessageFifo {
-        Observable<String> getOutgoingMsgs();
-    }
     public static final UUID APP_UUID = UUID.fromString("c6293521-3154-4765-933b-19219e20f0a9");
     public static final String TAG = BluetoothStuff.class.getSimpleName();
 

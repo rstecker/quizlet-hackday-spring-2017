@@ -6,89 +6,102 @@
     android:layout_height="match_parent"
     tools:context="sixarmstudios.quizletcolors.StartActivity">
 
-    <EditText
-        android:id="@+id/username_text_field"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/debug_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/username_hint"
-        android:minHeight="@dimen/min_tap_target_size"
-        android:minWidth="@dimen/min_tap_target_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content">
 
-    <CheckedTextView
-        android:id="@+id/start_hosting"
-        style="@style/LobbyButtons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/host_button"
-        app:layout_constraintBottom_toBottomOf="@id/username_text_field"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <CheckedTextView
-        android:id="@+id/join_game"
-        style="@style/LobbyButtons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/join_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/username_text_field" />
-
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/join_game"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:id="@+id/join_option_list"
+        <EditText
+            android:id="@+id/username_text_field"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:divider="@drawable/spacer_6dp_height"
-            android:orientation="vertical"
-            android:showDividers="middle">
+            android:hint="@string/username_hint"
+            android:minHeight="@dimen/min_tap_target_size"
+            android:minWidth="@dimen/min_tap_target_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                style="@style/GameOption"
-                tools:text="Sharks!" />
+        <CheckedTextView
+            android:id="@+id/start_hosting"
+            style="@style/LobbyButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/host_button"
+            app:layout_constraintBottom_toBottomOf="@id/username_text_field"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                style="@style/GameOption"
-                tools:text="Dogs!" />
-        </LinearLayout>
+        <CheckedTextView
+            android:id="@+id/join_game"
+            style="@style/LobbyButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/join_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/username_text_field" />
 
-    </ScrollView>
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/join_game"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/hosting_debug"
-        style="@style/DebugText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:text="debug text"
-        app:layout_constraintBottom_toTopOf="@id/join_game"
-        app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintRight_toRightOf="@id/start_hosting"
-        app:layout_constraintTop_toTopOf="parent" />
+            <LinearLayout
+                android:id="@+id/join_option_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/spacer_6dp_height"
+                android:orientation="vertical"
+                android:showDividers="middle">
+
+                <TextView
+                    style="@style/GameOption"
+                    tools:text="Sharks!" />
+
+                <TextView
+                    style="@style/GameOption"
+                    tools:text="Dogs!" />
+            </LinearLayout>
+
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/hosting_debug"
+            style="@style/DebugText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:text="debug text"
+            app:layout_constraintBottom_toTopOf="@id/join_game"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toRightOf="@id/start_hosting"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-    <TextView
-        android:id="@+id/joining_debug"
-        style="@style/DebugText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:text="debug text"
+        <TextView
+            android:id="@+id/joining_debug"
+            style="@style/DebugText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:text="debug text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/join_game"
+            app:layout_constraintTop_toTopOf="@id/username_text_field" />
+    </android.support.constraint.ConstraintLayout>
+
+    <FrameLayout
+        app:layout_constraintTop_toBottomOf="@id/debug_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/join_game"
-        app:layout_constraintTop_toTopOf="@id/username_text_field" />
+        android:id="@+id/lobby_users_fragment_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </android.support.constraint.ConstraintLayout>

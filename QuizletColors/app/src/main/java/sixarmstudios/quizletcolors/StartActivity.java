@@ -1,6 +1,8 @@
 package sixarmstudios.quizletcolors;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleActivity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -22,6 +24,8 @@ import com.example.bluetooth.core.IBluetoothHostListener;
 import com.example.bluetooth.core.IBluetoothPlayerListener;
 import com.example.bluetooth.server.HostService;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -31,12 +35,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
+import sixarmstudios.quizletcolors.ui.LobbyFragment;
+import sixarmstudios.quizletcolors.ui.LobbyViewModel;
+import ui.Game;
 
-public class StartActivity extends Activity implements IBluetoothHostListener, IBluetoothPlayerListener {
-    @LayoutRes
-    public static final int LAYOUT_ID = R.layout.activity_start;
+
+public class StartActivity extends LifecycleActivity implements IBluetoothHostListener, IBluetoothPlayerListener {
+    @LayoutRes public static final int LAYOUT_ID = R.layout.activity_start;
     public static final String TAG = StartActivity.class.getSimpleName();
 
     public static final int REQUEST_ENABLE_BT = 10;
@@ -59,8 +67,8 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
     }
 
     private PlayerState mPlayerState = PlayerState.UNKNOWN;
-    private HostServiceConnection mHostConnection = new HostServiceConnection();
-    private PlayerServiceConnection mPlayerConnection = new PlayerServiceConnection();
+    private HostServiceConnection mHostConnection = new HostServiceConnection(this);
+    private PlayerServiceConnection mPlayerConnection = new PlayerServiceConnection(this);
 
     // region Lifecycle stuff
     @Override
@@ -96,6 +104,18 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
         }
         if (mPlayerState == PlayerState.PLAYER || mPlayerState == PlayerState.UNKNOWN) {
             bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
+        }
+
+        if (getSupportFragmentManager().findFragmentByTag(LobbyFragment.TAG) == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.lobby_users_fragment_container, LobbyFragment.newInstance(), LobbyFragment.TAG)
+                    .commit();
+//            FragmentManager fm = getSupportFragmentManager();
+//
+//            FragmentTransaction ft = fm.beginTransaction();
+//            LobbyFragment lobbyFragment = new LobbyFragment();
+//            ft.replace(R.id.listFragment, (Fragment) lobbyFragment);
+//            ft.commit();
         }
     }
 
@@ -157,31 +177,62 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
     @OnClick(R.id.start_hosting)
     public void handleStartHostingClick() {
         mPlayerState = PlayerState.HOST;
+        LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
+        model.resetGame();
         if (mPlayerConnection.isBound()) {
             mPlayerConnection.unbindService(this);
         }
         if (mHostConnection.isBound()) {
             String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
+            if (StringUtils.isEmpty(hostName)) {
+                Toast.makeText(this, R.string.no_host_name, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            model.setUpNewGame(hostName);
+            initHostObservables();
             mDebugHost.setText("You are hosting at " + hostName);
             mHostConnection.getLobbyStateUpdates().subscribe(
-                    (msg) -> {
-                        mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.\nYou are the host.");
-                    },
-                    (e) -> {
-                        Log.e(TAG, "Received error from Player service : " + e);
-                    },
-                    () -> {
-                        mDebugJoin.setText("Connection ended");
-                    }
-            );
+                            (msg) -> {
+                                mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.\nYou are the host.");
+                            },
+                            (e) -> {
+                                Log.e(TAG, "Received error from Player service : " + e);
+                            },
+                            () -> {
+                                mDebugJoin.setText("Connection ended");
+                            }
+                    );
         } else {
             Log.e(TAG, "Wanted to be a Host but we're not server bound yet");
         }
     }
 
+    private void initHostObservables() {
+        mHostConnection.getLobbyStateUpdates().observeOn(Schedulers.io()).subscribe(
+                (state) -> {
+                    LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                    if (model != null) {
+                        Log.i(TAG, "I'm going in : " + Thread.currentThread().getName());
+                        model.processLobbyUpdate(state);
+                    } else {
+                        Log.w(TAG, "I tried to look up the player vm but it was null");
+                    }
+                },
+                (e) -> Log.e(TAG, "Error updating view model [" + Thread.currentThread().getName() + "] " + e)
+        );
+        mHostConnection.getStartStatusUpdates().observeOn(Schedulers.io()).subscribe(
+                (canStart) -> {
+                    LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                    viewModel.setGameState(canStart ? Game.State.CAN_START : Game.State.WAITING);
+                },
+                (e) -> Log.e(TAG, "Error updating start state [" + Thread.currentThread().getName() + "] " + e)
+        );
+    }
     @OnClick(R.id.join_game)
     public void handleJoinGameClick() {
         mPlayerState = PlayerState.PLAYER;
+        LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
+        model.resetGame();
         if (mHostConnection.isBound()) {
             mHostConnection.unbindService(this);
         }
@@ -226,17 +277,26 @@ public class StartActivity extends Activity implements IBluetoothHostListener, I
             if (mPlayerConnection.isBound()) {
                 mJoinList.removeAllViews();
                 mPlayerConnection.connectToServer(device, mUsernameField.getText().toString());
-                mPlayerConnection.getLobbyStateUpdates().subscribe(
-                        (msg) -> {
-                            mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.");
-                        },
-                        (e) -> {
-                            Log.e(TAG, "Received error from Player service : " + e);
-                        },
-                        () -> {
-                            mDebugJoin.setText("Connection ended");
-                        }
-                );
+
+                LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                viewModel.joinNewGame(name, bondState, address);
+                mPlayerConnection.getLobbyStateUpdates()
+                        .map((msg) -> {
+                            LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                            model.processLobbyUpdate(msg);
+                            return msg;
+                        })
+                        .subscribe(
+                                (msg) -> {
+                                    mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.");
+                                },
+                                (e) -> {
+                                    Log.e(TAG, "Received error from Player service : " + e);
+                                },
+                                () -> {
+                                    mDebugJoin.setText("Connection ended");
+                                }
+                        );
             }
         });
     }

@@ -1,5 +1,6 @@
 package sixarmstudios.quizletcolors.connections;
 
+import android.arch.lifecycle.LifecycleActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -42,7 +43,7 @@ public class HostServiceConnection implements ServiceConnection {
     private int msgCount = 0;
     private ObjectMapper mMapper;
 
-    public HostServiceConnection() {
+    public HostServiceConnection(LifecycleActivity context) {
         mGameEngine = new GameEngine();
         mPlayerEngine = new PlayerEngine();
         mMapper = new ObjectMapper();
@@ -125,10 +126,14 @@ public class HostServiceConnection implements ServiceConnection {
         return mPlayerEngine.getLobbyStateUpdates().observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Observable<Boolean> getStartStatusUpdates() {
+        return mGameEngine.isAbleToStart().observeOn(AndroidSchedulers.mainThread());
+    }
+
     private void sendOutResponse(QCGameMessage gameMessage) throws JsonProcessingException {
         if (isBound()) {
             String msg = mMapper.writeValueAsString(gameMessage);
-            Log.v(TAG, "Attempting to send host msg : "+msg);
+            Log.v(TAG, "Attempting to send host msg : " + msg);
             mServerService.sendMsg(msg);
             mPlayerEngine.processMessage(gameMessage);
         }

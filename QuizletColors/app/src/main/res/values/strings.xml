@@ -8,6 +8,7 @@
     <string name="permission_denied">You wont grant the permissions we need. How do you expect this game to work?</string>
     <string name="permission_approved">Thank you</string>
     <string name="discoverability_denied">Allowing Discoverability is required to be a Host</string>
+    <string name="no_host_name">Looks like you are not hosting yet. Try giving it another go.</string>
 
     <!-- Lobby text -->
 

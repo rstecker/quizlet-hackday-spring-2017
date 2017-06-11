@@ -1,5 +1,7 @@
 package sixarmstudios.quizletcolors.connections;
 
+import android.arch.lifecycle.LifecycleActivity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,8 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
+import sixarmstudios.quizletcolors.ui.LobbyViewModel;
 import ui.BoardState;
 import ui.LobbyState;
 
@@ -33,9 +37,22 @@ public class PlayerServiceConnection implements ServiceConnection {
     private ObjectMapper mMapper;
     private IPlayerEngine mEngine;
 
-    public PlayerServiceConnection() {
+    public PlayerServiceConnection(LifecycleActivity context) {
         mEngine = new PlayerEngine();
         mMapper = new ObjectMapper();
+
+        mEngine.getLobbyStateUpdates().observeOn(Schedulers.io()).subscribe(
+                (state) -> {
+                    LobbyViewModel model = ViewModelProviders.of(context).get(LobbyViewModel.class);
+                    if (model != null) {
+                        Log.i(TAG, "I'm going in : "+Thread.currentThread().getName());
+                        model.processLobbyUpdate(state);
+                    } else {
+                        Log.w(TAG, "I tried to look up the player vm but it was null");
+                    }
+                },
+                (e) -> Log.e(TAG, "Error updating view model ["+Thread.currentThread().getName()+"] " + e)
+        );
     }
 
     @Override

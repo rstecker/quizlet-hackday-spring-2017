@@ -122,7 +122,7 @@ public class PlayerEngine implements IPlayerEngine {
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < message.members().size(); ++i) {
             QCMember member = message.members().get(i);
-            players.add(Player.build(
+            players.add(new Player(
                     member.username(),
                     member.color() == null ? "#000000" : member.color(),
                     i == 0,
@@ -137,7 +137,7 @@ public class PlayerEngine implements IPlayerEngine {
         List<String> options = null;
         for (int i = 0; i < message.members().size(); ++i) {
             QCMember member = message.members().get(i);
-            players.add(Player.build(
+            players.add(new Player(
                     member.username(),
                     member.color(),
                     i == 0,

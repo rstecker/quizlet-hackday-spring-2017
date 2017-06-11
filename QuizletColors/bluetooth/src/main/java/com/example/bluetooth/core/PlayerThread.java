@@ -37,6 +37,7 @@ class PlayerThread extends Thread {
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {
+                // TODO : I need to bump this error up to the UI. In my case, I had to close app, turn on & off bluetooth, and then it worked
                 mSocket.close();
             } catch (IOException closeException) {
                 Log.e(TAG, "Could not close the client socket", closeException);
