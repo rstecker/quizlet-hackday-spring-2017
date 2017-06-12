@@ -12,9 +12,7 @@ import com.example.myapplication.bluetooth.QCMember;
 import com.example.myapplication.bluetooth.QCPlayerMessage;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -30,7 +28,7 @@ public class GameEngine implements IGameEngine {
     private ILobbyLogic mLobbyLogic;
     private IPlayLogic mPlayLogic;
     private IDistributionLogic mDistributionLogic;
-    private Set<QCMember> mMembers;
+    private List<QCMember> mMembers;
     private List<Pair<String, String>> mContent;
     private BehaviorSubject<Boolean> mCanStart;
 
@@ -38,7 +36,7 @@ public class GameEngine implements IGameEngine {
         mLobbyLogic = new LobbyLogic(this);
         mPlayLogic = new PlayLogic(this);
         mDistributionLogic = new DistributionLogic();
-        mMembers = new HashSet<>();
+        mMembers = new ArrayList<>();
         mContent = new ArrayList<>();
         mCanStart = BehaviorSubject.createDefault(false);
     }
@@ -106,6 +104,9 @@ public class GameEngine implements IGameEngine {
     }
 
     @Override public void addMember(@NonNull QCMember newMember) {
+        if (mMembers.contains(newMember)) {
+            return;
+        }
         mMembers.add(newMember);
         mCanStart.onNext(canStart());
     }
@@ -146,7 +147,6 @@ public class GameEngine implements IGameEngine {
             throw new IllegalStateException("Player is not asking a question : " + member);
         }
         for (Pair<String, String> pair : mContent) {
-            System.out.print("looking for " + pair.first + " : " + pair.second + "\n");
             if (question.equals(pair.first)) {
                 return pair.second;
             }
@@ -191,16 +191,16 @@ public class GameEngine implements IGameEngine {
     }
 
     @Override public void allocateContent() {
-        mMembers = new HashSet<>(mDistributionLogic.allocateContent(4, new ArrayList<>(mMembers), mContent));
+        mMembers = mDistributionLogic.allocateContent(4, new ArrayList<>(mMembers), mContent);
     }
 
     @Override
     public void updatePlayersForCorrectStatus(@NonNull QCMember asker, @NonNull QCMember answerer, @NonNull String answer) {
-        mMembers = new HashSet<>(mDistributionLogic.updateForCorrectMove(asker, answerer, answer, new ArrayList<>(mMembers), mContent));
+        mMembers = mDistributionLogic.updateForCorrectMove(asker, answerer, answer, new ArrayList<>(mMembers), mContent);
     }
 
     @Override
     public void updatePlayersForBadMove(@NonNull QCMember asker, @NonNull QCMember answerer, @NonNull String providedAnswer, @NonNull String correctAnswer, @NonNull List<QCMember> othersAtFault, @NonNull List<QCMember> askersOfAnswer) {
-        mMembers = new HashSet<>(mDistributionLogic.updateForBadMove(asker, answerer, providedAnswer, correctAnswer, othersAtFault, askersOfAnswer, new ArrayList<>(mMembers), mContent));
+        mMembers = mDistributionLogic.updateForBadMove(asker, answerer, providedAnswer, correctAnswer, othersAtFault, askersOfAnswer, new ArrayList<>(mMembers), mContent);
     }
 }

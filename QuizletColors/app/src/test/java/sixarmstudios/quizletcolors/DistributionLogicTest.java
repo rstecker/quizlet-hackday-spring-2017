@@ -8,7 +8,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import sixarmstudios.quizletcolors.logic.engine.DistributionLogic;
 import sixarmstudios.quizletcolors.logic.engine.IDistributionLogic;
@@ -25,10 +27,10 @@ import static junit.framework.Assert.assertTrue;
 public class DistributionLogicTest {
     @Test
     public void test_allocateContent() {
-        QCMember member1 = QCMember.build("shark");
-        QCMember member2 = QCMember.build("monkey");
-        QCMember member3 = QCMember.build("cat");
-        QCMember member4 = QCMember.build("snake");
+        QCMember member1 = QCMember.build("shark", true);
+        QCMember member2 = QCMember.build("monkey", false);
+        QCMember member3 = QCMember.build("cat", false);
+        QCMember member4 = QCMember.build("snake", false);
 
         List<QCMember> members = Arrays.asList(member1, member2, member3, member4);
         List<Pair<String, String>> content = Arrays.asList(
@@ -60,7 +62,25 @@ public class DistributionLogicTest {
             assertNotNull(member.question());
             assertEquals(3, member.options().size());
         }
-        assertEquals("s", allocatedSet);
+//        assertEquals("s", allocatedSet);
+
+        Set<String> questions = new HashSet<>();
+        questions.add(allocatedSet.get(0).question());
+        questions.add(allocatedSet.get(1).question());
+        questions.add(allocatedSet.get(2).question());
+        questions.add(allocatedSet.get(3).question());
+        assertEquals(4, questions.size());  // everyone should have a unique question
+
+        Set<String> answers = new HashSet<>();
+        answers.addAll(allocatedSet.get(0).options());
+        answers.addAll(allocatedSet.get(1).options());
+        answers.addAll(allocatedSet.get(2).options());
+        answers.addAll(allocatedSet.get(3).options());
+
+        for (String question : questions) {
+            String hackyAnswerCheck = question.replace('q','a');
+            assertTrue("Failed to find '" + hackyAnswerCheck + "' in  '" + answers + "'", answers.contains(hackyAnswerCheck));
+        }
     }
 
     @Test
@@ -82,10 +102,10 @@ public class DistributionLogicTest {
                 new Pair<>("q13", "a13")
         );
 
-        QCMember member1 = QCMember.build("one", true, "r","q0",Arrays.asList("a1","a2","a3"));
-        QCMember member2 = QCMember.build("two", false, "g","q1",Arrays.asList("a0","a1","a4"));
-        QCMember member3 = QCMember.build("thr", false, "b","q2",Arrays.asList("a4","a5","a6"));
-        QCMember member4 = QCMember.build("fou", false, "c","q3",Arrays.asList("a0","a8","a9"));
+        QCMember member1 = QCMember.build("one", true, "r", "q0", Arrays.asList("a1", "a2", "a3"));
+        QCMember member2 = QCMember.build("two", false, "g", "q1", Arrays.asList("a0", "a1", "a4"));
+        QCMember member3 = QCMember.build("thr", false, "b", "q2", Arrays.asList("a4", "a5", "a6"));
+        QCMember member4 = QCMember.build("fou", false, "c", "q3", Arrays.asList("a0", "a8", "a9"));
 
         List<QCMember> members = new ArrayList<>(Arrays.asList(member1, member2, member3, member4));
 
@@ -108,7 +128,24 @@ public class DistributionLogicTest {
         assertTrue(allocatedSet.get(1).options().contains("a1"));
         assertTrue(allocatedSet.get(1).options().contains("a4"));
 
-        // TODO : assert the new value is one not yet on the board
+
+        Set<String> questions = new HashSet<>();
+        questions.add(allocatedSet.get(0).question());
+        questions.add(allocatedSet.get(1).question());
+        questions.add(allocatedSet.get(2).question());
+        questions.add(allocatedSet.get(3).question());
+        assertEquals(4, questions.size());  // everyone should have a unique question
+
+        Set<String> answers = new HashSet<>();
+        answers.addAll(allocatedSet.get(0).options());
+        answers.addAll(allocatedSet.get(1).options());
+        answers.addAll(allocatedSet.get(2).options());
+        answers.addAll(allocatedSet.get(3).options());
+
+        for (String question : questions) {
+            String hackyAnswerCheck = question.replace('q','a');
+            assertTrue("Failed to find '" + hackyAnswerCheck + "' in  '" + answers + "'", answers.contains(hackyAnswerCheck));
+        }
     }
 
     @Test
@@ -130,11 +167,11 @@ public class DistributionLogicTest {
                 new Pair<>("q13", "a13")
         );
 
-        QCMember member1 = QCMember.build("one", false, "r","q0",Arrays.asList("a1","a2","a3"));
-        QCMember member2 = QCMember.build("two", false, "g","q1",Arrays.asList("a5","a1","a2"));
-        QCMember member3 = QCMember.build("thr", false, "b","q2",Arrays.asList("a4","a5","a6"));
-        QCMember member4 = QCMember.build("fou", false, "c","q3",Arrays.asList("a0","a8","a9"));
-        QCMember member5 = QCMember.build("fou", false, "c","q12",Arrays.asList("a4","a8", "a9"));
+        QCMember member1 = QCMember.build("one", false, "r", "q0", Arrays.asList("a1", "a2", "a3"));
+        QCMember member2 = QCMember.build("two", false, "g", "q1", Arrays.asList("a5", "a1", "a2"));
+        QCMember member3 = QCMember.build("thr", false, "b", "q2", Arrays.asList("a4", "a5", "a12"));
+        QCMember member4 = QCMember.build("fou", false, "c", "q3", Arrays.asList("a0", "a8", "a9"));
+        QCMember member5 = QCMember.build("fou", false, "c", "q12", Arrays.asList("a4", "a8", "a9"));
 
         List<QCMember> members = new ArrayList<>(Arrays.asList(member1, member2, member3, member4, member5));
 
@@ -168,6 +205,28 @@ public class DistributionLogicTest {
         assertTrue(member4.question().equals(allocatedSet.get(3).question()));
         assertFalse(member4.options().equals(allocatedSet.get(3).options()));
 
-        // TODO : verify everyone's questions can be answered and that the new options were not previously on the board
+
+        Set<String> questions = new HashSet<>();
+        questions.add(allocatedSet.get(0).question());
+        questions.add(allocatedSet.get(1).question());
+        questions.add(allocatedSet.get(2).question());
+        questions.add(allocatedSet.get(3).question());
+        assertEquals(4, questions.size());  // everyone should have a unique question
+
+        Set<String> answers = new HashSet<>();
+        answers.addAll(allocatedSet.get(0).options());
+        answers.addAll(allocatedSet.get(1).options());
+        answers.addAll(allocatedSet.get(2).options());
+        answers.addAll(allocatedSet.get(3).options());
+
+        assertFalse(answers.contains("a2"));
+        assertFalse(answers.contains("a0"));
+        assertFalse(questions.contains("q0"));
+        assertFalse(questions.contains("q2"));
+
+        for (String question : questions) {
+            String hackyAnswerCheck = question.replace('q','a');
+            assertTrue("Failed to find '" + hackyAnswerCheck + "' in  '" + answers + "'", answers.contains(hackyAnswerCheck));
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Created by rebeccastecker on 6/11/17.
@@ -14,6 +15,7 @@ import android.support.annotation.NonNull;
 @Entity
 @TypeConverters(Game.State.class)
 public class Game {
+
     public enum State {
         WAITING,
         CAN_START,
@@ -58,6 +60,13 @@ public class Game {
     @ColumnInfo(name = "answer_option_4")
     public String answerOption4;
 
+    @ColumnInfo(name = "selected_option")
+    public String selected_option;
+
+    @ColumnInfo(name = "selected_color")
+    public String selected_color;
+
+
     public State getState() {
         return gameState;
     }
@@ -77,5 +86,12 @@ public class Game {
         gameState = State.WAITING;
         this.hostName = "Game ["+name+"] / "+address+" ("+bondState+")";
         this.isHost = false;
+    }
+
+    public boolean isCurrentlySelected(@Nullable String optionText) {
+        if (selected_option == null) {
+            return false;
+        }
+        return selected_option.equals(optionText);
     }
 }

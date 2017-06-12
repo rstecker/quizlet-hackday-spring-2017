@@ -2,6 +2,7 @@ package sixarmstudios.quizletcolors.logic.engine;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import com.example.myapplication.bluetooth.ImmutableQCMember;
 import com.example.myapplication.bluetooth.QCMember;
@@ -17,13 +18,15 @@ import java.util.Map;
  */
 
 public class DistributionLogic implements IDistributionLogic {
+    public static final String TAG = DistributionLogic.class.getSimpleName();
+
     @NonNull @Override
     public List<QCMember> allocateContent(int handSize, @NonNull List<QCMember> members,
                                           @NonNull List<Pair<String, String>> content) {
         List<Pair<String, String>> possibleAnswers = new ArrayList<>();
 
         List<Pair<String, String>> stuffNotOnTheBoard = new ArrayList<>(content);
-        Collections.shuffle(new ArrayList<>(stuffNotOnTheBoard));
+        Collections.shuffle(stuffNotOnTheBoard);
 
         Map<QCMember, List<String>> memberHands = new HashMap<>();
         for (QCMember member : members) {
@@ -34,7 +37,7 @@ public class DistributionLogic implements IDistributionLogic {
             for (QCMember member : members) {
                 if (stuffNotOnTheBoard.size() < 1) {
                     stuffNotOnTheBoard = new ArrayList<>(content);
-                    Collections.shuffle(new ArrayList<>(stuffNotOnTheBoard));
+                    Collections.shuffle(stuffNotOnTheBoard);
                 }
                 Pair<String, String> entry = stuffNotOnTheBoard.remove(stuffNotOnTheBoard.size() - 1);
                 memberHands.get(member).add(entry.second);
@@ -61,6 +64,7 @@ public class DistributionLogic implements IDistributionLogic {
                                                @NonNull String answer,
                                                @NonNull List<QCMember> members,
                                                @NonNull List<Pair<String, String>> content) {
+        Log.d(TAG, "Re allocating content in response to a good move");
         Map<String, Pair<String, String>> answerLookup = new HashMap<>();
         Map<String, Pair<String, String>> questionLookup = new HashMap<>();
         populateContentLists(content, answerLookup, questionLookup);
@@ -72,8 +76,14 @@ public class DistributionLogic implements IDistributionLogic {
         populateCurrentStateLists(members, answerLookup, questionLookup, stuffNotOnTheBoard,
                 possibleAnswers, memberHands, memberQuestions);
 
-        selectNewQuestion(possibleAnswers, answerLookup, answer, memberQuestions, asker);
+        Log.d(TAG, "Member " + asker.username() + " had question " + memberQuestions.get(asker).first);
+        selectNewQuestion(possibleAnswers, answerLookup, answer, memberQuestions, memberHands, asker);
+        Log.d(TAG, "Member " + asker.username() + " just got question " + memberQuestions.get(asker).first);
+
+        Log.d(TAG, "Member " + answerer.username() + " had options " + memberHands.get(answerer));
         selectNewOption(stuffNotOnTheBoard, content, memberHands.get(answerer), answer);
+        Log.d(TAG, "Member " + answerer.username() + " just got options " + memberHands.get(answerer));
+
 
         return buildResultList(members, memberHands, memberQuestions);
     }
@@ -89,6 +99,7 @@ public class DistributionLogic implements IDistributionLogic {
                                            @NonNull List<QCMember> members,
                                            @NonNull List<Pair<String, String>> content) {
 
+        Log.d(TAG, "Re allocating content in response to a bad move");
         Map<String, Pair<String, String>> answerLookup = new HashMap<>();
         Map<String, Pair<String, String>> questionLookup = new HashMap<>();
         populateContentLists(content, answerLookup, questionLookup);
@@ -100,13 +111,27 @@ public class DistributionLogic implements IDistributionLogic {
         populateCurrentStateLists(members, answerLookup, questionLookup, stuffNotOnTheBoard,
                 possibleAnswers, memberHands, memberQuestions);
 
-        selectNewQuestion(possibleAnswers, answerLookup, correctAnswer, memberQuestions, asker);
+        possibleAnswers.remove(answerLookup.get(correctAnswer));
+        possibleAnswers.remove(answerLookup.get(providedAnswer));  // gotta' make sure we don't ask the answers we're removing from the board
+
+        Log.d(TAG, "Answer re-asignment - answered question was '" + questionLookup.get(providedAnswer) + "', asker was " + asker.username());
+        Log.d(TAG, "Member " + asker.username() + " had question " + memberQuestions.get(asker).first);
+        selectNewQuestion(possibleAnswers, answerLookup, correctAnswer, memberQuestions, memberHands, asker);
+        Log.d(TAG, "Member " + asker.username() + " just got question " + memberQuestions.get(asker).first);
         for (QCMember member : askersOfAnswer) {
-            selectNewQuestion(possibleAnswers, answerLookup, providedAnswer, memberQuestions, member);
+            Log.d(TAG, "Member " + member.username() + " had question " + memberQuestions.get(member).first);
+            selectNewQuestion(possibleAnswers, answerLookup, providedAnswer, memberQuestions, memberHands, member);
+            Log.d(TAG, "Member " + member.username() + " just got question " + memberQuestions.get(member).first);
         }
+        Log.d(TAG, "Provided answer was " + providedAnswer + ", correct answer was " + correctAnswer);
+        Log.d(TAG, "Member " + answerer.username() + " had options " + memberHands.get(answerer));
         selectNewOption(stuffNotOnTheBoard, content, memberHands.get(answerer), providedAnswer);
+        Log.d(TAG, "Member " + answerer.username() + " just got options " + memberHands.get(answerer));
         for (QCMember member : othersAtFault) {
+            Log.d(TAG, "Member " + member.username() + " had options " + memberHands.get(member));
             selectNewOption(stuffNotOnTheBoard, content, memberHands.get(member), correctAnswer);
+            Log.d(TAG, "Member " + member.username() + " just got options " + memberHands.get(member));
+
         }
 
         return buildResultList(members, memberHands, memberQuestions);
@@ -123,17 +148,21 @@ public class DistributionLogic implements IDistributionLogic {
                                    @NonNull Map<String, Pair<String, String>> answerLookup,
                                    @NonNull String oldAnswer,
                                    @NonNull Map<QCMember, Pair<String, String>> memberQuestions,
+                                   @NonNull Map<QCMember, List<String>> memberHands,
                                    @NonNull QCMember member
     ) {
         List<Pair<String, String>> answersToWorkWith = new ArrayList<>(possibleAnswers);
         answersToWorkWith.remove(answerLookup.get(oldAnswer));       // lets not ask the question we just did!
         List<Pair<String, String>> unaskedPossible = new ArrayList<>(answersToWorkWith);
         unaskedPossible.removeAll(memberQuestions.values());    // lets not ask the same thing as someone else
+//        for (String option : memberHands.get(member)) {
+//            unaskedPossible.remove(answerLookup.get(option));   // lets not ask ones that we have ourselves (FOR NOW)
+//        }
         if (unaskedPossible.size() > 0) {
-            Collections.shuffle(new ArrayList<>(unaskedPossible));
+            Collections.shuffle(unaskedPossible);
             memberQuestions.put(member, unaskedPossible.remove(0));    // shuffle and grab the first possible question
         } else {
-            Collections.shuffle(new ArrayList<>(answersToWorkWith));  // oh no, the only possible answers are the asked ones. whatever
+            Collections.shuffle(answersToWorkWith);  // oh no, the only possible answers are the asked ones. whatever
             memberQuestions.put(member, answersToWorkWith.remove(0));    // shuffle and grab the first possible question
         }
     }

@@ -16,14 +16,14 @@ import com.example.bluetooth.core.IBluetoothPlayerListener;
 import com.example.myapplication.bluetooth.QCGameMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gamelogic.BoardState;
+import gamelogic.LobbyState;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
-import ui.LobbyViewModel;
-import ui.BoardState;
-import ui.LobbyState;
+import viewmodel.TopLevelViewModel;
 
 /**
  * Created by rebeccastecker on 6/10/17.
@@ -43,7 +43,7 @@ public class PlayerServiceConnection implements ServiceConnection {
 
         mEngine.getLobbyStateUpdates().observeOn(Schedulers.io()).subscribe(
                 (state) -> {
-                    LobbyViewModel model = ViewModelProviders.of(context).get(LobbyViewModel.class);
+                    TopLevelViewModel model = ViewModelProviders.of(context).get(TopLevelViewModel.class);
                     if (model != null) {
                         Log.i(TAG, "I'm going in : "+Thread.currentThread().getName());
                         model.processLobbyUpdate(state);

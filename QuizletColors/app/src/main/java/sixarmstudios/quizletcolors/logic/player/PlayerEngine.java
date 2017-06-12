@@ -14,8 +14,8 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
-import ui.BoardState;
-import ui.LobbyState;
+import gamelogic.BoardState;
+import gamelogic.LobbyState;
 import ui.Player;
 
 public class PlayerEngine implements IPlayerEngine {
@@ -45,7 +45,7 @@ public class PlayerEngine implements IPlayerEngine {
     @Override public void makeMove(@NonNull String answer, @NonNull String color) {
         mOutgoingMsgs.onNext(
                 QCPlayerMessage.build(
-                        QCPlayerMessage.Action.JOIN_GAME,
+                        QCPlayerMessage.Action.PLAYER_MOVE,
                         GameState.PLAYING,
                         mUsername,
                         ImmutableQCMove.builder().answer(answer).color(color).build()
@@ -147,6 +147,6 @@ public class PlayerEngine implements IPlayerEngine {
                 options = member.options();
             }
         }
-        return BoardState.build(question, options, players);
+        return BoardState.build(question, options, players, null, null);
     }
 }

@@ -1,8 +1,10 @@
-package ui;
+package gamelogic;
 
 import org.immutables.value.Value;
 
 import java.util.List;
+
+import ui.Player;
 
 /**
  * Created by rebeccastecker on 6/9/17.

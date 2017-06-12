@@ -9,6 +9,10 @@ import com.example.myapplication.bluetooth.QCPlayerMessage;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by rebeccastecker on 6/8/17.
  */
@@ -50,10 +54,14 @@ public class LobbyLogic implements ILobbyLogic {
         mEngine.removeMember(member);
     }
 
+    private static List<String> COLORS = Arrays.asList("red", "blue", "green", "yellow",
+            "purple", "black", "white", "grey", "pink", "violet", "cyan", "teal");
     private QCMember generateNewMember(String username, boolean isHost) {
+        Collections.shuffle(COLORS);
         return ImmutableQCMember.builder()
                 .username(username)
                 .isHost(isHost)
+                .color(COLORS.get(0))
                 .build();
     }
 }

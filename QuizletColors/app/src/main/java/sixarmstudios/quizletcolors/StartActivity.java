@@ -41,10 +41,9 @@ import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
 import sixarmstudios.quizletcolors.ui.board.BoardFragment;
 import sixarmstudios.quizletcolors.ui.lobby.LobbyFragment;
-import ui.BoardViewModel;
 import ui.Fact;
 import ui.Game;
-import ui.LobbyViewModel;
+import viewmodel.TopLevelViewModel;
 
 import static sixarmstudios.quizletcolors.logic.SetupHelper.MOCK_USERNAMES;
 
@@ -99,7 +98,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
         }
 
-        LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
         if (mPlayerState == PlayerState.UNKNOWN) {
             mUsernameField.setText(MOCK_USERNAMES.get((int) (Math.random() * ((MOCK_USERNAMES.size() - 1) + 1))));
             viewModel.resetGame();
@@ -170,7 +169,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             mPlayerConnection.unbindService(this);
         }
         if (mHostConnection.isBound()) {
-            LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+            TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
             viewModel.resetGame();
             String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
             if (StringUtils.isEmpty(hostName)) {
@@ -194,7 +193,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             mHostConnection.unbindService(this);
         }
         if (mPlayerConnection.isBound()) {
-            LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
+            TopLevelViewModel model = ViewModelProviders.of(this).get(TopLevelViewModel.class);
             model.resetGame();
             mPlayerConnection.startLooking(this);
         } else {
@@ -231,6 +230,16 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             default:
                 throw new IllegalStateException("Unable to handle game state : " + game.getState());
         }
+        if (StringUtils.isNotEmpty(game.selected_option) && StringUtils.isNotEmpty(game.selected_color)) {
+            TopLevelViewModel boardViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+            boardViewModel.moveSubmitted(game.selected_option, game.selected_color);
+            if (mPlayerState == PlayerState.PLAYER) {
+                mPlayerConnection.makeMove(game.selected_option, game.selected_color);
+            } else {
+                mHostConnection.makeMove(game.selected_option, game.selected_color);
+            }
+            Log.i(TAG, "Player move submitted : '"+game.selected_option+"' to "+game.selected_color);
+        }
     }
 
     private void clearFragments() {
@@ -261,14 +270,14 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     private void initPlayerConnectionObservables() {
         mPlayerConnection.getBoardStateUpdates().observeOn(Schedulers.io()).subscribe(
                 (state) -> {
-                    BoardViewModel boardViewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
+                    TopLevelViewModel boardViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     boardViewModel.processGameUpdate(state);
                 },
                 (e) -> Log.e(TAG, "Error updating board view model [" + Thread.currentThread().getName() + "] " + e)
         );
         mPlayerConnection.getLobbyStateUpdates().subscribe(
                 (msg) -> {
-                    LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                    TopLevelViewModel lobbyViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     lobbyViewModel.processLobbyUpdate(msg);
                 },
                 (e) -> {
@@ -279,14 +288,14 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     private void initHostConnectionObservables() {
         mHostConnection.getLobbyStateUpdates().observeOn(Schedulers.io()).subscribe(
                 (state) -> {
-                    LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                    TopLevelViewModel model = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     model.processLobbyUpdate(state);
                 },
                 (e) -> Log.e(TAG, "Error updating lobby view model [" + Thread.currentThread().getName() + "] " + e)
         );
         mHostConnection.getBoardStateUpdates().observeOn(Schedulers.io()).subscribe(
                 (state) -> {
-                    BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
+                    TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     viewModel.processGameUpdate(state);
                     ensureBoardFragmentUp();
                 },
@@ -294,7 +303,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         );
         mHostConnection.getStartStatusUpdates().observeOn(Schedulers.io()).subscribe(
                 (canStart) -> {
-                    LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                    TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     viewModel.setGameState(canStart ? Game.State.CAN_START : Game.State.WAITING);
                 },
                 (e) -> Log.e(TAG, "Error updating start state [" + Thread.currentThread().getName() + "] " + e)
@@ -336,7 +345,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                 mJoinList.removeAllViews();
                 mPlayerConnection.connectToServer(device, mUsernameField.getText().toString());
 
-                LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+                TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                 viewModel.joinNewGame(name, bondState, address);
                 initPlayerConnectionObservables();
             }

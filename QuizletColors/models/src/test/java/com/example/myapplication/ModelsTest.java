@@ -18,9 +18,9 @@ public class ModelsTest {
     public void basicQCMemberTests() throws Exception {
         assertEquals(4, 2 + 2);
 
-        QCMember member1 = QCMember.build("shark");
-        QCMember member2 = QCMember.build("monkey");
-        QCMember member3 = QCMember.build("cat");
+        QCMember member1 = QCMember.build("shark", false);
+        QCMember member2 = QCMember.build("monkey", false);
+        QCMember member3 = QCMember.build("cat", false);
         QCGameMessage msg1 = QCGameMessage.build(QCGameMessage.Action.GAME_UPDATE, GameState.PLAYING)
                 .addMember(member1);
         assertEquals(1, msg1.members().size());

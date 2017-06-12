@@ -30,9 +30,11 @@ public interface GameDao {
     @Query("UPDATE game SET question = :question")
     void setCurrentQuestion(String question);
 
-    // TODO : I should probably re-evanuate how I'm storing board answer options.
-    @Query("UPDATE game SET answer_option_1 = :opt1, answer_option_2 = :opt2, answer_option_3 = :opt3, answer_option_4 = :opt4")
-    void setOptions(String opt1, String opt2, String opt3, String opt4);
+    @Query("UPDATE game SET selected_option = :selectedOption")
+    void setSelectedOption(String selectedOption);
+
+    @Query("UPDATE game SET selected_color = :selectedColor")
+    void setSelectedColor(String selectedColor);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(Game... games);

@@ -31,4 +31,8 @@ public class Player {
 
     public boolean isYou() { return isYou; }
     public boolean isHost() { return isHost; }
+
+    @Override public String toString() {
+        return username+" : "+color+" : "+isHost()+" : "+isYou();
+    }
 }

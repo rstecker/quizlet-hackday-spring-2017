@@ -31,9 +31,9 @@ import sixarmstudios.quizletcolors.logic.engine.GameEngine;
 import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
-import ui.BoardState;
+import gamelogic.BoardState;
 import ui.Fact;
-import ui.LobbyState;
+import gamelogic.LobbyState;
 
 /**
  * Created by rebeccastecker on 6/9/17.

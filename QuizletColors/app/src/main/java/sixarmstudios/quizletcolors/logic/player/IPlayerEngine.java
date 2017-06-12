@@ -6,8 +6,8 @@ import com.example.myapplication.bluetooth.QCGameMessage;
 import com.example.myapplication.bluetooth.QCPlayerMessage;
 
 import io.reactivex.Observable;
-import ui.BoardState;
-import ui.LobbyState;
+import gamelogic.BoardState;
+import gamelogic.LobbyState;
 
 /**
  * Logic each player runs, consuming Bluetooth input or user actions and spitting out either
