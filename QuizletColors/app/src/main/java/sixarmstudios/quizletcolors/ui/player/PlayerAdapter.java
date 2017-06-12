@@ -26,6 +26,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerViewHolder> {
     }
 
     public void setPlayers(List<Player> players) {
+        if (players == null || players.size() < mPlayers.size()) {
+            return;
+        }
         mPlayers = players;
         notifyDataSetChanged(); // TODO : ID the changed players and animate their update
     }

@@ -26,7 +26,7 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionViewHolder> {
     }
 
     public void setOptions(List<Option> options) {
-        if (mOptions == null || options.size() == 0) {
+        if (options == null || options.size() < mOptions.size()) {
             return;
         }
         mOptions = options;

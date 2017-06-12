@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -47,6 +48,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
     private OptionAdapter mOptionAdapter;
     private String mPlayerColor;
     private String mString;
+    private long mLastMoveUpdateTimestamp;
 
     public static BoardFragment newInstance() {
         BoardFragment fragment = new BoardFragment();
@@ -61,6 +63,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
         View view = inflater.inflate(LAYOUT_ID, container, false);
         ButterKnife.bind(this, view);
 
+        mLastMoveUpdateTimestamp = new Date().getTime();
         BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
         viewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         viewModel.getGame().observe(this, this::handleGameUpdates);
@@ -93,6 +96,10 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         BadMove move = badMoves.get(0);
+        if (move.timestamp < mLastMoveUpdateTimestamp) {
+            return;
+        }
+        mLastMoveUpdateTimestamp = move.timestamp;
         Log.i(TAG, "Bad move update : "+move);
         if (move.youAnsweredPoorly) {
             Toast.makeText(this.getContext(), "You submitted the wrong answer", Toast.LENGTH_SHORT).show();
@@ -111,6 +118,10 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         GoodMove move = goodMoves.get(0);
+        if (move.timestamp < mLastMoveUpdateTimestamp) {
+            return;
+        }
+        mLastMoveUpdateTimestamp = move.timestamp;
         Log.i(TAG, "Good move update : "+move);
         if (move.youAnswered && move.youAsked) {
             Toast.makeText(this.getContext(), "Good job!", Toast.LENGTH_SHORT).show();
