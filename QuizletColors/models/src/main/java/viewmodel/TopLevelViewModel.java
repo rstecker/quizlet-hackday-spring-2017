@@ -38,14 +38,15 @@ public class TopLevelViewModel extends AndroidViewModel {
     public LiveData<List<Game>> getGame() {
         return mAppDatabase.gameDao().getGame();
     }
-
     public LiveData<List<Fact>> getFacts() {
         return mAppDatabase.factDao().getFacts();
     }
 
     public void resetGame() {
+        Log.i(TAG, "Requesting a reset");
         Completable.defer(
                 () -> {
+                    Log.i(TAG, "Clearing out DB");
                     mAppDatabase.playerDao().clearGame();
                     mAppDatabase.gameDao().clearGame();
                     mAppDatabase.factDao().clearGame();

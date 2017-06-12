@@ -94,6 +94,7 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
     }
 
     @Override public void requestSet(final long setId) {
+        Log.i(TAG, "Requesting set "+setId);
         QSet cachedSet = mQSetMap.get(setId);
         if (cachedSet != null) {
             mCachedQSet.onNext(cachedSet);

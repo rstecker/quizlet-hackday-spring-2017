@@ -179,6 +179,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         mPlayerState = PlayerState.HOST;
         mJoinButton.setVisibility(View.GONE);
         mUsernameField.setVisibility(View.GONE);
+        mSetField.setVisibility(View.GONE);
         if (mPlayerConnection.isBound()) {
             mPlayerConnection.unbindService(this);
         }
@@ -187,7 +188,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         try {
             setId = Long.valueOf(userValue);
         } catch (NumberFormatException e) {
-            Log.d(TAG, "couldn't make a number out of " + userValue +", defaulting to "+setId);
+            Log.d(TAG, "couldn't make a number out of '" + userValue +"', defaulting to "+setId);
         }
         mModelService.requestSet(setId);
         if (mHostConnection.isBound()) {
@@ -209,6 +210,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         mPlayerState = PlayerState.PLAYER;
         mHostButton.setVisibility(View.GONE);
         mUsernameField.setVisibility(View.GONE);
+        mSetField.setVisibility(View.GONE);
         if (mHostConnection.isBound()) {
             mHostConnection.unbindService(this);
         }
@@ -222,6 +224,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
 
 
     private void handleContentUpdates(List<Fact> facts) {
+        Log.i(TAG, "Handling content updates : "+facts.size());
         mHostConnection.setContent(facts);
     }
 
@@ -270,6 +273,12 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     private void ensureBoardFragmentUp() {
+//        if (mPlayerState == PlayerState.UNKNOWN) {
+//            return;
+//        }
+//
+//        mHostButton.setVisibility(View.GONE);
+//        mJoinButton.setVisibility(View.GONE);
         if (getSupportFragmentManager().findFragmentByTag(BoardFragment.TAG) == null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, BoardFragment.newInstance(), BoardFragment.TAG);
@@ -278,6 +287,12 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     private void ensureLobbyFragmentUp() {
+//        if (mPlayerState == PlayerState.UNKNOWN) {
+//            return;
+//        }
+//
+//        mHostButton.setVisibility(View.GONE);
+//        mJoinButton.setVisibility(View.GONE);
         if (getSupportFragmentManager().findFragmentByTag(LobbyFragment.TAG) == null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, LobbyFragment.newInstance(), LobbyFragment.TAG);
