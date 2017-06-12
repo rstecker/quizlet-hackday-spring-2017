@@ -117,6 +117,13 @@ public class DistributionLogicTest {
         assertTrue(member3.equals(allocatedSet.get(2)));
         assertTrue(member4.equals(allocatedSet.get(3)));
 
+
+        // everyone has the same number of options
+        assertEquals(member1.options().size(), allocatedSet.get(0).options().size());
+        assertEquals(member2.options().size(), allocatedSet.get(1).options().size());
+        assertEquals(member3.options().size(), allocatedSet.get(2).options().size());
+        assertEquals(member4.options().size(), allocatedSet.get(3).options().size());
+
         // asker only changes their question
         assertFalse(member1.question().equals(allocatedSet.get(0).question()));
         assertTrue(member1.options().equals(allocatedSet.get(0).options()));
@@ -189,6 +196,13 @@ public class DistributionLogicTest {
         assertFalse(member4.equals(allocatedSet.get(3)));
         assertTrue(member5.equals(allocatedSet.get(4)));
 
+        // everyone has the same number of options
+        assertEquals(member1.options().size(), allocatedSet.get(0).options().size());
+        assertEquals(member2.options().size(), allocatedSet.get(1).options().size());
+        assertEquals(member3.options().size(), allocatedSet.get(2).options().size());
+        assertEquals(member4.options().size(), allocatedSet.get(3).options().size());
+        assertEquals(member5.options().size(), allocatedSet.get(4).options().size());
+
         // asker only changes their question
         assertFalse(member1.question().equals(allocatedSet.get(0).question()));
         assertTrue(member1.options().equals(allocatedSet.get(0).options()));
@@ -219,9 +233,9 @@ public class DistributionLogicTest {
         answers.addAll(allocatedSet.get(2).options());
         answers.addAll(allocatedSet.get(3).options());
 
-        assertFalse(answers.contains("a2"));
-        assertFalse(answers.contains("a0"));
-        assertFalse(questions.contains("q0"));
+//        assertFalse(answers.contains("a2"));    // these answers should have been junked
+//        assertFalse(answers.contains("a0"));
+        assertFalse(questions.contains("q0"));  // these questions should have been junked
         assertFalse(questions.contains("q2"));
 
         for (String question : questions) {

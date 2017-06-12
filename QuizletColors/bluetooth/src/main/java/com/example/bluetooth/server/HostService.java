@@ -129,6 +129,13 @@ public class HostService extends Service implements IServerService {
                         return false;
                     }
                     return true;
+                })
+                .map((m) -> {
+                    if (!m.startsWith(INIT_MSG)) {
+                        return m;
+                    }
+                    Log.i(TAG, "New connection detected");
+                    return m.substring(INIT_MSG.length());
                 });
     }
     //endregion

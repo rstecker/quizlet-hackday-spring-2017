@@ -12,12 +12,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.bluetooth.core.BluetoothPlayerStuff;
-import com.example.bluetooth.core.BluetoothStuff;
 import com.example.bluetooth.core.CommsHandler;
 import com.example.bluetooth.core.IBluetoothPlayerListener;
 
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.processors.BehaviorProcessor;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
@@ -130,7 +128,8 @@ public class PlayerService extends Service implements IClientService {
                         return false;
                     }
                     return true;
-                });
+                })
+                ;
     }
     //endregion
 }
