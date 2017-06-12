@@ -6,11 +6,13 @@ import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import database.AppDatabase;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
+import ui.Fact;
 import ui.Game;
 import ui.LobbyState;
 import ui.Player;
@@ -35,12 +37,16 @@ public class LobbyViewModel extends AndroidViewModel {
     public LiveData<List<Game>> getGame() {
         return mAppDatabase.gameDao().getGame();
     }
+    public LiveData<List<Fact>> getFacts() {
+        return mAppDatabase.factDao().getFacts();
+    }
 
     public void resetGame() {
         Completable.defer(
                 () -> {
                     mAppDatabase.playerDao().clearGame();
                     mAppDatabase.gameDao().clearGame();
+                    mAppDatabase.factDao().clearGame();
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.io())
@@ -67,6 +73,14 @@ public class LobbyViewModel extends AndroidViewModel {
                     Game newGame = new Game();
                     newGame.initForHost(hostName);
                     mAppDatabase.gameDao().insertAll(newGame);
+
+                    // TODO : somehow actually get content from Quizlet! In the mean time....
+                    List<Fact> mockContent = new ArrayList<>();
+                    for (int i = 1; i < 21; ++i) {
+                        mockContent.add(new Fact(-1, "q"+i, "a"+i));
+                    }
+                    mAppDatabase.factDao().insertAll(mockContent);
+
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.io())

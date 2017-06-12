@@ -76,9 +76,6 @@ public abstract class QCGameMessage {
 
     @JsonProperty("state") public abstract GameState state();
 
-    /**
-     * The "Host" is always the first member in the list
-     */
     @JsonProperty("members") public abstract List<QCMember> members();
 
     // region default/good user action responses

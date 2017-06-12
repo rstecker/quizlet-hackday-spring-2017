@@ -30,7 +30,7 @@ public class Game {
         }
     }
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int uid;
 
     @ColumnInfo(name = "game_state")

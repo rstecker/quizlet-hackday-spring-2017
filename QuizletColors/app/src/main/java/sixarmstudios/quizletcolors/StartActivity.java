@@ -40,6 +40,7 @@ import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
 import sixarmstudios.quizletcolors.ui.LobbyFragment;
 import sixarmstudios.quizletcolors.ui.LobbyViewModel;
+import ui.Fact;
 import ui.Game;
 
 
@@ -117,6 +118,11 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
 //            ft.replace(R.id.listFragment, (Fragment) lobbyFragment);
 //            ft.commit();
         }
+        if (mPlayerState == PlayerState.UNKNOWN) {
+            LobbyViewModel viewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
+            viewModel.resetGame();
+        }
+
     }
 
     @Override
@@ -179,6 +185,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         mPlayerState = PlayerState.HOST;
         LobbyViewModel model = ViewModelProviders.of(this).get(LobbyViewModel.class);
         model.resetGame();
+        model.getFacts().observe(this, this::handleContentUpdates);
         if (mPlayerConnection.isBound()) {
             mPlayerConnection.unbindService(this);
         }
@@ -192,19 +199,23 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             initHostObservables();
             mDebugHost.setText("You are hosting at " + hostName);
             mHostConnection.getLobbyStateUpdates().subscribe(
-                            (msg) -> {
-                                mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.\nYou are the host.");
-                            },
-                            (e) -> {
-                                Log.e(TAG, "Received error from Player service : " + e);
-                            },
-                            () -> {
-                                mDebugJoin.setText("Connection ended");
-                            }
-                    );
+                    (msg) -> {
+                        mDebugJoin.setText(Math.random() + "\nLobby State update. There are " + msg.players().size() + " players.\nYou are the host.");
+                    },
+                    (e) -> {
+                        Log.e(TAG, "Received error from Player service : " + e);
+                    },
+                    () -> {
+                        mDebugJoin.setText("Connection ended");
+                    }
+            );
         } else {
             Log.e(TAG, "Wanted to be a Host but we're not server bound yet");
         }
+    }
+
+    private void handleContentUpdates(List<Fact> facts) {
+        mHostConnection.setContent(facts);
     }
 
     private void initHostObservables() {
@@ -228,6 +239,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                 (e) -> Log.e(TAG, "Error updating start state [" + Thread.currentThread().getName() + "] " + e)
         );
     }
+
     @OnClick(R.id.join_game)
     public void handleJoinGameClick() {
         mPlayerState = PlayerState.PLAYER;

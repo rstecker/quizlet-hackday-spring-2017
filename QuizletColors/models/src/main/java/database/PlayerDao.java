@@ -34,17 +34,17 @@ public interface PlayerDao {
     Player findByUsername(String username);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(Player... users);
+    void insertAll(Player... players);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<Player> users);
+    void insertAll(List<Player> players);
 
     @Delete
-    void delete(Player user);
+    void delete(Player player);
 
     @Update
-    void update(Player... users);
+    void update(Player... players);
 
     @Update
-    void update(List<Player> users);
+    void update(List<Player> players);
 }

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.util.Log;
 
 import com.example.bluetooth.core.IBluetoothHostListener;
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -27,6 +31,7 @@ import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
 import ui.BoardState;
+import ui.Fact;
 import ui.LobbyState;
 
 /**
@@ -137,5 +142,18 @@ public class HostServiceConnection implements ServiceConnection {
             mServerService.sendMsg(msg);
             mPlayerEngine.processMessage(gameMessage);
         }
+    }
+
+    public void setContent(@Nullable List<Fact> facts) {
+        if (facts == null) {
+            mGameEngine.setContent(new ArrayList<>());
+            return;
+        }
+        List<Pair<String, String>> content = new ArrayList<>();
+        for(Fact fact : facts) {
+            content.add(new Pair<>(fact.question, fact.answer));
+        }
+        // TODO : are we overriding? are we adding? where are we screening for conflicting values?
+        mGameEngine.setContent(content);
     }
 };

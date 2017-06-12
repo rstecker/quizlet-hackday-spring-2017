@@ -37,6 +37,8 @@ public abstract class QCMember {
 
     @JsonProperty("username") public abstract String username();
 
+    @JsonProperty("is_host") public abstract boolean isHost();
+
     @JsonProperty("color") @Nullable public abstract String color();
 
     @JsonProperty("question") @Nullable public abstract String question();
@@ -49,6 +51,7 @@ public abstract class QCMember {
     @ParcelFactory
     public static QCMember build(
             @JsonProperty("username") @NonNull String username,
+            @JsonProperty("is_host") boolean isHost,
             @JsonProperty("color") @Nullable String color,
             @JsonProperty("question") @Nullable String question,
             @JsonProperty("options") @Nullable List<String> options,
@@ -56,6 +59,7 @@ public abstract class QCMember {
     ) {
         return ImmutableQCMember.builder()
                 .color(color)
+                .isHost(isHost)
                 .username(username)
                 .question(question)
                 .options(options)
@@ -65,16 +69,18 @@ public abstract class QCMember {
 
     public static QCMember build(
             @NonNull String username,
+            boolean isHost,
             @Nullable String color,
             @Nullable String question,
             @Nullable List<String> options
     ) {
-        return build(username, color, question, options, Reaction.NONE);
+        return build(username, isHost, color, question, options, Reaction.NONE);
     }
 
-    public static QCMember build(@NonNull String username) {
+    public static QCMember build(@NonNull String username, boolean isHost) {
         return ImmutableQCMember.builder()
                 .username(username)
+                .isHost(isHost)
                 .build();
     }
 }

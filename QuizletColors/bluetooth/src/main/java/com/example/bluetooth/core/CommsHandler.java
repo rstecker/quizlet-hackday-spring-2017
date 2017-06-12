@@ -46,8 +46,8 @@ public class CommsHandler extends Handler {
         if (msg.what == BluetoothTalker.MessageConstants.MESSAGE_WRITE) {
             Log.v(TAG, "we just wrote... [" + length + "] '" + text + "'");
         } else if (msg.what == BluetoothTalker.MessageConstants.MESSAGE_READ) {
-            Log.i(TAG, "we just read... [" + length + "] '" + text + "'");
-            Log.i(TAG, "    >>r " + Arrays.toString((byte[]) msg.obj));
+            Log.d(TAG, "we just read... [" + length + "] '" + text + "'");
+            Log.v(TAG, "    >>r " + Arrays.toString((byte[]) msg.obj));
             mMessageListener.update(text);
         } else if (msg.what == BluetoothTalker.MessageConstants.MESSAGE_END) {
             Log.i(TAG, "Received an end msg");

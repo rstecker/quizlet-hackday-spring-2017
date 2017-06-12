@@ -3,6 +3,7 @@ package sixarmstudios.quizletcolors.logic.engine;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import com.example.myapplication.bluetooth.GameState;
 import com.example.myapplication.bluetooth.ImmutableQCGameMessage;
@@ -23,6 +24,7 @@ import io.reactivex.subjects.BehaviorSubject;
  */
 
 public class GameEngine implements IGameEngine {
+    public static final String TAG = GameEngine.class.getSimpleName();
     public static final int MIN_CONTENT_SIZE = 10;
 
     private ILobbyLogic mLobbyLogic;
@@ -113,13 +115,19 @@ public class GameEngine implements IGameEngine {
         mCanStart.onNext(canStart());
     }
 
+    @Override public int getMemberCount() {
+        return mMembers.size();
+    }
+
     @Override public void setContent(@NonNull List<Pair<String, String>> content) {
         // TODO : don't allow duplicate values or values with ambigious results!!
+        Log.i(TAG, "Content has been set : "+content.size()+" pairs");
         mContent = content;
         mCanStart.onNext(canStart());
     }
 
     private boolean canStart() {
+        Log.v(TAG, "Checking to see if we can start... Players: "+mMembers.size()+" > 1 && "+mContent.size() +" > "+MIN_CONTENT_SIZE+" = ?");
         return mMembers.size() > 1 && mContent.size() > MIN_CONTENT_SIZE;
     }
 

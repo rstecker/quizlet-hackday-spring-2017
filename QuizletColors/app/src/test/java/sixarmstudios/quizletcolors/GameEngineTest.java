@@ -22,10 +22,10 @@ import static junit.framework.Assert.assertNull;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class GameEngineTest {
-    QCMember member1 = QCMember.build("shark", "red", "q1", Arrays.asList("a1", "a2", "a3", "a4"));
-    QCMember member2 = QCMember.build("monkey", "green", "q6", Arrays.asList("a2", "a3", "a4", "a5"));
-    QCMember member3 = QCMember.build("cat", "blue", "q7", Arrays.asList("a2", "a3", "a4"));
-    QCMember member4 = QCMember.build("rock", "white", "q1", Arrays.asList("a3", "a4", "a5", "a6"));
+    QCMember member1 = QCMember.build("shark", false,"red", "q1", Arrays.asList("a1", "a2", "a3", "a4"));
+    QCMember member2 = QCMember.build("monkey", false,"green", "q6", Arrays.asList("a2", "a3", "a4", "a5"));
+    QCMember member3 = QCMember.build("cat", true,"blue", "q7", Arrays.asList("a2", "a3", "a4"));
+    QCMember member4 = QCMember.build("rock", false, "white", "q1", Arrays.asList("a3", "a4", "a5", "a6"));
 
     private IGameEngine getBasicEngine() {
         IGameEngine engine = new GameEngine();

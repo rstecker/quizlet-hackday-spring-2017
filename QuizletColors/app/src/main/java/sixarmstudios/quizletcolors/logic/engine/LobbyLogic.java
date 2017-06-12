@@ -28,7 +28,7 @@ public class LobbyLogic implements ILobbyLogic {
                 handleLeaveGame(message);
                 return mEngine.generateBaseLobbyMessage(QCGameMessage.Action.LOBBY_UPDATE);
             case JOIN_GAME:
-                mEngine.addMember(generateNewMember(message.username()));
+                mEngine.addMember(generateNewMember(message.username(), mEngine.getMemberCount() == 0));
                 return mEngine.generateBaseLobbyMessage(QCGameMessage.Action.ACCEPT_REQUEST);
 
             case PLAYER_MOVE:
@@ -50,9 +50,10 @@ public class LobbyLogic implements ILobbyLogic {
         mEngine.removeMember(member);
     }
 
-    private QCMember generateNewMember(String username) {
+    private QCMember generateNewMember(String username, boolean isHost) {
         return ImmutableQCMember.builder()
                 .username(username)
+                .isHost(isHost)
                 .build();
     }
 }

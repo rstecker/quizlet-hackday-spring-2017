@@ -10,35 +10,32 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import ui.Game;
+import ui.Fact;
 
 /**
  * Created by rebeccastecker on 6/11/17.
  */
 
 @Dao
-public interface GameDao {
-    @Query("DELETE FROM player")
+public interface FactDao {
+    @Query("DELETE FROM fact")
     public void clearGame();
 
-    @Query("SELECT * FROM game LIMIT 1")
-    LiveData<List<Game>> getGame();
-
-    @Query("UPDATE game SET game_state = :state")
-    void setGameState(String state);
+    @Query("SELECT * FROM fact")
+    LiveData<List<Fact>> getFacts();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(Game... games);
+    void insertAll(Fact... facts);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<Game> games);
+    void insertAll(List<Fact> facts);
 
     @Delete
-    void delete(Game game);
+    void delete(Fact fact);
 
     @Update
-    void update(Game... games);
+    void update(Fact... facts);
 
     @Update
-    void update(List<Game> games);
+    void update(List<Fact> facts);
 }

@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import ui.Fact;
 import ui.Game;
 import ui.Player;
 
@@ -12,10 +13,11 @@ import ui.Player;
  * Created by rebeccastecker on 6/11/17.
  */
 
-@Database(entities = {Player.class, Game.class}, version = 1)
+@Database(entities = {Player.class, Game.class, Fact.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayerDao playerDao();
     public abstract GameDao gameDao();
+    public abstract FactDao factDao();
 
     private static AppDatabase mInstance;
 

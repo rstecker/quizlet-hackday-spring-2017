@@ -82,10 +82,10 @@ public class DistributionLogicTest {
                 new Pair<>("q13", "a13")
         );
 
-        QCMember member1 = QCMember.build("one", "r","q0",Arrays.asList("a1","a2","a3"));
-        QCMember member2 = QCMember.build("two", "g","q1",Arrays.asList("a0","a1","a4"));
-        QCMember member3 = QCMember.build("thr", "b","q2",Arrays.asList("a4","a5","a6"));
-        QCMember member4 = QCMember.build("fou", "c","q3",Arrays.asList("a0","a8","a9"));
+        QCMember member1 = QCMember.build("one", true, "r","q0",Arrays.asList("a1","a2","a3"));
+        QCMember member2 = QCMember.build("two", false, "g","q1",Arrays.asList("a0","a1","a4"));
+        QCMember member3 = QCMember.build("thr", false, "b","q2",Arrays.asList("a4","a5","a6"));
+        QCMember member4 = QCMember.build("fou", false, "c","q3",Arrays.asList("a0","a8","a9"));
 
         List<QCMember> members = new ArrayList<>(Arrays.asList(member1, member2, member3, member4));
 
@@ -130,11 +130,11 @@ public class DistributionLogicTest {
                 new Pair<>("q13", "a13")
         );
 
-        QCMember member1 = QCMember.build("one", "r","q0",Arrays.asList("a1","a2","a3"));
-        QCMember member2 = QCMember.build("two", "g","q1",Arrays.asList("a5","a1","a2"));
-        QCMember member3 = QCMember.build("thr", "b","q2",Arrays.asList("a4","a5","a6"));
-        QCMember member4 = QCMember.build("fou", "c","q3",Arrays.asList("a0","a8","a9"));
-        QCMember member5 = QCMember.build("fou", "c","q12",Arrays.asList("a4","a8", "a9"));
+        QCMember member1 = QCMember.build("one", false, "r","q0",Arrays.asList("a1","a2","a3"));
+        QCMember member2 = QCMember.build("two", false, "g","q1",Arrays.asList("a5","a1","a2"));
+        QCMember member3 = QCMember.build("thr", false, "b","q2",Arrays.asList("a4","a5","a6"));
+        QCMember member4 = QCMember.build("fou", false, "c","q3",Arrays.asList("a0","a8","a9"));
+        QCMember member5 = QCMember.build("fou", false, "c","q12",Arrays.asList("a4","a8", "a9"));
 
         List<QCMember> members = new ArrayList<>(Arrays.asList(member1, member2, member3, member4, member5));
 
