@@ -7,6 +7,8 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
+import ui.BadMove;
+import ui.GoodMove;
 import ui.Player;
 
 /**
@@ -34,6 +36,8 @@ public abstract class BoardState {
                 .question(question)
                 .options(options)
                 .players(players)
+                .goodMove(goodMove)
+                .badMove(badMove)
                 .build();
     }
 }

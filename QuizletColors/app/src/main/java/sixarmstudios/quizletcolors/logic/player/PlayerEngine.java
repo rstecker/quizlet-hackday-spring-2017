@@ -9,13 +9,16 @@ import com.example.myapplication.bluetooth.QCMember;
 import com.example.myapplication.bluetooth.QCPlayerMessage;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import gamelogic.BoardState;
+import gamelogic.LobbyState;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
-import gamelogic.BoardState;
-import gamelogic.LobbyState;
+import ui.BadMove;
+import ui.GoodMove;
 import ui.Player;
 
 public class PlayerEngine implements IPlayerEngine {
@@ -133,20 +136,57 @@ public class PlayerEngine implements IPlayerEngine {
 
     private BoardState extractBoardState(QCGameMessage message) {
         List<Player> players = new ArrayList<>();
+        QCMember currentPlayer = null;
         String question = null;
         List<String> options = null;
         for (QCMember member : message.members()) {
+            boolean isCurrentPlayer = mUsername.equals(member.username());
             players.add(new Player(
                     member.username(),
                     member.color(),
                     member.isHost(),
-                    mUsername.equals(member.username())
+                    isCurrentPlayer
             ));
-            if (mUsername.equals(member.username())) {
+            if (isCurrentPlayer) {
                 question = member.question();
                 options = member.options();
+                currentPlayer = member;
             }
         }
-        return BoardState.build(question, options, players, null, null);
+        // TODO : handle player missing. Either we lost our username or we got kicked
+        return BoardState.build(question, options, players,
+                extractPossibleGoodMove(message, currentPlayer),
+                extractPossibleBadMove(message, currentPlayer));
+    }
+
+    private BadMove extractPossibleBadMove(@NonNull QCGameMessage message, @NonNull QCMember currentPlayer) {
+        if (message.action() != QCGameMessage.Action.BAD_ANSWER
+                && message.action() != QCGameMessage.Action.WRONG_USER) {
+            return null;
+        }
+        BadMove bm = new BadMove();
+        bm.timestamp = new Date().getTime();
+        bm.offeredAnswer = message.providedAnswer();
+        bm.incorrectQuestion = message.answeredQuestion();
+        bm.correctQuestion = message.question();
+        bm.correctAnswer = message.correctAnswer();
+        bm.youWereGivenBadAnswer = currentPlayer.reaction() == QCMember.Reaction.RECEIVED_BAD_ANSWER;
+        bm.youAnsweredPoorly = currentPlayer.reaction() == QCMember.Reaction.WRONG_CHOICE || currentPlayer.reaction() == QCMember.Reaction.WRONG_USER;
+        bm.youFailedToAnswer = currentPlayer.reaction() == QCMember.Reaction.FAILED_TO_ANSWER;
+        bm.yourAnswerWentToSomeoneElse = currentPlayer.reaction() == QCMember.Reaction.FAILED_TO_RECEIVE_ANSWER;
+        return bm;
+    }
+
+    private GoodMove extractPossibleGoodMove(@NonNull QCGameMessage message, @NonNull QCMember currentPlayer) {
+        if (message.action() != QCGameMessage.Action.CORRECT_ANSWER) {
+            return null;
+        }
+        GoodMove gm = new GoodMove();
+        gm.timestamp = new Date().getTime();
+        gm.answer = message.providedAnswer();
+        gm.question = message.question();
+        gm.youAnswered = currentPlayer.reaction() == QCMember.Reaction.CORRECT_ANSWER_PROVIDED;
+        gm.youAsked = currentPlayer.reaction() == QCMember.Reaction.CORRECT_ANSWER_RECEIVED;
+        return gm;
     }
 }

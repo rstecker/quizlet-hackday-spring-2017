@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -22,7 +23,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.ui.player.PlayerAdapter;
+import ui.BadMove;
 import ui.Game;
+import ui.GoodMove;
 import ui.Option;
 import ui.Player;
 import viewmodel.BoardViewModel;
@@ -62,6 +65,8 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
         viewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         viewModel.getGame().observe(this, this::handleGameUpdates);
         viewModel.getOptions().observe(this, this::handleOptionUpdates);
+        viewModel.getMyBadMoves().observe(this, this::handleBadMoves);
+        viewModel.getMyGoodMoves().observe(this, this::handleGoodMoves);
 
         mPlayerAdapter = new PlayerAdapter(this);
         mPlayerList.setAdapter(mPlayerAdapter);
@@ -81,6 +86,39 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
         mOptionList.setLayoutManager(layoutManager2);
 
         return view;
+    }
+
+    private void handleBadMoves(List<BadMove> badMoves) {
+        if (badMoves == null || badMoves.size() == 0) {
+            return;
+        }
+        BadMove move = badMoves.get(0);
+        Log.i(TAG, "Bad move update : "+move);
+        if (move.youAnsweredPoorly) {
+            Toast.makeText(this.getContext(), "You submitted the wrong answer", Toast.LENGTH_SHORT).show();
+        } else if (move.youWereGivenBadAnswer) {
+            Toast.makeText(this.getContext(), "Your question was incorrectly answered", Toast.LENGTH_SHORT).show();
+        } else if (move.youFailedToAnswer) {
+            Toast.makeText(this.getContext(), "You failed to help someone out", Toast.LENGTH_SHORT).show();
+        } else if (move.yourAnswerWentToSomeoneElse) {
+            Toast.makeText(this.getContext(), "Your correct answer went to the wrong person", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void handleGoodMoves(List<GoodMove> goodMoves) {
+        if (goodMoves == null || goodMoves.size() == 0) {
+            return;
+        }
+        GoodMove move = goodMoves.get(0);
+        Log.i(TAG, "Good move update : "+move);
+        if (move.youAnswered && move.youAsked) {
+            Toast.makeText(this.getContext(), "Good job!", Toast.LENGTH_SHORT).show();
+        } else if (move.youAsked) {
+            Toast.makeText(this.getContext(), "Your question has been answered correctly!", Toast.LENGTH_SHORT).show();
+        } else if (move.youAnswered) {
+            Toast.makeText(this.getContext(), "You answered correctly!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void handlePlayerUpdates(List<Player> players) {

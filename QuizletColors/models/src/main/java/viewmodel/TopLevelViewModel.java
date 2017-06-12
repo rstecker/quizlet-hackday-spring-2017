@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,8 @@ public class TopLevelViewModel extends AndroidViewModel {
                     mAppDatabase.gameDao().clearGame();
                     mAppDatabase.factDao().clearGame();
                     mAppDatabase.optionsDao().clearGame();
+                    mAppDatabase.goodMovesDao().clearMoves();
+                    mAppDatabase.badMovesDao().clearMoves();
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.io())
@@ -134,6 +137,14 @@ public class TopLevelViewModel extends AndroidViewModel {
                     List<Option> options = new ArrayList<>();
                     for (int i = 0; i < state.options().size(); ++i) {
                         options.add(new Option(i, state.options().get(i)));
+                    }
+                    if (state.goodMove() != null) {
+                        Log.d(TAG, "Good move detected when reading in state update : "+state.goodMove());
+                        mAppDatabase.goodMovesDao().insertAll(state.goodMove());
+                    }
+                    if (state.badMove() != null) {
+                        Log.d(TAG, "Bad move detected when reading in state update: "+state.badMove());
+                        mAppDatabase.badMovesDao().insertAll(state.badMove());
                     }
                     mAppDatabase.optionsDao().insertAll(options);
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(Game.State.PLAYING));

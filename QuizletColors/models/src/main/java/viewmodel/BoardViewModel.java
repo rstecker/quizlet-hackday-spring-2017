@@ -10,6 +10,8 @@ import java.util.List;
 import database.AppDatabase;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
+import ui.BadMove;
+import ui.GoodMove;
 import ui.Option;
 import ui.Game;
 import ui.Player;
@@ -33,6 +35,12 @@ public class BoardViewModel extends AndroidViewModel {
 
     public LiveData<List<Game>> getGame() {
         return mAppDatabase.gameDao().getGame();
+    }
+    public LiveData<List<BadMove>> getMyBadMoves() {
+        return mAppDatabase.badMovesDao().getYourMostRecent();
+    }
+    public LiveData<List<GoodMove>> getMyGoodMoves() {
+        return mAppDatabase.goodMovesDao().getYourMostRecent();
     }
 
     public LiveData<List<Option>> getOptions() {

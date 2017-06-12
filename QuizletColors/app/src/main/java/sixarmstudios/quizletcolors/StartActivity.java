@@ -252,6 +252,9 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     private void ensureBoardFragmentUp() {
+        mHostButton.setVisibility(View.GONE);
+        mJoinList.setVisibility(View.GONE);
+        mJoinButton.setVisibility(View.GONE);
         if (getSupportFragmentManager().findFragmentByTag(BoardFragment.TAG) == null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, BoardFragment.newInstance());
@@ -260,6 +263,9 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     private void ensureLobbyFragmentUp() {
+        mHostButton.setVisibility(View.GONE);
+        mJoinList.setVisibility(View.GONE);
+        mJoinButton.setVisibility(View.GONE);
         if (getSupportFragmentManager().findFragmentByTag(LobbyFragment.TAG) == null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, LobbyFragment.newInstance());
