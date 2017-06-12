@@ -21,7 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
-import sixarmstudios.quizletcolors.ui.LobbyViewModel;
+import ui.LobbyViewModel;
 import ui.BoardState;
 import ui.LobbyState;
 

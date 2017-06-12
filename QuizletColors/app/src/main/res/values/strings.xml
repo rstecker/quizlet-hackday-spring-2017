@@ -10,6 +10,8 @@
     <string name="discoverability_denied">Allowing Discoverability is required to be a Host</string>
     <string name="no_host_name">Looks like you are not hosting yet. Try giving it another go.</string>
 
+    <string name="not_connected_yet_try_again">The Bluetooth connection was not set up yet. Please try again.</string>
+
     <!-- Lobby text -->
 
     <string name="username_hint">Enter username</string>

@@ -17,6 +17,7 @@ public class Game {
     public enum State {
         WAITING,
         CAN_START,
+        START,
         PLAYING;
 
         State() {}
@@ -42,13 +43,30 @@ public class Game {
     @ColumnInfo(name = "is_host")
     public boolean isHost;
 
+    @ColumnInfo(name = "question")
+    public String question;
+
+    @ColumnInfo(name = "answer_option_1")
+    public String answerOption1;
+
+    @ColumnInfo(name = "answer_option_2")
+    public String answerOption2;
+
+    @ColumnInfo(name = "answer_option_3")
+    public String answerOption3;
+
+    @ColumnInfo(name = "answer_option_4")
+    public String answerOption4;
+
     public State getState() {
         return gameState;
     }
+    public void setState(State state) { gameState = state;}
 
     public boolean isHost() {
         return isHost;
     }
+
     public void initForHost(String hostName) {
         gameState = State.WAITING;
         this.hostName = hostName;
@@ -57,7 +75,7 @@ public class Game {
 
     public void initForPlayer(@NonNull String name, int bondState, @NonNull String address) {
         gameState = State.WAITING;
-        this.hostName = address;
+        this.hostName = "Game ["+name+"] / "+address+" ("+bondState+")";
         this.isHost = false;
     }
 }

@@ -1,4 +1,4 @@
-package sixarmstudios.quizletcolors.ui;
+package ui;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -12,10 +12,6 @@ import java.util.List;
 import database.AppDatabase;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
-import ui.Fact;
-import ui.Game;
-import ui.LobbyState;
-import ui.Player;
 
 /**
  * Created by rebeccastecker on 6/10/17.
@@ -37,6 +33,7 @@ public class LobbyViewModel extends AndroidViewModel {
     public LiveData<List<Game>> getGame() {
         return mAppDatabase.gameDao().getGame();
     }
+
     public LiveData<List<Fact>> getFacts() {
         return mAppDatabase.factDao().getFacts();
     }
@@ -54,7 +51,13 @@ public class LobbyViewModel extends AndroidViewModel {
     }
 
     public void processLobbyUpdate(LobbyState state) {
-        mAppDatabase.playerDao().insertAll(state.players());
+        Completable.defer(
+                () -> {
+                    mAppDatabase.playerDao().insertAll(state.players());
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
     public void setGameState(Game.State state) {
@@ -67,7 +70,7 @@ public class LobbyViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
-    public void setUpNewGame(@NonNull String hostName) {
+    public void setUpNewGame(final @NonNull String hostName) {
         Completable.defer(
                 () -> {
                     Game newGame = new Game();
@@ -77,7 +80,7 @@ public class LobbyViewModel extends AndroidViewModel {
                     // TODO : somehow actually get content from Quizlet! In the mean time....
                     List<Fact> mockContent = new ArrayList<>();
                     for (int i = 1; i < 21; ++i) {
-                        mockContent.add(new Fact(-1, "q"+i, "a"+i));
+                        mockContent.add(new Fact(-1, "q" + i, "a" + i));
                     }
                     mAppDatabase.factDao().insertAll(mockContent);
 
@@ -98,5 +101,4 @@ public class LobbyViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
-
 }

@@ -13,7 +13,7 @@ import ui.Player;
  * Created by rebeccastecker on 6/11/17.
  */
 
-@Database(entities = {Player.class, Game.class, Fact.class}, version = 3)
+@Database(entities = {Player.class, Game.class, Fact.class}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayerDao playerDao();
     public abstract GameDao gameDao();

@@ -18,7 +18,7 @@ import ui.Game;
 
 @Dao
 public interface GameDao {
-    @Query("DELETE FROM player")
+    @Query("DELETE FROM game")
     public void clearGame();
 
     @Query("SELECT * FROM game LIMIT 1")
@@ -26,6 +26,13 @@ public interface GameDao {
 
     @Query("UPDATE game SET game_state = :state")
     void setGameState(String state);
+
+    @Query("UPDATE game SET question = :question")
+    void setCurrentQuestion(String question);
+
+    // TODO : I should probably re-evanuate how I'm storing board answer options.
+    @Query("UPDATE game SET answer_option_1 = :opt1, answer_option_2 = :opt2, answer_option_3 = :opt3, answer_option_4 = :opt4")
+    void setOptions(String opt1, String opt2, String opt3, String opt4);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(Game... games);

@@ -22,10 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.logic.engine.GameEngine;
 import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
@@ -71,19 +72,6 @@ public class HostServiceConnection implements ServiceConnection {
                             Log.e(TAG, "Incoming msg : " + e);
                         })
 
-        ;
-
-        // This is a test system that just posts a slow loop welcome msg
-        Observable.interval(1, 15, TimeUnit.SECONDS)
-                .map(
-                        (t) -> {
-                            return mGameEngine.generateBaseLobbyMessage(QCGameMessage.Action.LOBBY_WELCOME);
-                        })
-                .subscribe(
-                        this::sendOutResponse,
-                        (e) -> {
-                            Log.e(TAG, "Error sending msg : " + e);
-                        })
         ;
 
         // This is us listening to our local player
@@ -150,10 +138,20 @@ public class HostServiceConnection implements ServiceConnection {
             return;
         }
         List<Pair<String, String>> content = new ArrayList<>();
-        for(Fact fact : facts) {
+        for (Fact fact : facts) {
             content.add(new Pair<>(fact.question, fact.answer));
         }
         // TODO : are we overriding? are we adding? where are we screening for conflicting values?
         mGameEngine.setContent(content);
+    }
+
+    public void startGame() {
+        Completable.defer(
+                () -> {
+                    sendOutResponse(mGameEngine.startGame());
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 };
