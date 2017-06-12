@@ -93,13 +93,15 @@ public class GameEngine implements IGameEngine {
     }
 
     @Override public QCGameMessage processMessage(@NonNull QCPlayerMessage message) {
-        switch (message.state()) {
-            case LOBBY:
-                return mLobbyLogic.processMessage(message);
-            case PLAYING:
-                return mPlayLogic.processMessage(message);
-            default:
-                throw new UnsupportedOperationException("I don't know how to handle : " + message.state());
+        synchronized (TAG) {
+            switch (message.state()) {
+                case LOBBY:
+                    return mLobbyLogic.processMessage(message);
+                case PLAYING:
+                    return mPlayLogic.processMessage(message);
+                default:
+                    throw new UnsupportedOperationException("I don't know how to handle : " + message.state());
+            }
         }
     }
 

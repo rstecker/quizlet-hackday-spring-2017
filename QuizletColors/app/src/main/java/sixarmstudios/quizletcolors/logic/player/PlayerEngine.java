@@ -22,6 +22,7 @@ import ui.GoodMove;
 import ui.Player;
 
 public class PlayerEngine implements IPlayerEngine {
+    public static final String TAG = PlayerEngine.class.getSimpleName();
     private final Subject<BoardState> mBoardState = BehaviorSubject.create();
     private final Subject<LobbyState> mLobbyState = BehaviorSubject.create();
     private final Subject<QCPlayerMessage> mOutgoingMsgs = BehaviorSubject.create();
@@ -33,15 +34,17 @@ public class PlayerEngine implements IPlayerEngine {
     }
 
     @Override public void processMessage(@NonNull QCGameMessage message) {
-        switch (message.state()) {
-            case PLAYING:
-                handleGameUpdate(message);
-                break;
-            case LOBBY:
-                handleLobbyUpdate(message);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unable to handle engine state : " + message.state());
+        synchronized (TAG) {
+            switch (message.state()) {
+                case PLAYING:
+                    handleGameUpdate(message);
+                    break;
+                case LOBBY:
+                    handleLobbyUpdate(message);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unable to handle engine state : " + message.state());
+            }
         }
     }
 

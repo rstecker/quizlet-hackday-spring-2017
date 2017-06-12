@@ -5,10 +5,13 @@ import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,9 +39,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import quizlet.QSet;
 import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
+import sixarmstudios.quizletcolors.network.IModelRetrievalService;
+import sixarmstudios.quizletcolors.network.ModelRetrievalService;
 import sixarmstudios.quizletcolors.ui.board.BoardFragment;
 import sixarmstudios.quizletcolors.ui.lobby.LobbyFragment;
 import ui.Fact;
@@ -59,10 +66,13 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     private static final String PLAYER_STATE_KEY = "player_state";
 
     @BindView(R.id.username_text_field) EditText mUsernameField;
+    @BindView(R.id.set_text_field) EditText mSetField;
     @BindView(R.id.start_hosting) CheckedTextView mHostButton;
     @BindView(R.id.join_game) CheckedTextView mJoinButton;
     @BindView(R.id.join_option_list) LinearLayout mJoinList;
 
+    IModelRetrievalService mModelService;
+    boolean mModelBound = false;
     private PlayerState mPlayerState = PlayerState.UNKNOWN;
     private HostServiceConnection mHostConnection = new HostServiceConnection(this);
     private PlayerServiceConnection mPlayerConnection = new PlayerServiceConnection(this);
@@ -74,6 +84,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         setContentView(LAYOUT_ID);
         ButterKnife.bind(this);
         mJoinList.removeAllViews();
+        startService(ModelRetrievalService.startIntent(this, "fakeClientId"));
     }
 
     @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -91,6 +102,8 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         super.onStart();
         // if I only JUST bind, the service dies when we background :'(
         // TODO : inspect these flags, I bet we want a different ont
+        bindService(new Intent(this, ModelRetrievalService.class), mModelConnection, Context.BIND_AUTO_CREATE);
+
         if (mPlayerState == PlayerState.HOST || mPlayerState == PlayerState.UNKNOWN) {
             bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
         }
@@ -162,15 +175,22 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
 
     @OnClick(R.id.start_hosting)
     public void handleStartHostingClick() {
+        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
         mPlayerState = PlayerState.HOST;
         mJoinButton.setVisibility(View.GONE);
         mUsernameField.setVisibility(View.GONE);
         if (mPlayerConnection.isBound()) {
             mPlayerConnection.unbindService(this);
         }
+        String userValue =mSetField.getText().toString();
+        long setId = 415;
+        try {
+            setId = Long.valueOf(userValue);
+        } catch (NumberFormatException e) {
+            Log.d(TAG, "couldn't make a number out of " + userValue +", defaulting to "+setId);
+        }
+        mModelService.requestSet(setId);
         if (mHostConnection.isBound()) {
-            TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-            viewModel.resetGame();
             String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
             if (StringUtils.isEmpty(hostName)) {
                 Toast.makeText(this, R.string.no_host_name, Toast.LENGTH_SHORT).show();
@@ -193,8 +213,6 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             mHostConnection.unbindService(this);
         }
         if (mPlayerConnection.isBound()) {
-            TopLevelViewModel model = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-            model.resetGame();
             mPlayerConnection.startLooking(this);
         } else {
             Toast.makeText(this, R.string.not_connected_yet_try_again, Toast.LENGTH_SHORT).show();
@@ -238,7 +256,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             } else {
                 mHostConnection.makeMove(game.selected_option, game.selected_color);
             }
-            Log.i(TAG, "Player move submitted : '"+game.selected_option+"' to "+game.selected_color);
+            Log.i(TAG, "Player move submitted : '" + game.selected_option + "' to " + game.selected_color);
         }
     }
 
@@ -382,4 +400,37 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     //endregion
+
+
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
+    private ServiceConnection mModelConnection = new ServiceConnection() {
+
+        Disposable mDisposable;
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            ModelRetrievalService.LocalBinder binder = (ModelRetrievalService.LocalBinder) service;
+            mModelService = binder.getService();
+
+            mDisposable = mModelService.getQSetFlowable()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((QSet qSet) -> {
+                        TopLevelViewModel viewModel = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
+                        viewModel.processQuizletResults(qSet);
+                    })
+            ;
+            mModelBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            if (mDisposable != null) {
+                mDisposable.dispose();
+            }
+            mModelBound = false;
+        }
+    };
 }

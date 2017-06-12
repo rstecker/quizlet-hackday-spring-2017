@@ -15,6 +15,8 @@ import gamelogic.BoardState;
 import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
+import quizlet.QSet;
+import quizlet.QTerm;
 import ui.Fact;
 import ui.Game;
 import ui.Option;
@@ -24,7 +26,7 @@ import ui.Option;
  */
 
 public class TopLevelViewModel extends AndroidViewModel {
-    public static final String TAG = LobbyViewModel.class.getSimpleName();
+    public static final String TAG = TopLevelViewModel.class.getSimpleName();
     private AppDatabase mAppDatabase;
 
     public TopLevelViewModel(Application application) {
@@ -66,7 +68,7 @@ public class TopLevelViewModel extends AndroidViewModel {
                     // TODO : somehow actually get content from Quizlet! In the mean time....
                     List<Fact> mockContent = new ArrayList<>();
                     for (int i = 1; i < 21; ++i) {
-                        String question = "q"+ i;
+                        String question = "q" + i;
                         String answer = "a" + i;
 //                        for (int j = 0; j < Math.random() * 5; ++j) {
 //                            question += " q"+i;
@@ -77,7 +79,7 @@ public class TopLevelViewModel extends AndroidViewModel {
 
                         mockContent.add(new Fact(-1, question, answer));
                     }
-                    mAppDatabase.factDao().insertAll(mockContent);
+//                    mAppDatabase.factDao().insertAll(mockContent);
 
                     return Completable.complete();
                 })
@@ -139,15 +141,30 @@ public class TopLevelViewModel extends AndroidViewModel {
                         options.add(new Option(i, state.options().get(i)));
                     }
                     if (state.goodMove() != null) {
-                        Log.d(TAG, "Good move detected when reading in state update : "+state.goodMove());
+                        Log.d(TAG, "Good move detected when reading in state update : " + state.goodMove());
                         mAppDatabase.goodMovesDao().insertAll(state.goodMove());
                     }
                     if (state.badMove() != null) {
-                        Log.d(TAG, "Bad move detected when reading in state update: "+state.badMove());
+                        Log.d(TAG, "Bad move detected when reading in state update: " + state.badMove());
                         mAppDatabase.badMovesDao().insertAll(state.badMove());
                     }
                     mAppDatabase.optionsDao().insertAll(options);
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(Game.State.PLAYING));
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    public void processQuizletResults(QSet qSet) {
+        Completable.defer(
+                () -> {
+                    List<Fact> content = new ArrayList<>();
+                    for (QTerm t : qSet.terms()) {
+                        content.add(new Fact(qSet.id(), t.word(), t.definition()));
+                    }
+                    Log.i(TAG, "Adding "+content.size()+" Quizlet Facts into the db");
+                    mAppDatabase.factDao().insertAll(content);
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.io())

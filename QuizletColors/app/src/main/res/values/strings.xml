@@ -15,6 +15,7 @@
     <!-- Lobby text -->
 
     <string name="username_hint">Enter username</string>
+    <string name="set_field_hint">Enter a Quizlet set ID</string>
 
     <string name="host_button">Start Hosting</string>
     <string name="host_button_discoverable">…Hosting…</string>

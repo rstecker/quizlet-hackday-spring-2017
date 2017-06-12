@@ -19,10 +19,21 @@ android {
 
         javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
     }
+
     buildTypes {
+        debug {
+            def Properties localProperties = new Properties()
+            localProperties.load(project.rootProject.file("local.properties").newDataInputStream())
+            buildConfigField "String", "QUIZLET_API_KEY", localProperties.getProperty("quizletClientId")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+
+            def Properties localProperties = new Properties()
+            localProperties.load(project.rootProject.file("local.properties").newDataInputStream())
+            buildConfigField "String", "QUIZLET_API_KEY", localProperties.getProperty("quizletClientId")
         }
     }
 
@@ -77,5 +88,6 @@ dependencies {
 
     compile 'com.android.support:support-vector-drawable:26.0.0-beta2'
 
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
 
 }
