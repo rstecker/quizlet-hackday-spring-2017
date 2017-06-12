@@ -188,8 +188,12 @@ public abstract class QCGameMessage {
      * @param correctAnswer   the answer for the user for whom the answer was incorrectly submitted to
      * @param correctQuestion the question of the user for whom the answer was incorrectly submitted to
      */
-    public QCGameMessage setInfoForBadMove(@NonNull String answer, @NonNull String question,
-                                           @NonNull String correctAnswer, @NonNull String correctQuestion,
+    public QCGameMessage setInfoForBadMove(@NonNull String answer,
+                                           @NonNull String question,
+                                           @NonNull String correctAnswer,
+                                           @NonNull String correctQuestion,
+                                           @Nullable String askerColor,
+                                           @Nullable String answererColor,
                                            @NonNull List<QCMember> askersOfSubmittedQuestion) {
 
         Set<String> correctColors = new HashSet<>();
@@ -208,6 +212,8 @@ public abstract class QCGameMessage {
                 .question(question)
                 .correctAnswer(correctAnswer)
                 .answeredQuestion(correctQuestion)
+                .answererColor(answererColor)
+                .providedColor(askerColor)
                 .build();
 
     }

@@ -96,7 +96,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         BadMove move = badMoves.get(0);
-        if (move.timestamp < mLastMoveUpdateTimestamp) {
+        if (move.timestamp <= mLastMoveUpdateTimestamp) {
             return;
         }
         mLastMoveUpdateTimestamp = move.timestamp;
@@ -118,7 +118,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         GoodMove move = goodMoves.get(0);
-        if (move.timestamp < mLastMoveUpdateTimestamp) {
+        if (move.timestamp <= mLastMoveUpdateTimestamp) {
             return;
         }
         mLastMoveUpdateTimestamp = move.timestamp;
