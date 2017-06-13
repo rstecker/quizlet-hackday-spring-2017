@@ -16,7 +16,7 @@ import ui.Player;
  * Created by rebeccastecker on 6/11/17.
  */
 
-@Database(entities = {Player.class, Game.class, Fact.class, Option.class, GoodMove.class, BadMove.class}, version = 6)
+@Database(entities = {Player.class, Game.class, Fact.class, Option.class, GoodMove.class, BadMove.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayerDao playerDao();
     public abstract GameDao gameDao();

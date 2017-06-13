@@ -45,7 +45,7 @@ public class LobbyViewModel extends AndroidViewModel {
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(state));
                     return Completable.complete();
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe();
     }
 

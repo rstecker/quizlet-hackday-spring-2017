@@ -53,7 +53,7 @@ public class BoardViewModel extends AndroidViewModel {
                     mAppDatabase.gameDao().setSelectedOption(option);
                     return Completable.complete();
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe();
     }
 
@@ -63,7 +63,7 @@ public class BoardViewModel extends AndroidViewModel {
                     mAppDatabase.gameDao().setSelectedColor(selectedColor);
                     return Completable.complete();
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe();
     }
 }

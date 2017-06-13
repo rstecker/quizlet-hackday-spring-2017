@@ -41,7 +41,7 @@ public class PlayerServiceConnection implements ServiceConnection {
         mEngine = new PlayerEngine();
         mMapper = new ObjectMapper();
 
-        mEngine.getLobbyStateUpdates().observeOn(Schedulers.io()).subscribe(
+        mEngine.getLobbyStateUpdates().observeOn(Schedulers.newThread()).subscribe(
                 (state) -> {
                     TopLevelViewModel model = ViewModelProviders.of(context).get(TopLevelViewModel.class);
                     if (model != null) {

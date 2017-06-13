@@ -31,12 +31,15 @@ import com.example.bluetooth.server.HostService;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -129,6 +132,9 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         if (mPlayerConnection.isBound()) {
             mPlayerConnection.unbindService(this);
         }
+        if (mModelBound) {
+            this.unbindService(mModelConnection);
+        }
     }
 
     @Override
@@ -173,6 +179,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
     //endregion
 
+
     @OnClick(R.id.start_hosting)
     public void handleStartHostingClick() {
         TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
@@ -183,14 +190,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         if (mPlayerConnection.isBound()) {
             mPlayerConnection.unbindService(this);
         }
-        String userValue =mSetField.getText().toString();
-        long setId = 415;
-        try {
-            setId = Long.valueOf(userValue);
-        } catch (NumberFormatException e) {
-            Log.d(TAG, "couldn't make a number out of '" + userValue +"', defaulting to "+setId);
-        }
-        mModelService.requestSet(setId);
+
         if (mHostConnection.isBound()) {
             String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
             if (StringUtils.isEmpty(hostName)) {
@@ -224,8 +224,14 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
 
 
     private void handleContentUpdates(List<Fact> facts) {
-        Log.i(TAG, "Handling content updates : "+facts.size());
+        Log.i(TAG, "Handling content updates : " + facts.size());
         mHostConnection.setContent(facts);
+        if (facts.size() == 0) {
+            Log.i(TAG, "Can now start game, now that we've cleared facts DB");
+            mHostButton.setVisibility(View.VISIBLE);
+        } else {
+            Log.i(TAG, "Can maybe start game now? Size " + facts + ", button is visible " + (mHostButton.getVisibility() == View.VISIBLE));
+        }
     }
 
     private void handleGameUpdates(List<Game> games) {
@@ -301,7 +307,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     private void initPlayerConnectionObservables() {
-        mPlayerConnection.getBoardStateUpdates().observeOn(Schedulers.io()).subscribe(
+        mPlayerConnection.getBoardStateUpdates().observeOn(Schedulers.newThread()).subscribe(
                 (state) -> {
                     TopLevelViewModel boardViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     boardViewModel.processGameUpdate(state);
@@ -319,14 +325,40 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
 
     private void initHostConnectionObservables() {
-        mHostConnection.getLobbyStateUpdates().observeOn(Schedulers.io()).subscribe(
+        mHostConnection.getLobbyStateUpdates()
+                .take(1)
+                .observeOn(Schedulers.newThread())
+                .subscribe((u) -> {
+                    List<Integer> sampleSetIds = Arrays.asList(
+                            415 /*state capitals*/,
+                            100860839 /* IPA */,
+                            118250511 /*french verbs */);
+                    String userValue = mSetField.getText().toString();
+                    Collections.shuffle(sampleSetIds);
+                    long setId = 415;//sampleSetIds.get(0);
+                    try {
+                        setId = Long.valueOf(userValue);
+                    } catch (NumberFormatException e) {
+                        Log.d(TAG, "couldn't make a number out of '" + userValue + "', defaulting to " + setId);
+                    }
+
+                    Log.i(TAG, "Can now look up QSet for content " + setId);
+
+                    mModelService.requestSet(setId);
+
+//                    model.getFacts().observe(this, (l)->{
+//                        Log.i(TAG,"Can I see this sad pathetic other update? ");
+//                        Log.i(TAG, )
+//                    });
+                });
+        mHostConnection.getLobbyStateUpdates().observeOn(Schedulers.newThread()).subscribe(
                 (state) -> {
                     TopLevelViewModel model = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     model.processLobbyUpdate(state);
                 },
                 (e) -> Log.e(TAG, "Error updating lobby view model [" + Thread.currentThread().getName() + "] " + e)
         );
-        mHostConnection.getBoardStateUpdates().observeOn(Schedulers.io()).subscribe(
+        mHostConnection.getBoardStateUpdates().observeOn(Schedulers.newThread()).subscribe(
                 (state) -> {
                     TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     viewModel.processGameUpdate(state);
@@ -334,7 +366,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                 },
                 (e) -> Log.e(TAG, "Error updating board view model [" + Thread.currentThread().getName() + "] " + e)
         );
-        mHostConnection.getStartStatusUpdates().observeOn(Schedulers.io()).subscribe(
+        mHostConnection.getStartStatusUpdates().observeOn(Schedulers.newThread()).subscribe(
                 (canStart) -> {
                     TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
                     viewModel.setGameState(canStart ? Game.State.CAN_START : Game.State.WAITING);
@@ -435,6 +467,13 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                     .subscribe((QSet qSet) -> {
                         TopLevelViewModel viewModel = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
                         viewModel.processQuizletResults(qSet);
+
+                        Completable.defer(() -> {
+                            TopLevelViewModel model = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
+                            List<Fact> facts = model.getFacts().getValue();
+                            Log.i(TAG, "Rebecca, I've gotten my updated facts : "+facts);
+                            return Completable.complete();
+                        }).subscribeOn(Schedulers.newThread()).subscribe();
                     })
             ;
             mModelBound = true;

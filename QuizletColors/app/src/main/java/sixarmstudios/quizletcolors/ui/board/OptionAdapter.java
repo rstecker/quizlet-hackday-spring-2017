@@ -35,6 +35,7 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionViewHolder> {
 
     @Override public OptionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(OptionViewHolder.LAYOUT_ID, viewGroup, false);
+
         return new OptionViewHolder(view, mSelector);
     }
 

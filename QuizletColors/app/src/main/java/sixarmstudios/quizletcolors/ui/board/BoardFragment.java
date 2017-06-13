@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +49,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
     private String mPlayerColor;
     private String mString;
     private long mLastMoveUpdateTimestamp;
+    private GridLayoutManager mOptionsLayoutManager;
 
     public static BoardFragment newInstance() {
         BoardFragment fragment = new BoardFragment();
@@ -79,14 +80,12 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
 
         mOptionAdapter = new OptionAdapter(this);
         mOptionList.setAdapter(mOptionAdapter);
-        LinearLayoutManager layoutManager2 = new LinearLayoutManager(this.getContext());
-
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layoutManager2.setOrientation(LinearLayout.VERTICAL);
+            mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
         } else {
-            layoutManager2.setOrientation(LinearLayout.HORIZONTAL);
+            mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.HORIZONTAL, false);
         }
-        mOptionList.setLayoutManager(layoutManager2);
+        mOptionList.setLayoutManager(mOptionsLayoutManager);
 
         return view;
     }
@@ -142,6 +141,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
         if (options == null) {
             return;
         }
+        mOptionsLayoutManager.setSpanCount(Math.max(1,options.size()));
         mOptionAdapter.setOptions(options);
     }
 

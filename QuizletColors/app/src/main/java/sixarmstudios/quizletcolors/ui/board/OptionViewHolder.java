@@ -29,6 +29,6 @@ public class OptionViewHolder extends RecyclerView.ViewHolder {
     public void setOptionText(String option, boolean selected) {
         mOption.setText(option);
         itemView.setTag(option);
-        itemView.setBackgroundColor(itemView.getContext().getColor(selected ? R.color.background_color_active : R.color.background_color_accent));
+        mOption.setBackgroundColor(itemView.getContext().getColor(selected ? R.color.background_color_active : R.color.background_color_accent));
     }
 }

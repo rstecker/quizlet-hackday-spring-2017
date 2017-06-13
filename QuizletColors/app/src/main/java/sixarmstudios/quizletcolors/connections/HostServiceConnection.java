@@ -151,7 +151,7 @@ public class HostServiceConnection implements ServiceConnection {
                     sendOutResponse(mGameEngine.startGame());
                     return Completable.complete();
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe();
     }
 };

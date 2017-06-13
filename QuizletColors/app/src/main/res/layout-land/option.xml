@@ -2,22 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/option_text"
         style="@style/GameOption"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:ellipsize="none"
         android:minHeight="@dimen/min_tap_target_size"
         android:minWidth="@dimen/min_tap_target_size"
         android:scrollHorizontally="false"
         app:autoSizeTextType="uniform"
-        android:autoSizeMinTextSize="5sp"
-        app:autoSizeStepGranularity="1sp"
         tools:text="Sharks sharks sharks Sharks " />
 </LinearLayout>
 
