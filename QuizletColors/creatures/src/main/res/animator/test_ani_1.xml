@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <objectAnimator
+        android:duration="1000"
+        android:propertyName="pathData"
+        android:valueFrom="@string/rounded_arrow"
+        android:valueTo="@string/sharp_arrow"
+        android:valueType="pathType"
+        android:repeatMode="reverse"
+        android:repeatCount="-1"/>
+
+</set>

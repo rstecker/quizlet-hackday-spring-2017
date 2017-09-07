@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,12 +52,12 @@ import sixarmstudios.quizletcolors.network.IModelRetrievalService;
 import sixarmstudios.quizletcolors.network.ModelRetrievalService;
 import sixarmstudios.quizletcolors.ui.board.BoardFragment;
 import sixarmstudios.quizletcolors.ui.lobby.LobbyFragment;
+import studioes.arm.six.creatures.ShapeDemo;
 import ui.Fact;
 import ui.Game;
 import viewmodel.TopLevelViewModel;
 
 import static sixarmstudios.quizletcolors.logic.SetupHelper.MOCK_USERNAMES;
-
 
 public class StartActivity extends LifecycleActivity implements IBluetoothHostListener, IBluetoothPlayerListener {
     @LayoutRes public static final int LAYOUT_ID = R.layout.activity_start;
@@ -73,6 +74,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     @BindView(R.id.start_hosting) CheckedTextView mHostButton;
     @BindView(R.id.join_game) CheckedTextView mJoinButton;
     @BindView(R.id.join_option_list) LinearLayout mJoinList;
+    @BindView(R.id.shape_demo) FrameLayout demoFrame;
 
     IModelRetrievalService mModelService;
     boolean mModelBound = false;
@@ -88,6 +90,8 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         ButterKnife.bind(this);
         mJoinList.removeAllViews();
         startService(ModelRetrievalService.startIntent(this, "fakeClientId"));
+        ShapeDemo demo = new ShapeDemo();
+        demo.generateView(this, getLayoutInflater(), demoFrame);
     }
 
     @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -471,7 +475,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                         Completable.defer(() -> {
                             TopLevelViewModel model = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
                             List<Fact> facts = model.getFacts().getValue();
-                            Log.i(TAG, "Rebecca, I've gotten my updated facts : "+facts);
+                            Log.i(TAG, "Rebecca, I've gotten my updated facts : " + facts);
                             return Completable.complete();
                         }).subscribeOn(Schedulers.newThread()).subscribe();
                     })

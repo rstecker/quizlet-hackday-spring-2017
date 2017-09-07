@@ -20,8 +20,8 @@
             style="@style/LobbyButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:text="@string/host_button" />
+            android:text="@string/host_button"
+            android:visibility="invisible" />
 
         <EditText
             android:id="@+id/username_text_field"
@@ -47,6 +47,13 @@
             android:layout_height="wrap_content"
             android:text="@string/join_button" />
 
+        <FrameLayout
+            android:id="@+id/shape_demo"
+            android:layout_width="200dp"
+            android:layout_height="200dp">
+
+        </FrameLayout>
+
     </LinearLayout>
 
     <FrameLayout
@@ -57,9 +64,9 @@
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@id/fragment_container"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/debug_layout"
-        app:layout_constraintBottom_toTopOf="@id/fragment_container"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
