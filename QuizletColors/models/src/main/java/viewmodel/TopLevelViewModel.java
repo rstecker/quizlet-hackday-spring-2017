@@ -60,13 +60,12 @@ public class TopLevelViewModel extends AndroidViewModel {
     }
 
     public void resetGame() {
-        Log.i(TAG, "Requesting a reset");
+        Log.i(TAG, "Requesting a game reset");
         Completable.defer(
                 () -> {
                     Log.i(TAG, "Clearing out DB");
                     mAppDatabase.playerDao().clearGame();
                     mAppDatabase.gameDao().clearGame();
-                    mAppDatabase.factDao().clearGame();
                     mAppDatabase.optionsDao().clearGame();
                     mAppDatabase.goodMovesDao().clearMoves();
                     mAppDatabase.badMovesDao().clearMoves();
@@ -81,7 +80,7 @@ public class TopLevelViewModel extends AndroidViewModel {
         Completable.defer(
                 () -> {
                     Game newGame = new Game();
-                    newGame.initForHost(hostName);
+//                    newGame.initForHost(hostName);
                     mAppDatabase.gameDao().insertAll(newGame);
 
                     // TODO : somehow actually get content from Quizlet! In the mean time....
@@ -187,6 +186,9 @@ public class TopLevelViewModel extends AndroidViewModel {
         Completable.defer(
                 () -> {
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(state));
+                    if (state == Game.State.PLAYING || state == Game.State.START) {
+                        mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.PLAYING.toDBVal());
+                    }
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -223,6 +225,7 @@ public class TopLevelViewModel extends AndroidViewModel {
                     }
                     mAppDatabase.optionsDao().insertAll(options);
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(Game.State.PLAYING));
+                    mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.PLAYING.toDBVal());
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -258,11 +261,15 @@ public class TopLevelViewModel extends AndroidViewModel {
         // TODO : update payment level in DB?
     }
 
+    /**
+     * Should only happen once per app install. Initial setup.
+     */
     public void initApplication(PlayerState playerState) {
         Completable.defer(
                 () -> {
                     AppState appState = new AppState();
                     appState.playState = playerState.toDBVal();
+                    mAppDatabase.applicationStateDao().clearState();
                     mAppDatabase.applicationStateDao().insertAll(appState);
                     return Completable.complete();
                 })
@@ -319,9 +326,10 @@ public class TopLevelViewModel extends AndroidViewModel {
         Completable.fromRunnable(
                 () -> {
                     Game newGame = new Game();
-                    newGame.initForHost(hostName);
+                    newGame.initForHost(hostName, setId);
                     mAppDatabase.gameDao().insertAll(newGame);
                     mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.LOBBY.toDBVal());
+                    mAppDatabase.applicationStateDao().updateCurrentSetId(setId);
                 })
                 .subscribeOn(Schedulers.newThread())
                 .subscribe();

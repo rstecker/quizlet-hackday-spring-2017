@@ -95,6 +95,7 @@ public class LookingForSetFragment extends LifecycleFragment implements SetSumma
     }
 
     @Override public void start(long setId) {
+        // FIXME : the listener should probably be the activity, not the fragment? OR, the fragment should block advancement to lobby till hosting
         String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
         if (StringUtils.isEmpty(hostName)) {
             Toast.makeText(getContext(), R.string.no_host_name, Toast.LENGTH_SHORT).show();

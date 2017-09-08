@@ -30,6 +30,9 @@ public interface ApplicationStateDao {
     @Query("UPDATE appState SET playState = :playerState, qusername = :username, qtoken = :token")
     void updatePlayerStateWithQuizletAuth(String playerState, String token, String username);
 
+    @Query("UPDATE appState SET q_set_id = :setId")
+    void updateCurrentSetId(long setId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(AppState... games);
 
@@ -44,4 +47,5 @@ public interface ApplicationStateDao {
 
     @Update
     void update(List<AppState> games);
+
 }

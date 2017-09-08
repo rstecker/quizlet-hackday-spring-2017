@@ -8,12 +8,14 @@ import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import appstate.PlayerState;
 import database.AppDatabase;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import ui.Fact;
 import ui.Game;
 import ui.Player;
+import ui.SetSummary;
 
 /**
  * Created by rebeccastecker on 6/10/17.
@@ -36,8 +38,12 @@ public class LobbyViewModel extends AndroidViewModel {
         return mAppDatabase.gameDao().getGame();
     }
 
-    public LiveData<List<Fact>> getFacts() {
-        return mAppDatabase.factDao().getFacts();
+    public LiveData<List<SetSummary>> getSetSummary(long setId) {
+        return mAppDatabase.setSummaryDao().getSetSummary(setId);
+    }
+
+    public LiveData<List<Fact>> getFacts(long setId) {
+        return mAppDatabase.factDao().getFactsForSet(setId);
     }
 
 
@@ -45,6 +51,9 @@ public class LobbyViewModel extends AndroidViewModel {
         Completable.defer(
                 () -> {
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(state));
+                    if (state == Game.State.PLAYING || state == Game.State.START) {
+                        mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.PLAYING.toDBVal());
+                    }
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())

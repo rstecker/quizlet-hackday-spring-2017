@@ -28,6 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import appstate.AppState;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +42,7 @@ import viewmodel.TopLevelViewModel;
 /**
  * Created by rebeccastecker on 9/7/17.
  */
+@ParametersAreNonnullByDefault
 public class LookingForGameFragment extends LifecycleFragment implements IBluetoothPlayerListener {
     public static final String TAG = LookingForGameFragment.class.getSimpleName();
     @LayoutRes public static final int LAYOUT_ID = R.layout.fragment_looking_for_game;

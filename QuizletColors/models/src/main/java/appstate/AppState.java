@@ -17,6 +17,9 @@ public class AppState {
     @ColumnInfo(name = "qusername")
     public String qUsername;
 
+    @ColumnInfo(name = "q_set_id")
+    public long currentQSetId;
+
     @ColumnInfo(name = "qtoken")
     public String qToken;
 

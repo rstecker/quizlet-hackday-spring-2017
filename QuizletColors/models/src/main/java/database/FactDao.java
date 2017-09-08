@@ -24,6 +24,9 @@ public interface FactDao {
     @Query("SELECT * FROM fact")
     LiveData<List<Fact>> getFacts();
 
+    @Query("SELECT * FROM fact WHERE q_set_id = :setId")
+    LiveData<List<Fact>> getFactsForSet(long setId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(Fact... facts);
 
@@ -38,4 +41,5 @@ public interface FactDao {
 
     @Update
     void update(List<Fact> facts);
+
 }

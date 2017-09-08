@@ -59,7 +59,7 @@ import ui.Game;
 import viewmodel.TopLevelViewModel;
 
 @ParametersAreNonnullByDefault
-public class StartActivity extends LifecycleActivity implements IBluetoothHostListener, IBluetoothPlayerListener {
+public class StartActivity extends LifecycleActivity implements IBluetoothPlayerListener {
     @LayoutRes
     public static final int LAYOUT_ID = R.layout.activity_start;
     public static final String TAG = StartActivity.class.getSimpleName();
@@ -79,13 +79,14 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
 
     // region Lifecycle stuff
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT_ID);
         ButterKnife.bind(this);
 
         watchAppState();
         debugVMStuff();
+
         startService(ModelRetrievalService.startIntent(this));
     }
 
@@ -109,7 +110,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             if (appStates == null || appStates.isEmpty()) {
                 mPlayerState = PlayerState.UNKNOWN_STARTING;
                 viewModel.initApplication(mPlayerState);
-                syncFragments();
+                syncFragments(null);
                 return;
             }
             // reset old application state
@@ -119,7 +120,9 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                 case UNKNOWN_INIT:
                     mPlayerState = PlayerState.UNKNOWN_STARTING;
                     appState.playState = mPlayerState.toDBVal();
+                    appState.currentQSetId = 0;
                     viewModel.updateAppState(appState);
+                    viewModel.resetGame();
                     mBoundModelServiceSubject
                             .filter((bound) -> bound)
                             .take(1)
@@ -174,10 +177,20 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                         default:
                             throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
                     }
+                case LOBBY:
+                    switch (dbAppState) {
+                        case LOBBY:
+                            break;
+                        case PLAYING:
+                            mPlayerState = dbAppState;
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
+                    }
                 default:
                     break;
             }
-            syncFragments();
+            syncFragments(appState);
         });
 
     }
@@ -200,21 +213,8 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         // if I only JUST bind, the service dies when we background :'(
         // TODO : inspect these flags, I bet we want a different ont
         bindService(new Intent(this, ModelRetrievalService.class), mModelConnection, Context.BIND_AUTO_CREATE);
-//
-//        if (mPlayerState == PlayerState.HOST || mPlayerState == PlayerState.UNKNOWN) {
-//            bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
-//        }
-//        if (mPlayerState == PlayerState.PLAYER || mPlayerState == PlayerState.UNKNOWN) {
-//            bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
-//        }
-
-//        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-//        if (mPlayerState == PlayerState.UNKNOWN) {
-//            mUsernameField.setText(MOCK_USERNAMES.get((int) (Math.random() * ((MOCK_USERNAMES.size() - 1) + 1))));
-//            viewModel.resetGame();
-//        }
-//        viewModel.getFacts().observe(this, this::handleContentUpdates);
-//        viewModel.getGame().observe(this, this::handleGameUpdates);
+        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+        viewModel.getGame().observe(this, this::handleGameUpdates);
     }
 
     @Override protected void onDestroy() {
@@ -229,26 +229,6 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         }
         if (mModelBound) {
             this.unbindService(mModelConnection);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
-            Toast.makeText(this, R.string.bluetooth_denied, Toast.LENGTH_LONG).show();
-            Log.e(TAG, "Bluetooth request denied");
-        } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, R.string.bluetooth_approved, Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "Bluetooth enabled");
-        } else if (requestCode == REQUEST_DISCOVERABLE_CODE) {
-            if (resultCode <= 0) {
-                Log.e(TAG, "Denied discoverability");
-                Toast.makeText(this, R.string.discoverability_denied, Toast.LENGTH_LONG).show();
-            } else {
-                Log.i(TAG, "Discoverable mode enabled for " + resultCode + " seconds");
-//                startHostDiscoverabilityWindow(resultCode);
-            }
         }
     }
 
@@ -314,62 +294,8 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         auth_dialog.setCancelable(true);
     }
 
-//    @OnClick(R.id.start_hosting)
-//    public void handleStartHostingClick() {
-//        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-//        mPlayerState = PlayerState.HOST;
-//        mJoinButton.setVisibility(View.GONE);
-//        mUsernameField.setVisibility(View.GONE);
-//        mSetField.setVisibility(View.GONE);
-//        if (mPlayerConnection.isBound()) {
-//            mPlayerConnection.unbindService(this);
-//        }
-//
-//        if (mHostConnection.isBound()) {
-//            String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
-//            if (StringUtils.isEmpty(hostName)) {
-//                Toast.makeText(this, R.string.no_host_name, Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//            viewModel.setUpNewGame(hostName);
-//            initHostConnectionObservables();
-//        } else {
-//            Toast.makeText(this, R.string.not_connected_yet_try_again, Toast.LENGTH_SHORT).show();
-//            Log.e(TAG, "Wanted to be a Host but we're not server bound yet");
-//        }
-//    }
-
-//    @OnClick(R.id.join_game)
-//    public void handleJoinGameClick() {
-//        mPlayerState = PlayerState.PLAYER;
-//        mHostButton.setVisibility(View.GONE);
-//        mUsernameField.setVisibility(View.GONE);
-//        mSetField.setVisibility(View.GONE);
-//        if (mHostConnection.isBound()) {
-//            mHostConnection.unbindService(this);
-//        }
-//        if (mPlayerConnection.isBound()) {
-//            mPlayerConnection.startLooking(this);
-//        } else {
-//            Toast.makeText(this, R.string.not_connected_yet_try_again, Toast.LENGTH_SHORT).show();
-//            Log.e(TAG, "Wanted to be a Player but we're not server bound yet");
-//        }
-//    }
-
-
-//    private void handleContentUpdates(List<Fact> facts) {
-//        Log.i(TAG, "Handling content updates : " + facts.size());
-//        mHostConnection.setContent(facts);
-//        if (facts.size() == 0) {
-//            Log.i(TAG, "Can now start game, now that we've cleared facts DB");
-//            mHostButton.setVisibility(View.VISIBLE);
-//        } else {
-//            Log.i(TAG, "Can maybe start game now? Size " + facts + ", button is visible " + (mHostButton.getVisibility() == View.VISIBLE));
-//        }
-//    }
-
     private void handleGameUpdates(List<Game> games) {
-        if (games == null || games.size() != 1) {
+        if (games.isEmpty()) {
             return;
         }
         Game game = games.get(0);
@@ -377,7 +303,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         if (StringUtils.isNotEmpty(game.selected_option) && StringUtils.isNotEmpty(game.selected_color)) {
             TopLevelViewModel boardViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
             boardViewModel.moveSubmitted(game.selected_option, game.selected_color);
-            if (mPlayerState == PlayerState.PLAYING) {  // TODO : rebecca, gota' fix this
+            if (!game.isHost()) {
                 mPlayerConnection.makeMove(game.selected_option, game.selected_color);
             } else {
                 mHostConnection.makeMove(game.selected_option, game.selected_color);
@@ -386,8 +312,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         }
     }
 
-
-    private void syncFragments() {
+    private void syncFragments(AppState appState) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         String currentTag = currentFragment == null ? null : currentFragment.getTag();
 
@@ -423,7 +348,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             case LOBBY:
                 if (!LobbyFragment.TAG.equals(currentTag)) {
                     newTag = LobbyFragment.TAG;
-                    newFragment = LobbyFragment.newInstance();
+                    newFragment = LobbyFragment.newInstance(appState.currentQSetId);
                 }
                 break;
 
@@ -482,62 +407,12 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         );
     }
 
-//    private void startHostDiscoverabilityWindow(int seconds) {
-//        String toastMsg = String.format(getResources().getString(R.string.host_discoverable_toast), seconds);
-//        Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
-//        mHostButton.setChecked(true);
-//        mHostButton.setText(R.string.host_button_discoverable);
-//        Single.timer(seconds, TimeUnit.SECONDS)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe((t) -> { // do I need to worry about the button no longer being around?
-//                    mHostButton.setText(R.string.host_button);
-//                    mHostButton.setChecked(false);
-//                    Log.i(TAG, "Host no longer discoverable after " + seconds + " seconds");
-//                });
-//    }
-
-//    private void addToGameOptionList(@NonNull BluetoothDevice device, @Nullable String name, int bondState, @NonNull String address) {
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//        TextView v = new TextView(this, null, 0, R.style.GameOption);
-//
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(name == null ? "unknown" : name);
-//        sb.append(" ");
-//        sb.append(bondState == BluetoothDevice.BOND_BONDING ? "[bonding] " : bondState == BluetoothDevice.BOND_BONDED ? "[bonded] " : "");
-//        sb.append(address);
-//        v.setText(sb.toString());
-//        v.setLayoutParams(layoutParams);
-//        if (bondState == BluetoothDevice.BOND_BONDED) {
-//            mJoinList.addView(v, 0);
-//        } else {
-//            mJoinList.addView(v);
-//        }
-//        v.setOnClickListener((view) -> {
-//            if (mPlayerConnection.isBound()) {
-//                mJoinList.removeAllViews();
-//                mPlayerConnection.connectToServer(device, mUsernameField.getText().toString());
-//
-//                TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-//                viewModel.joinNewGame(name, bondState, address);
-//                initPlayerConnectionObservables();
-//            }
-//        });
-//    }
-
-
     @Override
     public void onDeviceFound(@NonNull BluetoothDevice device, @Nullable String name, int bondState, @NonNull String address) {
         if (mPlayerBluetoothListener != null) {
             mPlayerBluetoothListener.onDeviceFound(device, name, bondState, address);
         }
         Log.e(TAG, "onDeviceFound  : " + name + " : " + bondState + " : " + address);
-//        addToGameOptionList(device, name, bondState, address);
-    }
-
-    @Override
-    public void requestDiscoverabilityIntent(@NonNull Intent intent) {
-        Log.i(TAG, "Starting Discoverability Intent");
-        startActivityForResult(intent, REQUEST_DISCOVERABLE_CODE);
     }
 
     @Override
