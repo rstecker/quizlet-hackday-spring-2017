@@ -36,6 +36,9 @@ public class Game {
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
+    @ColumnInfo(name = "q_set_id")
+    public long qSetId;
+
     @ColumnInfo(name = "game_state")
     public State gameState;
 
@@ -76,9 +79,10 @@ public class Game {
         return isHost;
     }
 
-    public void initForHost(String hostName) {
+    public void initForHost(String hostName, long qSetId) {
         gameState = State.WAITING;
         this.hostName = hostName;
+        this.qSetId = qSetId;
         this.isHost = true;
     }
 

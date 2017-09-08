@@ -11,7 +11,7 @@ import java.util.List;
 import io.reactivex.annotations.Nullable;
 
 /**
- * Created by rebeccastecker on 6/12/17.
+ * See {@link ui.SetSummary} for how we store it in the DB
  */
 @Value.Immutable
 @Value.Style(builder = "new") // builder has to have constructor
@@ -33,12 +33,5 @@ public interface QSet {
     @JsonProperty("term_count") int termCount();
     @JsonProperty("has_images") boolean hasImages();
     @Nullable @JsonProperty("terms") List<QTerm> terms();
-
-    /**
-     "subjects": [
-     "french",
-     "animals"
-     ],
-     },
-     */
+    @Nullable @JsonProperty("modified_date") Long modifiedDate();
 }

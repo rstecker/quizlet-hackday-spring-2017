@@ -1,7 +1,11 @@
 package sixarmstudios.quizletcolors.network;
 
+import android.arch.lifecycle.LifecycleActivity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.room.util.StringUtil;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,8 +17,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Locale;
 
+import appstate.PlayerState;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.BehaviorProcessor;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.CompletableSubject;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
@@ -27,15 +36,16 @@ import okhttp3.Route;
 import quizlet.QOAuthResponse;
 import quizlet.QSet;
 import quizlet.QUser;
+import viewmodel.TopLevelViewModel;
 
 /**
+ * Is not responsible for thread management. That's the {@link ModelRetrievalService}'s job.
  * Created by rebeccastecker on 6/12/17.
  */
-
-
 public class ApiClient {
     public static final String TAG = ApiClient.class.getSimpleName();
-    private static final String SET_URL = "https://api.quizlet.com/2.0/sets/%d?client_id=%s";
+    private static final String SET_URL2 = "https://api.quizlet.com/2.0/sets/%d?client_id=%s";
+    private static final String SET_URL = "https://api.quizlet.com/2.0/sets/%d";
     private static final String USER_DEETS_URL = "https://api.quizlet.com/2.0/users/%s";
     private OkHttpClient mClient;
     private String mToken;
@@ -52,13 +62,14 @@ public class ApiClient {
                 .build();
     }
 
+
     private String getApproriateAuth(String encodedString) {
         return StringUtils.isEmpty(mToken) ? "Basic " + encodedString : "Bearer " + mToken;
     }
 
     String fetchSet(long setId, @NonNull String clientId) {
         Request request = new Request.Builder()
-                .url(String.format(Locale.ENGLISH, SET_URL, setId, clientId))
+                .url(String.format(Locale.ENGLISH, SET_URL2, setId, clientId))
                 .build();
         try {
             try (Response response = mClient.newCall(request).execute()) {
@@ -90,12 +101,13 @@ public class ApiClient {
     Flowable<QSet> getQSetFlowable() {
         return mQSetProcessor;
     }
+
     Flowable<QUser> getQUserFlowable() {
         return mQUserProcessor;
     }
 
 
-    void handleOAuthCode(String authCode, String redirectUrl) {
+    void handleOAuthCode(LifecycleActivity context, String authCode, String redirectUrl) {
         mToken = null;
         Request request = new Request.Builder()
                 .url("https://api.quizlet.com/oauth/token")
@@ -117,6 +129,9 @@ public class ApiClient {
                 if (oAuthResponse != null) {
                     mToken = oAuthResponse.accessToken();
                     mUsername = oAuthResponse.username();
+
+                    TopLevelViewModel viewModel = ViewModelProviders.of(context).get(TopLevelViewModel.class);
+                    viewModel.updateQuizletData(mToken, mUsername);
                     Log.i(TAG, "Access Token successfully set on client for " + mUsername);
                     updateUserInfo();
                 }
@@ -154,7 +169,7 @@ public class ApiClient {
                 Log.i(TAG, "User info response " + jsonResponse);
                 QUser user = convertResponseToQUser(jsonResponse);
                 if (user != null) {
-                    Log.i(TAG, "Successfully parsed user info "+user);
+                    Log.i(TAG, "Successfully parsed user info " + user);
                     mQUserProcessor.onNext(user);
                 }
             }
@@ -171,5 +186,32 @@ public class ApiClient {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setRestoredState(String accessCode, String username) {
+        Log.i(TAG, "Restoring API client state : " + accessCode + " & " + username);
+        mToken = accessCode;
+        mUsername = username;
+    }
+
+    Completable updateOrFetchSet(long setId) {
+        return Completable.fromRunnable(() -> {
+            Request request = new Request.Builder()
+                    .url(String.format(Locale.ENGLISH, SET_URL, setId))
+                    .build();
+            try {
+                Response response = mClient.newCall(request).execute();
+                Log.v(TAG, "Response from server : " + response);
+                if (response != null && response.body() != null) {
+                    String jsonResponse = response.body().string();
+                    QSet qset = convertResponseToQSet(jsonResponse);
+                    mQSetProcessor.onNext(qset);
+                } else {
+                    Log.e(TAG, "Error encountered trying to load set " + setId + " : " + response);
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
     }
 }

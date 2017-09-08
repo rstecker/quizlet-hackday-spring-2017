@@ -2,6 +2,7 @@ package sixarmstudios.quizletcolors.ui.lobby;
 
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -18,23 +19,30 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import sixarmstudios.quizletcolors.R;
+import sixarmstudios.quizletcolors.StartActivity;
+import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.ui.board.IUserSelector;
 import sixarmstudios.quizletcolors.ui.player.PlayerAdapter;
+import ui.Fact;
 import ui.Game;
+import ui.SetSummary;
 import viewmodel.LobbyViewModel;
 import ui.Player;
 
 /**
  * Created by rebeccastecker on 6/10/17.
  */
-
+@ParametersAreNonnullByDefault
 public class LobbyFragment extends LifecycleFragment implements IUserSelector {
     public static final String TAG = LobbyFragment.class.getSimpleName();
     @LayoutRes public static final int LAYOUT_ID = R.layout.lobby_users_fragment;
+    private static final String SET_ID_ARG = "setIdArg";
 
     @BindView(R.id.lobby_users_text_field) TextView mUsers;
     @BindView(R.id.game_state_text_field) TextView mGameTextField;
@@ -42,10 +50,14 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
     @BindView(R.id.player_list) RecyclerView mPlayerList;
 
     private PlayerAdapter mAdapter;
+    private HostServiceConnection mHostConnection;
 
-    public static LobbyFragment newInstance() {
+    public static LobbyFragment newInstance(@Nullable Long qSetId) {
         LobbyFragment fragment = new LobbyFragment();
         Bundle args = new Bundle();
+        if (qSetId != null) {
+            args.putLong(SET_ID_ARG, qSetId);
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,6 +73,11 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         lobbyViewModel.getGame().observe(this, this::handleGameUpdates);
+        long qSetId = getArguments().getLong(SET_ID_ARG, 0);
+        if (qSetId > 0) {
+            lobbyViewModel.getSetSummary(qSetId).observe(this, this::handleSetUpdates);
+            lobbyViewModel.getFacts(qSetId).observe(this, this::handleFactsUpdates);
+        }
 
         mAdapter = new PlayerAdapter(this);
         mPlayerList.setAdapter(mAdapter);
@@ -70,10 +87,31 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
         return view;
     }
 
+    @Override public void onAttach(Context context) {
+        super.onAttach(context);
+        mHostConnection = ((StartActivity) context).getHostConnection();
+    }
+
     @OnClick(R.id.start_game_button)
     public void handleStartClick() {
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.setGameState(Game.State.START);
+        mHostConnection.startGame();
+    }
+
+    private void handleSetUpdates(List<SetSummary> summaries) {
+        if (summaries.isEmpty()) {
+            return;
+        }
+        Log.i(TAG, "I see a set summary " + summaries.get(0));
+    }
+
+    private void handleFactsUpdates(List<Fact> facts) {
+        if (facts.isEmpty()) {
+            return;
+        }
+        Log.i(TAG, "I see " + facts.size());
+        mHostConnection.setContent(facts);
     }
 
     private void handleGameUpdates(List<Game> games) {
@@ -121,5 +159,6 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
         mUsers.setText(sb.toString());
     }
 
-    @Override public void playerClicked(@NonNull String playerColor) {}
+    @Override public void playerClicked(@NonNull String playerColor) {
+    }
 }

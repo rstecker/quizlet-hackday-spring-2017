@@ -48,7 +48,6 @@ public abstract class BluetoothStuff {
         }
         if (!mBluetoothAdapter.isEnabled()) {
             Log.e(TAG, "Bluetooth not enabled, no go!");
-            mClientListener.requestBluetooth();
             return false;
         }
         if (!verifyPermission(context, mClientListener)) {
@@ -62,8 +61,7 @@ public abstract class BluetoothStuff {
     }
 
     /**
-     * @return true if the app has all the permissions it needs. Otherwise it'll be hassling the
-     * listener via {@link IBluetoothClientListener#requestPermission(String[])}
+     * @return true if the app has all the permissions it needs.
      */
     private boolean verifyPermission(Context context, IBluetoothClientListener listener) {
         int accessCoarseLocation = context.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -73,7 +71,6 @@ public abstract class BluetoothStuff {
         }
         if (!listRequestPermission.isEmpty()) {
             String[] strRequestPermission = listRequestPermission.toArray(new String[listRequestPermission.size()]);
-            listener.requestPermission(strRequestPermission);
         }
         return listRequestPermission.isEmpty();
     }
