@@ -9,7 +9,10 @@ import android.util.Log;
 import android.util.LongSparseArray;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import appstate.AppState;
 import appstate.PlayerState;
@@ -19,6 +22,7 @@ import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import quizlet.QSet;
+import quizlet.QTerm;
 import quizlet.QUser;
 import ui.Fact;
 import ui.Game;
@@ -28,7 +32,7 @@ import ui.SetSummary;
 /**
  * Created by rebeccastecker on 6/11/17.
  */
-
+@ParametersAreNonnullByDefault
 public class TopLevelViewModel extends AndroidViewModel {
     public static final String TAG = TopLevelViewModel.class.getSimpleName();
     private AppDatabase mAppDatabase;
@@ -46,11 +50,13 @@ public class TopLevelViewModel extends AndroidViewModel {
     public LiveData<List<Fact>> getFacts() {
         return mAppDatabase.factDao().getFacts();
     }
+
     public LiveData<List<AppState>> getAppState() {
         return mAppDatabase.applicationStateDao().getGame();
     }
+
     public LiveData<List<SetSummary>> getSetSummaries() {
-        return mAppDatabase.setSummaryDao().getAll();
+        return mAppDatabase.setSummaryDao().getAllByQuizletUse();
     }
 
     public void resetGame() {
@@ -70,6 +76,7 @@ public class TopLevelViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
+    @Deprecated
     public void setUpNewGame(final @NonNull String hostName) {
         Completable.defer(
                 () -> {
@@ -143,7 +150,7 @@ public class TopLevelViewModel extends AndroidViewModel {
 //                        mockContent.add(new Fact(-1, question, answer));
 //                    }
                     Log.i(TAG, "Adding mock content : " + mockContent.size() + " to db. Can we see this?");
-                    mAppDatabase.factDao().insertAll(mockContent);
+//                    mAppDatabase.factDao().insertAll(mockContent);
 
                     return Completable.complete();
                 })
@@ -222,36 +229,29 @@ public class TopLevelViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
-    public void processQuizletResults(QSet qSet) {
-        Completable.defer(
+    public void markSetAsSynced(long setId) {
+        Completable.fromRunnable(
                 () -> {
-
-                    List<Fact> content = new ArrayList<>();
-
-//                    for (QTerm t : qSet.terms()) {
-////                        content.add(new Fact((int)(Math.random() * 100000), t.word(), t.definition()));
-//                        mAppDatabase.factDao().insertAll(new Fact((int)(Math.random() * 100000), t.word(), t.definition()));
-//                    }
-
-
-//                    for (int i = 1; i < 21; ++i) {
-//                        String question = "q" + i;
-//                        String answer = "a" + i;
-////                        for (int j = 0; j < Math.random() * 5; ++j) {
-////                            question += " q"+i;
-////                        }
-////                        for (int j = 0; j < Math.random() * 10; ++j) {
-////                            answer += " a"+i;
-////                        }
-//                        content.add(new Fact(-1, question, answer));
-//                    }
-
-//                    Log.i(TAG, "Adding "+content.size()+" Quizlet Facts into the db. Can we see this?");
-//                    mAppDatabase.factDao().insertAll(content);
-                    return Completable.complete();
+                    mAppDatabase.setSummaryDao().updateSyncTimestamp(setId, new Date().getTime());
                 })
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(() -> Log.i(TAG, "Can I see my db stuff NOW? Has completed"), (e) -> Log.e(TAG, "Error encountered while updating QSet terms.Can I see it?"));
+                .subscribe();
+    }
+
+    public void processTermsFromQuizletSet(QSet qSet) {
+        Completable.fromRunnable(
+                () -> {
+                    List<Fact> content = new ArrayList<>();
+                    for (QTerm qTerm : qSet.terms()) {
+                        content.add(new Fact(qSet.id(), qTerm.word(), qTerm.definition()));
+                    }
+                    mAppDatabase.factDao().insertAll(content);
+                })
+                .subscribeOn(Schedulers.newThread())
+                .doOnError((e) -> Log.e(TAG, "Error encountered while updating QSet terms.Can I see it?"))
+                .doOnComplete(() -> Log.i(TAG, "Can I see my db stuff NOW? Has completed"))
+                .subscribe()
+        ;
     }
 
     public void processQUser(QUser qUser) {
@@ -269,6 +269,7 @@ public class TopLevelViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.newThread())
                 .subscribe();
     }
+
     public void updatePlayerState(PlayerState playerState) {
         Completable.defer(
                 () -> {
@@ -300,18 +301,30 @@ public class TopLevelViewModel extends AndroidViewModel {
     }
 
     public void updateSetSummaryData(LongSparseArray<QSet> sets) {
-        Completable.defer(
+        Completable.fromRunnable(
                 () -> {
                     List<SetSummary> summaries = new ArrayList<>();
-                    for(int i = 0; i < sets.size(); ++i) {
+                    for (int i = 0; i < sets.size(); ++i) {
                         QSet qset = sets.valueAt(i);
                         summaries.add(new SetSummary(qset));
                     }
-                    Log.i(TAG, "Updating db with "+summaries.size()+" set summaries");
+                    Log.i(TAG, "Updating db with " + summaries.size() + " set summaries");
                     mAppDatabase.setSummaryDao().insertAll(summaries);
-                    return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
                 .subscribe();
+    }
+
+    public void startHostingGame(long setId, String hostName) {
+        Completable.fromRunnable(
+                () -> {
+                    Game newGame = new Game();
+                    newGame.initForHost(hostName);
+                    mAppDatabase.gameDao().insertAll(newGame);
+                    mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.LOBBY.toDBVal());
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+
     }
 }

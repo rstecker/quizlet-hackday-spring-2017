@@ -8,6 +8,9 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 /**
+ * We intentionally don't track the term ID because we don't want duplicate questions, even if there
+ * are dup questions in the set :P
+ *
  * Created by rebeccastecker on 6/11/17.
  */
 

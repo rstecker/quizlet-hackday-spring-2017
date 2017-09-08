@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -38,7 +40,7 @@ import gamelogic.LobbyState;
 /**
  * Created by rebeccastecker on 6/9/17.
  */
-
+@ParametersAreNonnullByDefault
 public class HostServiceConnection implements ServiceConnection {
     public static final String TAG = HostServiceConnection.class.getSimpleName();
 
@@ -92,6 +94,7 @@ public class HostServiceConnection implements ServiceConnection {
     }
 
     public String startHosting(IBluetoothHostListener listener, String username) {
+        // FIXME : I should PROBABLY check to make sure this is bound/wait for it... being lazy atm
         mPlayerEngine.initializePlayer(username);
         return mServerService.startHosting(listener);
     }

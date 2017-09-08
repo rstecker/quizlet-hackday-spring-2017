@@ -16,6 +16,7 @@ import com.example.bluetooth.core.IBluetoothPlayerListener;
 import com.example.myapplication.bluetooth.QCGameMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.security.auth.Subject;
 
 import gamelogic.BoardState;
@@ -31,7 +32,7 @@ import viewmodel.TopLevelViewModel;
 /**
  * Created by rebeccastecker on 6/10/17.
  */
-
+@ParametersAreNonnullByDefault
 public class PlayerServiceConnection implements ServiceConnection {
     public static final String TAG = PlayerServiceConnection.class.getSimpleName();
     private IClientService mClientService;

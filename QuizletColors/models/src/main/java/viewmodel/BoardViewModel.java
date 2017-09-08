@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import database.AppDatabase;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
@@ -19,7 +21,7 @@ import ui.Player;
 /**
  * Created by rebeccastecker on 6/11/17.
  */
-
+@ParametersAreNonnullByDefault
 public class BoardViewModel extends AndroidViewModel {
     public static final String TAG = BoardViewModel.class.getSimpleName();
     private AppDatabase mAppDatabase;

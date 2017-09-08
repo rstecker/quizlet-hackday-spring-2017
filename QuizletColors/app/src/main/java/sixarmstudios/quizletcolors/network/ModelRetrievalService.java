@@ -14,19 +14,25 @@ import android.widget.Toast;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.BehaviorProcessor;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.CompletableSubject;
 import quizlet.QSet;
 import quizlet.QUser;
 import sixarmstudios.quizletcolors.BuildConfig;
 
 /**
  * Created by rebeccastecker on 6/12/17.
+ * This Service assumes things are coming in on Whatever thread and results are served on the
+ * Main thread. It ensures that all API logic happens on the correct thread
  */
-
+@ParametersAreNonnullByDefault
 public class ModelRetrievalService extends Service implements IModelRetrievalService {
     public static final String TAG = ModelRetrievalService.class.getSimpleName();
     private static final String CLIENT_ID_ARG = "clientIdArg";
@@ -43,7 +49,7 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
     String mRedirectUrl;
     String mSecretCode;
 
-    public static Intent startIntent(Context context, String fakeClientId) {
+    public static Intent startIntent(Context context) {
         Intent intent = new Intent(context, ModelRetrievalService.class);
 //        BuildConfig
         intent.putExtra(CLIENT_ID_ARG, BuildConfig.QUIZLET_API_KEY);
@@ -126,6 +132,7 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
         // in theory I would own this observable and select between my cache and the API to find it
         return Flowable.merge(mCachedQSet, mClient.getQSetFlowable());
     }
+
     @Override
     public Flowable<QUser> getQUserFlowable() {
         // in theory I would own this observable and select between my cache and the API to find it
@@ -161,11 +168,6 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
     }
 
     @Override
-    public String getSecretCode() {
-        return mSecretCode;
-    }
-
-    @Override
     public String getRedirectUrl() {
         return mRedirectUrl;
     }
@@ -178,7 +180,7 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
                 })
                 .subscribeOn(Schedulers.newThread())
                 .subscribe()
-                ;
+        ;
     }
 
     @Override public void restoreQuizletInfo(String accessCode, String username) {
@@ -187,5 +189,13 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
         }
         mClient.setRestoredState(accessCode, username);
     }
+
+    @Override public Completable fetchSetDetails(long setId) {
+        Log.i(TAG, "Re-requesting set " + setId);
+        return mClient.updateOrFetchSet(setId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     //endregion
 }

@@ -3,6 +3,7 @@ package sixarmstudios.quizletcolors.network;
 import android.arch.lifecycle.LifecycleActivity;
 import android.support.v4.app.FragmentActivity;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import quizlet.QSet;
 import quizlet.QUser;
@@ -30,11 +31,10 @@ public interface IModelRetrievalService {
      * Kicks off a server request. When the set is loaded, you can find the results over at
      * {@link IModelRetrievalService#getQSetFlowable()}
      */
+    @Deprecated
     void requestSet(long localId);
 
     String getOauthUrl();
-
-    String getSecretCode();
 
     String getRedirectUrl();
 
@@ -43,4 +43,6 @@ public interface IModelRetrievalService {
     void refreshSummary();
 
     void restoreQuizletInfo(String accessCode, String username);
+
+    Completable fetchSetDetails(long setId);
 }

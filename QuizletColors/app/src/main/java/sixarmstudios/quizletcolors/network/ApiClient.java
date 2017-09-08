@@ -18,8 +18,12 @@ import java.io.IOException;
 import java.util.Locale;
 
 import appstate.PlayerState;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.BehaviorProcessor;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.CompletableSubject;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
@@ -35,13 +39,13 @@ import quizlet.QUser;
 import viewmodel.TopLevelViewModel;
 
 /**
+ * Is not responsible for thread management. That's the {@link ModelRetrievalService}'s job.
  * Created by rebeccastecker on 6/12/17.
  */
-
-
 public class ApiClient {
     public static final String TAG = ApiClient.class.getSimpleName();
-    private static final String SET_URL = "https://api.quizlet.com/2.0/sets/%d?client_id=%s";
+    private static final String SET_URL2 = "https://api.quizlet.com/2.0/sets/%d?client_id=%s";
+    private static final String SET_URL = "https://api.quizlet.com/2.0/sets/%d";
     private static final String USER_DEETS_URL = "https://api.quizlet.com/2.0/users/%s";
     private OkHttpClient mClient;
     private String mToken;
@@ -65,7 +69,7 @@ public class ApiClient {
 
     String fetchSet(long setId, @NonNull String clientId) {
         Request request = new Request.Builder()
-                .url(String.format(Locale.ENGLISH, SET_URL, setId, clientId))
+                .url(String.format(Locale.ENGLISH, SET_URL2, setId, clientId))
                 .build();
         try {
             try (Response response = mClient.newCall(request).execute()) {
@@ -97,6 +101,7 @@ public class ApiClient {
     Flowable<QSet> getQSetFlowable() {
         return mQSetProcessor;
     }
+
     Flowable<QUser> getQUserFlowable() {
         return mQUserProcessor;
     }
@@ -164,7 +169,7 @@ public class ApiClient {
                 Log.i(TAG, "User info response " + jsonResponse);
                 QUser user = convertResponseToQUser(jsonResponse);
                 if (user != null) {
-                    Log.i(TAG, "Successfully parsed user info "+user);
+                    Log.i(TAG, "Successfully parsed user info " + user);
                     mQUserProcessor.onNext(user);
                 }
             }
@@ -184,8 +189,29 @@ public class ApiClient {
     }
 
     public void setRestoredState(String accessCode, String username) {
-        Log.i(TAG, "Restoring API client state : "+accessCode+" & "+username);
+        Log.i(TAG, "Restoring API client state : " + accessCode + " & " + username);
         mToken = accessCode;
         mUsername = username;
+    }
+
+    Completable updateOrFetchSet(long setId) {
+        return Completable.fromRunnable(() -> {
+            Request request = new Request.Builder()
+                    .url(String.format(Locale.ENGLISH, SET_URL, setId))
+                    .build();
+            try {
+                Response response = mClient.newCall(request).execute();
+                Log.v(TAG, "Response from server : " + response);
+                if (response != null && response.body() != null) {
+                    String jsonResponse = response.body().string();
+                    QSet qset = convertResponseToQSet(jsonResponse);
+                    mQSetProcessor.onNext(qset);
+                } else {
+                    Log.e(TAG, "Error encountered trying to load set " + setId + " : " + response);
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
     }
 }

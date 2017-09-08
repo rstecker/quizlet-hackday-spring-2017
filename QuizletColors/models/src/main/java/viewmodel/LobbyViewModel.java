@@ -6,6 +6,8 @@ import android.arch.lifecycle.LiveData;
 
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import database.AppDatabase;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
@@ -16,7 +18,7 @@ import ui.Player;
 /**
  * Created by rebeccastecker on 6/10/17.
  */
-
+@ParametersAreNonnullByDefault
 public class LobbyViewModel extends AndroidViewModel {
     public static final String TAG = LobbyViewModel.class.getSimpleName();
     private AppDatabase mAppDatabase;

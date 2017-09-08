@@ -27,15 +27,17 @@ import android.widget.Toast;
 import com.example.bluetooth.client.PlayerService;
 import com.example.bluetooth.core.IBluetoothHostListener;
 import com.example.bluetooth.core.IBluetoothPlayerListener;
+import com.example.bluetooth.server.HostService;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import appstate.AppState;
 import appstate.PlayerState;
 import butterknife.ButterKnife;
-import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -56,7 +58,7 @@ import ui.Fact;
 import ui.Game;
 import viewmodel.TopLevelViewModel;
 
-
+@ParametersAreNonnullByDefault
 public class StartActivity extends LifecycleActivity implements IBluetoothHostListener, IBluetoothPlayerListener {
     @LayoutRes
     public static final int LAYOUT_ID = R.layout.activity_start;
@@ -67,13 +69,6 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     public static final int REQUEST_DISCOVERABLE_CODE = 12;
 
     private static final String PLAYER_STATE_KEY = "player_state";
-
-//    @BindView(R.id.username_text_field) EditText mUsernameField;
-//    @BindView(R.id.set_text_field) EditText mSetField;
-//    @BindView(R.id.start_hosting) CheckedTextView mHostButton;
-//    @BindView(R.id.join_game) CheckedTextView mJoinButton;
-//    @BindView(R.id.join_option_list) LinearLayout mJoinList;
-//    @BindView(R.id.oauth_start) View mOauthButton;
 
     IModelRetrievalService mModelService;
     boolean mModelBound = false;
@@ -90,8 +85,21 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         ButterKnife.bind(this);
 
         watchAppState();
-//        mJoinList.removeAllViews();
-        startService(ModelRetrievalService.startIntent(this, "fakeClientId"));
+        debugVMStuff();
+        startService(ModelRetrievalService.startIntent(this));
+    }
+
+    private void debugVMStuff() {
+        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+        viewModel.getFacts().observe(this, (facts -> {
+            Log.i(TAG, "I see an update of facts " + facts);
+            if (facts == null || facts.isEmpty()) {
+                return;
+            }
+            for (Fact fact : facts) {
+                Log.i(TAG, " >> " + fact.qSetId + " [" + fact.uid + "] : \t'" + fact.question + "' \t'" + fact.answer + "'");
+            }
+        }));
     }
 
     private void watchAppState() {
@@ -106,6 +114,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             }
             // reset old application state
             AppState appState = appStates.get(0);
+            PlayerState dbAppState = PlayerState.fromDBVal(appState.playState);
             switch (mPlayerState) {
                 case UNKNOWN_INIT:
                     mPlayerState = PlayerState.UNKNOWN_STARTING;
@@ -119,7 +128,6 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                             });
                     break;
                 case UNKNOWN_STARTING:
-                    PlayerState dbAppState = PlayerState.fromDBVal(appState.playState);
                     switch (dbAppState) {
                         case UNKNOWN_STARTING:
                             break;
@@ -135,12 +143,37 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                             mPlayerState = dbAppState;
                             break;
                         case FIND_SET:
+                            if (mHostConnection == null || !mHostConnection.isBound()) {
+                                Log.i(TAG, "Requesting the Host Service to bind");
+                                bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
+                                initHostConnectionObservables();
+                            }
                             mPlayerState = dbAppState;
                             break;
                         default:
                             throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
                     }
                     break;
+                case FIND_GAME:
+                    switch (dbAppState) {
+                        case FIND_GAME:
+                            break;
+                        case LOBBY:
+                            mPlayerState = dbAppState;
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
+                    }
+                case FIND_SET:
+                    switch (dbAppState) {
+                        case FIND_SET:
+                            break;
+                        case LOBBY:
+                            mPlayerState = dbAppState;
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
+                    }
                 default:
                     break;
             }
@@ -425,56 +458,29 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                 });
     }
 
-//    private void initHostConnectionObservables() {
-//        mHostConnection.getLobbyStateUpdates()
-//                .take(1)
-//                .observeOn(Schedulers.newThread())
-//                .subscribe((u) -> {
-//                    List<Integer> sampleSetIds = Arrays.asList(
-//                            415 /*state capitals*/,
-//                            100860839 /* IPA */,
-//                            118250511 /*french verbs */);
-//                    String userValue = mSetField.getText().toString();
-//                    Collections.shuffle(sampleSetIds);
-//                    long setId = 415;//sampleSetIds.get(0);
-//                    try {
-//                        setId = Long.valueOf(userValue);
-//                    } catch (NumberFormatException e) {
-//                        Log.d(TAG, "couldn't make a number out of '" + userValue + "', defaulting to " + setId);
-//                    }
-//
-//                    Log.i(TAG, "Can now look up QSet for content " + setId);
-//
-//                    mModelService.requestSet(setId);
-//
-////                    model.getFacts().observe(this, (l)->{
-////                        Log.i(TAG,"Can I see this sad pathetic other update? ");
-////                        Log.i(TAG, )
-////                    });
-//                });
-//        mHostConnection.getLobbyStateUpdates().observeOn(Schedulers.newThread()).subscribe(
-//                (state) -> {
-//                    TopLevelViewModel model = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-//                    model.processLobbyUpdate(state);
-//                },
-//                (e) -> Log.e(TAG, "Error updating lobby view model [" + Thread.currentThread().getName() + "] " + e)
-//        );
-//        mHostConnection.getBoardStateUpdates().observeOn(Schedulers.newThread()).subscribe(
-//                (state) -> {
-//                    TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-//                    viewModel.processGameUpdate(state);
-//                    ensureBoardFragmentUp();
-//                },
-//                (e) -> Log.e(TAG, "Error updating board view model [" + Thread.currentThread().getName() + "] " + e)
-//        );
-//        mHostConnection.getStartStatusUpdates().observeOn(Schedulers.newThread()).subscribe(
-//                (canStart) -> {
-//                    TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
-//                    viewModel.setGameState(canStart ? Game.State.CAN_START : Game.State.WAITING);
-//                },
-//                (e) -> Log.e(TAG, "Error updating start state [" + Thread.currentThread().getName() + "] " + e)
-//        );
-//    }
+    private void initHostConnectionObservables() {
+        mHostConnection.getLobbyStateUpdates().observeOn(Schedulers.newThread()).subscribe(
+                (state) -> {
+                    TopLevelViewModel model = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+                    model.processLobbyUpdate(state);
+                },
+                (e) -> Log.e(TAG, "Error updating lobby view model [" + Thread.currentThread().getName() + "] " + e)
+        );
+        mHostConnection.getBoardStateUpdates().observeOn(Schedulers.newThread()).subscribe(
+                (state) -> {
+                    TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+                    viewModel.processGameUpdate(state);
+                },
+                (e) -> Log.e(TAG, "Error updating board view model [" + Thread.currentThread().getName() + "] " + e)
+        );
+        mHostConnection.getStartStatusUpdates().observeOn(Schedulers.newThread()).subscribe(
+                (canStart) -> {
+                    TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+                    viewModel.setGameState(canStart ? Game.State.CAN_START : Game.State.WAITING);
+                },
+                (e) -> Log.e(TAG, "Error updating start state [" + Thread.currentThread().getName() + "] " + e)
+        );
+    }
 
 //    private void startHostDiscoverabilityWindow(int seconds) {
 //        String toastMsg = String.format(getResources().getString(R.string.host_discoverable_toast), seconds);
@@ -562,14 +568,8 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((QSet qSet) -> {
                         TopLevelViewModel viewModel = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
-                        viewModel.processQuizletResults(qSet);
-
-                        Completable.defer(() -> {
-                            TopLevelViewModel model = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
-                            List<Fact> facts = model.getFacts().getValue();
-                            Log.i(TAG, "Rebecca, I've gotten my updated facts : " + facts);
-                            return Completable.complete();
-                        }).subscribeOn(Schedulers.newThread()).subscribe();
+                        viewModel.processTermsFromQuizletSet(qSet);
+                        viewModel.markSetAsSynced(qSet.id());
                     }))
             ;
 
@@ -616,6 +616,10 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         mPlayerBluetoothListener = listener;
         mPlayerConnection.startLooking(this);
         return mPlayerConnection;
+    }
+
+    public HostServiceConnection getHostConnection() {
+        return mHostConnection;
     }
 
     public IModelRetrievalService getModelService() {

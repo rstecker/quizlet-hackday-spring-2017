@@ -1,9 +1,10 @@
 package sixarmstudios.quizletcolors.ui.setup;
 
+import android.app.Activity;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -14,36 +15,36 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.bluetooth.core.IBluetoothHostListener;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import appstate.AppState;
+import appstate.PlayerState;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import quizlet.QSet;
+import io.reactivex.Completable;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.StartActivity;
+import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.network.IModelRetrievalService;
 import ui.SetSummary;
-import ui.immutable.ImmSetSummary;
-import ui.immutable.ImmutableImmSetSummary;
 import viewmodel.TopLevelViewModel;
 
-import static android.view.View.GONE;
+import static sixarmstudios.quizletcolors.StartActivity.REQUEST_DISCOVERABLE_CODE;
 
 /**
  * Created by rebeccastecker on 9/7/17.
  */
 
-public class LookingForSetFragment extends LifecycleFragment {
+public class LookingForSetFragment extends LifecycleFragment implements SetSummaryAdapter.Callback, IBluetoothHostListener {
     public static final String TAG = LookingForSetFragment.class.getSimpleName();
     @LayoutRes public static final int LAYOUT_ID = R.layout.fragment_looking_for_set;
 
@@ -51,7 +52,8 @@ public class LookingForSetFragment extends LifecycleFragment {
     @BindView(R.id.welcome_host_view) TextView mWelcomeTxtView;
     @BindView(R.id.set_list) RecyclerView mSetList;
     @BindView(R.id.refresh_overview) View mRefreshList;
-    SetAdapter mAdapter;
+    SetSummaryAdapter mAdapter;
+    HostServiceConnection mHostConnection;
     IModelRetrievalService mModelService;
 
     public static LookingForSetFragment newInstance() {
@@ -69,7 +71,7 @@ public class LookingForSetFragment extends LifecycleFragment {
         TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
         viewModel.getAppState().observe(this, this::handleVMUpdates);
         viewModel.getSetSummaries().observe(this, this::handleSetUpdates);
-        mAdapter = new SetAdapter();
+        mAdapter = new SetSummaryAdapter(this);
         mSetList.setAdapter(mAdapter);
         mSetList.setLayoutManager(new LinearLayoutManager(getContext()));
         return view;
@@ -78,12 +80,32 @@ public class LookingForSetFragment extends LifecycleFragment {
     @Override public void onAttach(Context context) {
         super.onAttach(context);
         mModelService = ((StartActivity) context).getModelService();
+        mHostConnection = ((StartActivity) context).getHostConnection();
     }
 
     @OnClick(R.id.refresh_overview)
     public void handleRefreshList() {
         mModelService.refreshSummary();
     }
+
+    //region Callback interface for Adapter
+
+    @Override public Completable sync(long setId) {
+        return mModelService.fetchSetDetails(setId);
+    }
+
+    @Override public void start(long setId) {
+        String hostName = mHostConnection.startHosting(this, mUsernameField.getText().toString());
+        if (StringUtils.isEmpty(hostName)) {
+            Toast.makeText(getContext(), R.string.no_host_name, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+        viewModel.startHostingGame(setId, hostName);
+    }
+
+
+    //endregion
 
     private void handleVMUpdates(List<AppState> states) {
         if (states == null || states.isEmpty()) {
@@ -103,76 +125,37 @@ public class LookingForSetFragment extends LifecycleFragment {
         mAdapter.processLiveUpdate(summaries);
     }
 
-    private static class SetAdapter extends RecyclerView.Adapter<SetViewHolder> {
-        List<ImmSetSummary> summaries = new ArrayList<>();
+    @Override public void requestDiscoverabilityIntent(@NonNull Intent intent) {
+        Log.i(TAG, "Starting Discoverability Intent");
+        startActivityForResult(intent, REQUEST_DISCOVERABLE_CODE);
+    }
 
-        @Override
-        public SetViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(SetViewHolder.LAYOUT_ID, parent, false);
-            return new SetViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(SetViewHolder holder, int position) {
-            if (position < 0 && position >= summaries.size()) {
-                return;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_DISCOVERABLE_CODE) {
+            if (resultCode <= 0) {
+                Log.e(TAG, "Denied discoverability");
+                Toast.makeText(getContext(), R.string.discoverability_denied, Toast.LENGTH_LONG).show();
+            } else {
+                Log.i(TAG, "Discoverable mode enabled for " + resultCode + " seconds");
+//                startHostDiscoverabilityWindow(resultCode);
             }
-            holder.bind(summaries.get(position));
-        }
-
-        @Override public int getItemCount() {
-            return summaries == null ? 0 : summaries.size();
-        }
-
-        void processLiveUpdate(@NonNull List<SetSummary> dbSummaries) {
-            for (int i = 0; i < summaries.size() && i < dbSummaries.size(); ++i) {
-                ImmSetSummary dbSummary = ImmSetSummary.from(dbSummaries.get(i));
-                ImmSetSummary adapterSummary = summaries.get(i);
-                if (!dbSummary.equals(adapterSummary)) {
-                    summaries.set(i, dbSummary);
-                    notifyItemChanged(i);
-                }
-            }
-            if (summaries.size() < dbSummaries.size()) {
-                int oldSize = summaries.size();
-                for (int i = oldSize; i < dbSummaries.size(); ++i) {
-                    summaries.add(ImmSetSummary.from(dbSummaries.get(i)));
-                }
-                notifyItemRangeInserted(oldSize, dbSummaries.size() - oldSize);
-            } else if (summaries.size() > dbSummaries.size()) {
-                int oldSize = summaries.size();
-                for (int i = oldSize; i >= dbSummaries.size(); --i) {
-                    summaries.remove(i);
-                }
-                notifyItemRangeRemoved(oldSize, oldSize - dbSummaries.size());
-            }
-            notifyDataSetChanged();
         }
     }
 
-    static class SetViewHolder extends RecyclerView.ViewHolder {
-        @LayoutRes public static final int LAYOUT_ID = R.layout.view_set_summary;
+//    private void startHostDiscoverabilityWindow(int seconds) {
+//        String toastMsg = String.format(getResources().getString(R.string.host_discoverable_toast), seconds);
+//        Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
+//        mHostButton.setChecked(true);
+//        mHostButton.setText(R.string.host_button_discoverable);
+//        Single.timer(seconds, TimeUnit.SECONDS)
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe((t) -> { // do I need to worry about the button no longer being around?
+//                    mHostButton.setText(R.string.host_button);
+//                    mHostButton.setChecked(false);
+//                    Log.i(TAG, "Host no longer discoverable after " + seconds + " seconds");
+//                });
+//    }
 
-        @BindView(R.id.set_name) TextView mSetName;
-        @BindView(R.id.set_desc) TextView mSetDesc;
-        @BindView(R.id.creator_name) TextView mCreatorName;
-        @BindView(R.id.term_count) TextView mTermCount;
-        @BindView(R.id.synced) TextView mSynced;
-
-        public SetViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        public void bind(ImmSetSummary summary) {
-            Resources r = itemView.getContext().getResources();
-            mSetName.setText(summary.title());
-            mSetDesc.setText(summary.description());
-            mSetDesc.setVisibility(StringUtils.isEmpty(summary.description()) ? GONE : View.VISIBLE);
-            mCreatorName.setText(summary.creatorUsername());
-            mTermCount.setText(r.getString(R.string.term_count, summary.termCount()));
-            Date d = new Date(summary.lastSynced());
-            mSynced.setText(summary.lastSynced() == 0 ? r.getString(R.string.never_synced) : d.toString());
-        }
-    }
 }

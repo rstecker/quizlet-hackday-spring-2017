@@ -31,6 +31,9 @@ public interface SetSummaryDao {
     @Query("SELECT * FROM setSummary WHERE id = :setId LIMIT 1")
     LiveData<List<SetSummary>> getSetSummary(long setId);
 
+    @Query("UPDATE setSummary SET last_sync = :time WHERE id = :setId")
+    void updateSyncTimestamp(long setId, long time);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertAll(SetSummary... sets);
 

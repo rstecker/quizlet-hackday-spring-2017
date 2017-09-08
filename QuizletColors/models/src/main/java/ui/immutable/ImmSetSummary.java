@@ -38,6 +38,8 @@ public interface ImmSetSummary {
 
     public boolean hasImages();
 
+    boolean syncing();
+
     public static ImmSetSummary from(SetSummary summary) {
         return new ImmutableImmSetSummary.Builder()
                 .id(summary.id)
@@ -50,6 +52,7 @@ public interface ImmSetSummary {
                 .lastSynced(summary.lastSynced)
                 .lastQuizletUse(summary.lastQuizletUse)
                 .hasImages(summary.hasImages)
+                .syncing(false)
                 .build();
 
     }
