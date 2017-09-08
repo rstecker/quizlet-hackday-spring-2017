@@ -16,6 +16,7 @@ import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import quizlet.QSet;
+import quizlet.QUser;
 import ui.Fact;
 import ui.Game;
 import ui.Option;
@@ -239,5 +240,8 @@ public class TopLevelViewModel extends AndroidViewModel {
                 })
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(() -> Log.i(TAG, "Can I see my db stuff NOW? Has completed"), (e) -> Log.e(TAG, "Error encountered while updating QSet terms.Can I see it?"));
+    }
+
+    public void processQUser(QUser qUser) {
     }
 }

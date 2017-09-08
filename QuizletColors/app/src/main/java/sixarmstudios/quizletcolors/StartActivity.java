@@ -1,6 +1,7 @@
 package sixarmstudios.quizletcolors;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothAdapter;
@@ -9,7 +10,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.LayoutRes;
@@ -18,6 +22,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -42,9 +48,12 @@ import butterknife.OnClick;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import quizlet.QSet;
+import quizlet.QStudied;
+import quizlet.QUser;
 import sixarmstudios.quizletcolors.connections.HostServiceConnection;
 import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
 import sixarmstudios.quizletcolors.network.IModelRetrievalService;
@@ -59,7 +68,8 @@ import static sixarmstudios.quizletcolors.logic.SetupHelper.MOCK_USERNAMES;
 
 
 public class StartActivity extends LifecycleActivity implements IBluetoothHostListener, IBluetoothPlayerListener {
-    @LayoutRes public static final int LAYOUT_ID = R.layout.activity_start;
+    @LayoutRes
+    public static final int LAYOUT_ID = R.layout.activity_start;
     public static final String TAG = StartActivity.class.getSimpleName();
 
     public static final int REQUEST_ENABLE_BT = 10;
@@ -68,11 +78,18 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
 
     private static final String PLAYER_STATE_KEY = "player_state";
 
-    @BindView(R.id.username_text_field) EditText mUsernameField;
-    @BindView(R.id.set_text_field) EditText mSetField;
-    @BindView(R.id.start_hosting) CheckedTextView mHostButton;
-    @BindView(R.id.join_game) CheckedTextView mJoinButton;
-    @BindView(R.id.join_option_list) LinearLayout mJoinList;
+    @BindView(R.id.username_text_field)
+    EditText mUsernameField;
+    @BindView(R.id.set_text_field)
+    EditText mSetField;
+    @BindView(R.id.start_hosting)
+    CheckedTextView mHostButton;
+    @BindView(R.id.join_game)
+    CheckedTextView mJoinButton;
+    @BindView(R.id.join_option_list)
+    LinearLayout mJoinList;
+    @BindView(R.id.oauth_start)
+    View mOauthButton;
 
     IModelRetrievalService mModelService;
     boolean mModelBound = false;
@@ -90,12 +107,14 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
         startService(ModelRetrievalService.startIntent(this, "fakeClientId"));
     }
 
-    @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mPlayerState = (PlayerState) savedInstanceState.get(PLAYER_STATE_KEY);
     }
 
-    @Override protected void onSaveInstanceState(Bundle outState) {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(PLAYER_STATE_KEY, mPlayerState);
     }
@@ -179,6 +198,47 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
     }
     //endregion
 
+
+    @OnClick(R.id.oauth_start)
+    public void handleOauthStart() {
+        Dialog auth_dialog;
+        WebView web;
+
+        auth_dialog = new Dialog(this);
+        auth_dialog.setContentView(R.layout.auth_dialog);
+        web = (WebView) auth_dialog.findViewById(R.id.webv);
+        web.getSettings().setJavaScriptEnabled(true);
+        web.loadUrl(mModelService.getOauthUrl());
+        final String secretCode = mModelService.getSecretCode();
+        final String redirectUrl = mModelService.getRedirectUrl();
+
+        web.setWebViewClient(new WebViewClient() {
+            String authCode;
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                Log.i(TAG, "We are STARTING " + url);
+                if (!url.contains(redirectUrl)) {
+                    super.onPageStarted(view, url, favicon);
+                    return;
+                }
+                Uri uri = Uri.parse(url);
+                if (url.contains("code=")) {
+                    authCode = uri.getQueryParameter("code");
+                    Log.i(TAG, "CODE : " + authCode);
+                    mModelService.handelOauthCode(authCode);
+                } else if (url.contains("error=access_denied")) {
+                    Log.i(TAG, "ACCESS_DENIED_HERE");
+                } else {
+                    Log.w(TAG, "OAuth response that doesn't make sense : " + url);
+                }
+                auth_dialog.dismiss();
+            }
+        });
+        auth_dialog.show();
+        auth_dialog.setTitle("Sharks are fun");
+        auth_dialog.setCancelable(true);
+    }
 
     @OnClick(R.id.start_hosting)
     public void handleStartHostingClick() {
@@ -454,7 +514,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
      */
     private ServiceConnection mModelConnection = new ServiceConnection() {
 
-        Disposable mDisposable;
+        CompositeDisposable mDisposable = new CompositeDisposable();
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -462,7 +522,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
             ModelRetrievalService.LocalBinder binder = (ModelRetrievalService.LocalBinder) service;
             mModelService = binder.getService();
 
-            mDisposable = mModelService.getQSetFlowable()
+            mDisposable.add(mModelService.getQSetFlowable()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((QSet qSet) -> {
                         TopLevelViewModel viewModel = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
@@ -471,13 +531,34 @@ public class StartActivity extends LifecycleActivity implements IBluetoothHostLi
                         Completable.defer(() -> {
                             TopLevelViewModel model = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
                             List<Fact> facts = model.getFacts().getValue();
-                            Log.i(TAG, "Rebecca, I've gotten my updated facts : "+facts);
+                            Log.i(TAG, "Rebecca, I've gotten my updated facts : " + facts);
                             return Completable.complete();
                         }).subscribeOn(Schedulers.newThread()).subscribe();
-                    })
+                    }))
+            ;
+
+            mDisposable.add(mModelService.getQUserFlowable()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((QUser qUser) -> {
+                        TopLevelViewModel viewModel = ViewModelProviders.of(StartActivity.this).get(TopLevelViewModel.class);
+                        viewModel.processQUser(qUser);
+                        mUsernameField.setText(qUser.username());
+                        for(QSet set : qUser.recentSets()) {
+                            Log.i(TAG, " >> [recent set] "+set.title()+" : "+set.description() +" : "+set.creatorUsername());
+                        }
+                        for(QSet set : qUser.favoriteSets()) {
+                            Log.i(TAG, " >> [favorite set] "+set.title()+" : "+set.description() +" : "+set.creatorUsername());
+                        }
+
+                        for(QStudied studied : qUser.studied()) {
+                            QSet set = studied.set();
+                            Log.i(TAG, " >> [studied set] "+set.title()+" : "+set.description() +" : "+set.creatorUsername());
+                        }
+                    }))
             ;
             mModelBound = true;
         }
+
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {

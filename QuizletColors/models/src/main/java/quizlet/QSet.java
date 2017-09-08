@@ -8,6 +8,8 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
+import io.reactivex.annotations.Nullable;
+
 /**
  * Created by rebeccastecker on 6/12/17.
  */
@@ -21,16 +23,16 @@ public interface QSet {
     @JsonProperty("title") String title();
     @JsonProperty("description") String description();
 
-
     @JsonProperty("lang_terms") String wordLanguageCode();
     @JsonProperty("lang_definitions") String definitionLanguageCode();
 
     @JsonProperty("created_by") String creatorUsername();
-    @JsonProperty("creator") QUser creator();
+    @JsonProperty("creator_id") long creatorId();
+    @Nullable @JsonProperty("creator") QUser creator();
 
     @JsonProperty("term_count") int termCount();
     @JsonProperty("has_images") boolean hasImages();
-    @JsonProperty("terms") List<QTerm> terms();
+    @Nullable @JsonProperty("terms") List<QTerm> terms();
 
     /**
      "subjects": [

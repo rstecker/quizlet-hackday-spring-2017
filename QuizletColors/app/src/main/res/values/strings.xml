@@ -23,6 +23,7 @@
 
 
     <string name="join_button">Join Game</string>
+    <string name="start_oath">Start OAuth</string>
     <string name="join_button_looking">…Looking…</string>
 
 </resources>

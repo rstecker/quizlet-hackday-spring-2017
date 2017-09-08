@@ -47,6 +47,13 @@
             android:layout_height="wrap_content"
             android:text="@string/join_button" />
 
+        <Button
+            android:id="@+id/oauth_start"
+            style="@style/LobbyButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start_oath" />
+
     </LinearLayout>
 
     <FrameLayout

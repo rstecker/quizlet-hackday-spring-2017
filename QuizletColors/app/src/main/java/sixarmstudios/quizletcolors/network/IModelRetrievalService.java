@@ -2,6 +2,7 @@ package sixarmstudios.quizletcolors.network;
 
 import io.reactivex.Flowable;
 import quizlet.QSet;
+import quizlet.QUser;
 
 /**
  * Created by rebeccastecker on 6/12/17.
@@ -18,8 +19,22 @@ public interface IModelRetrievalService {
     Flowable<QSet> getQSetFlowable();
 
     /**
+     * @return observable that emits the user details of the latest user to auth with the app
+     */
+    Flowable<QUser> getQUserFlowable();
+
+    /**
      * Kicks off a server request. When the set is loaded, you can find the results over at
      * {@link IModelRetrievalService#getQSetFlowable()}
      */
     void requestSet(long localId);
+
+    String getOauthUrl();
+
+    String getSecretCode();
+
+    String getRedirectUrl();
+
+    void handelOauthCode(String authCode);
+
 }
