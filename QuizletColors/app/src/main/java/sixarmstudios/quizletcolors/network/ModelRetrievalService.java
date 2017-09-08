@@ -1,14 +1,18 @@
 package sixarmstudios.quizletcolors.network;
 
 import android.app.Service;
+import android.arch.lifecycle.LifecycleActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.widget.Toast;
+
+import org.apache.commons.lang3.StringUtils;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -145,10 +149,10 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
     }
 
     @Override
-    public void handelOauthCode(String authCode) {
+    public void handelOauthCode(LifecycleActivity context, String authCode) {
         Completable
                 .defer(() -> {
-                    mClient.handleOAuthCode(authCode, mRedirectUrl);
+                    mClient.handleOAuthCode(context, authCode, mRedirectUrl);
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -166,5 +170,22 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
         return mRedirectUrl;
     }
 
+    @Override public void refreshSummary() {
+        Completable
+                .defer(() -> {
+                    mClient.updateUserInfo();
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe()
+                ;
+    }
+
+    @Override public void restoreQuizletInfo(String accessCode, String username) {
+        if (StringUtils.isEmpty(username)) {
+            return;
+        }
+        mClient.setRestoredState(accessCode, username);
+    }
     //endregion
 }

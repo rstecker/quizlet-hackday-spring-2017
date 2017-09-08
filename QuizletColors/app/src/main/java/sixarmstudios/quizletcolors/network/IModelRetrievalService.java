@@ -1,5 +1,8 @@
 package sixarmstudios.quizletcolors.network;
 
+import android.arch.lifecycle.LifecycleActivity;
+import android.support.v4.app.FragmentActivity;
+
 import io.reactivex.Flowable;
 import quizlet.QSet;
 import quizlet.QUser;
@@ -35,6 +38,9 @@ public interface IModelRetrievalService {
 
     String getRedirectUrl();
 
-    void handelOauthCode(String authCode);
+    void handelOauthCode(LifecycleActivity lifecycleActivity, String authCode);
 
+    void refreshSummary();
+
+    void restoreQuizletInfo(String accessCode, String username);
 }

@@ -6,10 +6,13 @@ import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import appstate.AppState;
+import appstate.PlayerState;
 import database.AppDatabase;
 import gamelogic.BoardState;
 import gamelogic.LobbyState;
@@ -20,6 +23,7 @@ import quizlet.QUser;
 import ui.Fact;
 import ui.Game;
 import ui.Option;
+import ui.SetSummary;
 
 /**
  * Created by rebeccastecker on 6/11/17.
@@ -41,6 +45,12 @@ public class TopLevelViewModel extends AndroidViewModel {
 
     public LiveData<List<Fact>> getFacts() {
         return mAppDatabase.factDao().getFacts();
+    }
+    public LiveData<List<AppState>> getAppState() {
+        return mAppDatabase.applicationStateDao().getGame();
+    }
+    public LiveData<List<SetSummary>> getSetSummaries() {
+        return mAppDatabase.setSummaryDao().getAll();
     }
 
     public void resetGame() {
@@ -155,9 +165,11 @@ public class TopLevelViewModel extends AndroidViewModel {
     public void joinNewGame(@Nullable String name, int bondState, @NonNull String address) {
         Completable.defer(
                 () -> {
+
                     Game newGame = new Game();
                     newGame.initForPlayer(name, bondState, address);
                     mAppDatabase.gameDao().insertAll(newGame);
+                    mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.LOBBY.toDBVal());
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -243,5 +255,63 @@ public class TopLevelViewModel extends AndroidViewModel {
     }
 
     public void processQUser(QUser qUser) {
+        // TODO : update payment level in DB?
+    }
+
+    public void initApplication(PlayerState playerState) {
+        Completable.defer(
+                () -> {
+                    AppState appState = new AppState();
+                    appState.playState = playerState.toDBVal();
+                    mAppDatabase.applicationStateDao().insertAll(appState);
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+    }
+    public void updatePlayerState(PlayerState playerState) {
+        Completable.defer(
+                () -> {
+                    mAppDatabase.applicationStateDao().updatePlayerState(playerState.toDBVal());
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+    }
+
+    public void updateAppState(AppState appState) {
+        Completable.defer(
+                () -> {
+                    mAppDatabase.applicationStateDao().update(appState);
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+    }
+
+    public void updateQuizletData(String token, String username) {
+        Completable.defer(
+                () -> {
+                    mAppDatabase.applicationStateDao().updatePlayerStateWithQuizletAuth(PlayerState.FIND_SET.toDBVal(), token, username);
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+    }
+
+    public void updateSetSummaryData(LongSparseArray<QSet> sets) {
+        Completable.defer(
+                () -> {
+                    List<SetSummary> summaries = new ArrayList<>();
+                    for(int i = 0; i < sets.size(); ++i) {
+                        QSet qset = sets.valueAt(i);
+                        summaries.add(new SetSummary(qset));
+                    }
+                    Log.i(TAG, "Updating db with "+summaries.size()+" set summaries");
+                    mAppDatabase.setSummaryDao().insertAll(summaries);
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
     }
 }
