@@ -33,6 +33,8 @@ public abstract class QCGameMessage {
     public static QCGameMessage build(
             @JsonProperty("action") Action action,
             @JsonProperty("state") GameState state,
+            @JsonProperty("set_name") String setName,
+            @JsonProperty("fact_count") Integer factCount,
             @JsonProperty("members") List<QCMember> members,
             @JsonProperty("question") String question,
             @JsonProperty("provided_answer") String providedAnswer,
@@ -44,6 +46,8 @@ public abstract class QCGameMessage {
         return ImmutableQCGameMessage.builder()
                 .action(action)
                 .state(state)
+                .setName(setName)
+                .factCount(factCount)
                 .members(members)
                 .question(question)
                 .providedAnswer(providedAnswer)
@@ -77,6 +81,14 @@ public abstract class QCGameMessage {
     @JsonProperty("state") public abstract GameState state();
 
     @JsonProperty("members") public abstract List<QCMember> members();
+
+    // region Lobby welcome info
+
+    @JsonProperty("set_name") @Nullable public abstract String setName();
+
+    @JsonProperty("fact_count") @Nullable public abstract Integer factCount();
+
+    // endregion
 
     // region default/good user action responses
 

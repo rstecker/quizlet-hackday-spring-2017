@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.LongSparseArray;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,93 +66,12 @@ public class TopLevelViewModel extends AndroidViewModel {
         Completable.defer(
                 () -> {
                     Log.i(TAG, "Clearing out DB");
+                    // don't clear out sets, facts, or appstate info!
                     mAppDatabase.playerDao().clearGame();
                     mAppDatabase.gameDao().clearGame();
                     mAppDatabase.optionsDao().clearGame();
                     mAppDatabase.goodMovesDao().clearMoves();
                     mAppDatabase.badMovesDao().clearMoves();
-                    return Completable.complete();
-                })
-                .subscribeOn(Schedulers.newThread())
-                .subscribe();
-    }
-
-    @Deprecated
-    public void setUpNewGame(final @NonNull String hostName) {
-        Completable.defer(
-                () -> {
-                    Game newGame = new Game();
-//                    newGame.initForHost(hostName);
-                    mAppDatabase.gameDao().insertAll(newGame);
-
-                    // TODO : somehow actually get content from Quizlet! In the mean time....
-                    List<Fact> mockContent = new ArrayList<>();
-                    mockContent.add(new Fact(-1, "Alabama", "Montgomery"));
-                    mockContent.add(new Fact(-1, "Alaska", "Juneau"));
-                    mockContent.add(new Fact(-1, "Arizona", "Phoenix"));
-                    mockContent.add(new Fact(-1, "Arkansas", "Little Rock"));
-                    mockContent.add(new Fact(-1, "California", "Sacramento"));
-                    mockContent.add(new Fact(-1, "Colorado", "Denver"));
-                    mockContent.add(new Fact(-1, "Connecticut", "Hartford"));
-                    mockContent.add(new Fact(-1, "Delaware", "Dover"));
-                    mockContent.add(new Fact(-1, "Florida", "Tallahassee"));
-                    mockContent.add(new Fact(-1, "Georgia", "Atlanta"));
-                    mockContent.add(new Fact(-1, "Hawaii", "Honolulu"));
-                    mockContent.add(new Fact(-1, "Idaho", "Boise"));
-                    mockContent.add(new Fact(-1, "Illinois", "Springfield"));
-                    mockContent.add(new Fact(-1, "Indiana", "Indianapolis"));
-                    mockContent.add(new Fact(-1, "Iowa", "Des Moines"));
-                    mockContent.add(new Fact(-1, "Kansas", "Topeka"));
-                    mockContent.add(new Fact(-1, "Kentucky", "Frankfort"));
-                    mockContent.add(new Fact(-1, "Louisiana", "Baton Rouge"));
-                    mockContent.add(new Fact(-1, "Maine", "Augusta"));
-                    mockContent.add(new Fact(-1, "Maryland", "Annapolis"));
-                    mockContent.add(new Fact(-1, "Massachusetts", "Boston"));
-                    mockContent.add(new Fact(-1, "Michigan", "Lansing "));
-                    mockContent.add(new Fact(-1, "Minnesota", "St.Paul "));
-                    mockContent.add(new Fact(-1, "Mississippi", "Jackson "));
-                    mockContent.add(new Fact(-1, "Missouri", "Jefferson City "));
-                    mockContent.add(new Fact(-1, "Montana", "Helena "));
-                    mockContent.add(new Fact(-1, "Nebraska", "Lincoln "));
-                    mockContent.add(new Fact(-1, "Nevada", "Carson City "));
-                    mockContent.add(new Fact(-1, "New Hampshire", "-Concord "));
-                    mockContent.add(new Fact(-1, "New Jersey", "Trenton "));
-                    mockContent.add(new Fact(-1, "New Mexico", "Santa Fe "));
-                    mockContent.add(new Fact(-1, "New York", "Albany "));
-                    mockContent.add(new Fact(-1, "North Carolina", "Raleigh "));
-                    mockContent.add(new Fact(-1, "North Dakota", "Bismarck "));
-                    mockContent.add(new Fact(-1, "Ohio", "Columbus "));
-                    mockContent.add(new Fact(-1, "Oklahoma", "Oklahoma City "));
-                    mockContent.add(new Fact(-1, "Oregon", "Salem "));
-                    mockContent.add(new Fact(-1, "Pennsylvania", "Harrisburg "));
-                    mockContent.add(new Fact(-1, "Rhode Island", "Providence "));
-                    mockContent.add(new Fact(-1, "South Carolina", "Columbia "));
-                    mockContent.add(new Fact(-1, "South Dakota", "Pierre "));
-                    mockContent.add(new Fact(-1, "Tennessee", "Nashville "));
-                    mockContent.add(new Fact(-1, "Texas", "Austin "));
-                    mockContent.add(new Fact(-1, "Utah", "Salt Lake City "));
-                    mockContent.add(new Fact(-1, "Vermont", "Montpelier "));
-                    mockContent.add(new Fact(-1, "Virginia", "Richmond "));
-                    mockContent.add(new Fact(-1, "Washington", "Olympia "));
-                    mockContent.add(new Fact(-1, "West Virginia", "Charleston "));
-                    mockContent.add(new Fact(-1, "Wisconsin", "Madison "));
-                    mockContent.add(new Fact(-1, "Wyoming", "Cheyenne "));
-
-//                    for (int i = 1; i < 21; ++i) {
-//                        String question = "q" + i;
-//                        String answer = "a" + i;
-////                        for (int j = 0; j < Math.random() * 5; ++j) {
-////                            question += " q"+i;
-////                        }
-////                        for (int j = 0; j < Math.random() * 10; ++j) {
-////                            answer += " a"+i;
-////                        }
-//
-//                        mockContent.add(new Fact(-1, question, answer));
-//                    }
-                    Log.i(TAG, "Adding mock content : " + mockContent.size() + " to db. Can we see this?");
-//                    mAppDatabase.factDao().insertAll(mockContent);
-
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -200,6 +121,10 @@ public class TopLevelViewModel extends AndroidViewModel {
         Completable.defer(
                 () -> {
                     mAppDatabase.playerDao().insertAll(state.players());
+                    Integer count = state.factCount();
+                    if (StringUtils.isNotEmpty(state.setName()) && count != null) {
+                        mAppDatabase.gameDao().updateGameDetails(state.setName(), count);
+                    }
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -246,7 +171,7 @@ public class TopLevelViewModel extends AndroidViewModel {
                 () -> {
                     List<Fact> content = new ArrayList<>();
                     for (QTerm qTerm : qSet.terms()) {
-                        content.add(new Fact(qSet.id(), qTerm.word(), qTerm.definition()));
+                        content.add(new Fact(qSet.id(), qSet.title(), qTerm.word(), qTerm.definition()));
                     }
                     mAppDatabase.factDao().insertAll(content);
                 })

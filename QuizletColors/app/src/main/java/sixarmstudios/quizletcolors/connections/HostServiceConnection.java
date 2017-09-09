@@ -147,9 +147,9 @@ public class HostServiceConnection implements ServiceConnection {
         }
     }
 
-    public void setContent(@Nullable List<Fact> facts) {
+    public void setContent(@NonNull String setName, @Nullable List<Fact> facts) {
         if (facts == null) {
-            mGameEngine.setContent(new ArrayList<>());
+            mGameEngine.setContent("", new ArrayList<>());
             return;
         }
         List<Pair<String, String>> content = new ArrayList<>();
@@ -157,7 +157,7 @@ public class HostServiceConnection implements ServiceConnection {
             content.add(new Pair<>(fact.question, fact.answer));
         }
         // TODO : are we overriding? are we adding? where are we screening for conflicting values?
-        mGameEngine.setContent(content);
+        mGameEngine.setContent(setName, content);
     }
 
     public void startGame() {

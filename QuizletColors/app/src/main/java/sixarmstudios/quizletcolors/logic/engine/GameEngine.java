@@ -31,6 +31,7 @@ public class GameEngine implements IGameEngine {
     private List<QCMember> mMembers;
     private List<Pair<String, String>> mContent;
     private BehaviorSubject<Boolean> mCanStart;
+    private String mSetName;
 
     public GameEngine() {
         mLobbyLogic = new LobbyLogic(this);
@@ -55,6 +56,8 @@ public class GameEngine implements IGameEngine {
                 .action(action)
                 .state(GameState.LOBBY)
                 .members(mMembers)
+                .setName(mSetName)
+                .factCount(mContent == null ? 0 : mContent.size())
                 .build();
     }
 
@@ -122,7 +125,8 @@ public class GameEngine implements IGameEngine {
         return mMembers.size();
     }
 
-    @Override public void setContent(@NonNull List<Pair<String, String>> content) {
+    @Override public void setContent(@NonNull String setName, @NonNull List<Pair<String, String>> content) {
+        mSetName = setName;
         // TODO : don't allow duplicate values or values with ambigious results!!
         Log.i(TAG, "Content has been set : "+content.size()+" pairs");
         mContent = content;

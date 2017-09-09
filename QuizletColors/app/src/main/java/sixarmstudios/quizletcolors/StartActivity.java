@@ -137,7 +137,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                             handleOAuthStart();
                             break;
                         case FIND_GAME:
-                            if (mPlayerConnection == null || !mPlayerConnection.isBound()) {
+                            if (!mPlayerConnection.isBound()) {
                                 Log.i(TAG, "Requesting the Player Service to bind (find game)");
                                 bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
                                 initPlayerConnectionObservables();
@@ -228,6 +228,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        Log.i(TAG, "Restoring state. This is going to break our connections, right?");
         mPlayerState = (PlayerState) savedInstanceState.get(PLAYER_STATE_KEY);
 
         if (mPlayerState == PlayerState.FIND_SET) {
@@ -472,6 +473,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
 
     /**
      * Defines callbacks for service binding, passed to bindService()
+     * FIXME : could we please fucking move this out of the main activity??
      */
     BehaviorSubject<Boolean> mBoundModelServiceSubject = BehaviorSubject.create();
     private ServiceConnection mModelConnection = new ServiceConnection() {

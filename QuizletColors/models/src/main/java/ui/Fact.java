@@ -29,12 +29,16 @@ public class Fact {
     @ColumnInfo(name = "answer")
     public String answer;
 
+    @ColumnInfo(name = "q_set_name")
+    public String qSetName;
+
     public Fact() {
     }
 
     @Ignore
-    public Fact(long setId, @NonNull String question, @NonNull String answer) {
+    public Fact(long setId, @NonNull String setName, @NonNull String question, @NonNull String answer) {
         this.qSetId = setId;
+        this.qSetName = setName;
         this.question = question;
         this.answer = answer;
     }

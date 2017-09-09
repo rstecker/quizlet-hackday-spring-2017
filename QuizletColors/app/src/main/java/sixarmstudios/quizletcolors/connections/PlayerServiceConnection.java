@@ -61,7 +61,9 @@ public class PlayerServiceConnection implements ServiceConnection {
                         })
         ;
         // this is us piping our actions to the server. We want to wait till we establish a connection before we go
-        mEngine.getOutgoingBluetoothMessages().subscribe(
+        mEngine.getOutgoingBluetoothMessages()
+                .distinctUntilChanged()
+                .subscribe(
                 (msg) -> {
                     if (isBound()) {
                         String stringMsg = mMapper.writeValueAsString(msg);

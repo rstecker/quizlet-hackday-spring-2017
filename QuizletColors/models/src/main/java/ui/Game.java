@@ -45,6 +45,12 @@ public class Game {
     @ColumnInfo(name = "host_name")
     public String hostName;
 
+    @ColumnInfo(name = "set_name")
+    public String qSetName;
+
+    @ColumnInfo(name = "fact_count")
+    public int factCount;
+
     @ColumnInfo(name = "is_host")
     public boolean isHost;
 

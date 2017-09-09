@@ -14,10 +14,12 @@ Currently there are a couple strings required in the `local.properties` file:
 
 # TODOs
 
-- service clean up
+- service/bluetooth clean up
   - OMG MAKE THINGS NOT BREAK ON LIFECYCLE CHANGES!!!!
   - just... ugh... clean everything up. Why is the model service different?
   - make bluetooth do a better job of maintaining connection...
+  - kick players from the game when they drop off
+  - know when you've lost your connection to the host
 - clean up Auth flow
   - expose errors to users
   - refactor the secret code to be randomly generated
@@ -43,3 +45,20 @@ Currently there are a couple strings required in the `local.properties` file:
 - implement end game logic
   - end game state screen
   - logic in game engine
+
+# Notes on Game Engine 
+
+How to pipe data from the Host to a Player
+
+1. ... start somewhere in host logic...
+2. add it to the `QCGameMessage` object. That's what gets piped over via Bluetooth
+3. pick it out of the `QCGameMessage` in the `PlayerEngine` 
+4. depending on what phase of the game it is, pass through the details via `LobbyState` or `BoardState`
+5. modify how the states are processed in the `TopLevelViewModel` (piped through automatically by the `StartActivity`), which will require you to modify the various DB objects as needed to pass changes through via `LiveData` to the UI Fragments
+6. in your Fragments, listen to the correct `LiveData` feed.
+
+See, easy!  While it may look tedious, it's great because we have 3 different models to seperate the 3 different levels of concern : bluetooth, game logic, ui logic.  Also, lets be clear-- you really shouldn't be piping brand new data formats from host to player all that often. Doing so is a breaking schema change and we really should have though things out before hand. It's expected that most changes are isolated to just game logic OR just ui logic and can fit into the communication protocall already...
+
+
+
+ (note : this doc was written in Sublime, without the safety net of spell check)
