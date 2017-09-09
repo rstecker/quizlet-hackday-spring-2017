@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/background_color">
 
-    <LinearLayout
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/board_question"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:autoSizeMinTextSize="5sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
+        tools:text="Sharks sharks sharks Sharks " />
 
-        <TextView
-            android:id="@+id/board_question"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="no game info yet" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/option_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/min_tap_target_size" />
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/player_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/min_tap_target_size" />
-    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/option_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:minHeight="@dimen/min_tap_target_size" />
 
-</ScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/player_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:minHeight="@dimen/min_tap_target_size" />
+</LinearLayout>

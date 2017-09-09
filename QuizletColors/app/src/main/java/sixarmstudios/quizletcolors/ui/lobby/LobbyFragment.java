@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -50,6 +51,7 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
     @BindView(R.id.player_list) RecyclerView mPlayerList;
 
     private PlayerAdapter mAdapter;
+    private GridLayoutManager mPlayersLayoutManager;
     private HostServiceConnection mHostConnection;
 
     public static LobbyFragment newInstance(@Nullable Long qSetId) {
@@ -81,8 +83,8 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
 
         mAdapter = new PlayerAdapter(this);
         mPlayerList.setAdapter(mAdapter);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mPlayerList.setLayoutManager(layoutManager);
+        mPlayersLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
+        mPlayerList.setLayoutManager(mPlayersLayoutManager);
 
         return view;
     }
@@ -141,6 +143,7 @@ public class LobbyFragment extends LifecycleFragment implements IUserSelector {
             mUsers.setText("Lobby is empty");
             return;
         }
+        mPlayersLayoutManager.setSpanCount(Math.max(1, players.size()));
         mAdapter.setPlayers(players);
         StringBuilder sb = new StringBuilder();
         for (Player player : players) {

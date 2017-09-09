@@ -116,6 +116,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
             // reset old application state
             AppState appState = appStates.get(0);
             PlayerState dbAppState = PlayerState.fromDBVal(appState.playState);
+            boolean isHosting = appState.currentQSetId > 0;
             switch (mPlayerState) {
                 case UNKNOWN_INIT:
                     mPlayerState = PlayerState.UNKNOWN_STARTING;
@@ -139,7 +140,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                             break;
                         case FIND_GAME:
                             if (mPlayerConnection == null || !mPlayerConnection.isBound()) {
-                                Log.i(TAG, "Requesting the Player Service to bind");
+                                Log.i(TAG, "Requesting the Player Service to bind (find game)");
                                 bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
                                 initPlayerConnectionObservables();
                             }
@@ -147,7 +148,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                             break;
                         case FIND_SET:
                             if (mHostConnection == null || !mHostConnection.isBound()) {
-                                Log.i(TAG, "Requesting the Host Service to bind");
+                                Log.i(TAG, "Requesting the Host Service to bind (find set)");
                                 bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
                                 initHostConnectionObservables();
                             }
@@ -167,6 +168,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                         default:
                             throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
                     }
+                    break;
                 case FIND_SET:
                     switch (dbAppState) {
                         case FIND_SET:
@@ -177,9 +179,20 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                         default:
                             throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
                     }
+                    break;
                 case LOBBY:
                     switch (dbAppState) {
                         case LOBBY:
+                            if (isHosting && !mHostConnection.isBound()) {
+                                Log.i(TAG, "Requesting the Host Service to bind (lobby)");
+                                bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
+                                initHostConnectionObservables();
+                            }
+                            if (!isHosting && !mPlayerConnection.isBound()) {
+                                Log.i(TAG, "Requesting the Player Service to bind (lobby)");
+                                bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
+                                initPlayerConnectionObservables();
+                            }
                             break;
                         case PLAYING:
                             mPlayerState = dbAppState;
@@ -187,6 +200,25 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                         default:
                             throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
                     }
+                    break;
+                case PLAYING:
+                    switch (dbAppState) {
+                        case PLAYING:
+                            if (isHosting && !mHostConnection.isBound()) {
+                                Log.i(TAG, "Requesting the Host Service to bind (game)");
+                                bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
+                                initHostConnectionObservables();
+                            }
+                            if (!isHosting && !mPlayerConnection.isBound()) {
+                                Log.i(TAG, "Requesting the Player Service to bind (game)");
+                                bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
+                                initPlayerConnectionObservables();
+                            }
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -219,6 +251,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "onDestroy, unbinding all services");
         if (mHostConnection.isBound()) {
             mHostConnection.unbindService(this);
             mHostConnection = null;

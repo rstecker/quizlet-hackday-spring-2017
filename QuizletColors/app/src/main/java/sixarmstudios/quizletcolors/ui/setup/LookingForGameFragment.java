@@ -88,6 +88,16 @@ public class LookingForGameFragment extends LifecycleFragment implements IBlueto
             if (StringUtils.isNoneEmpty(state.qUsername)) {
                 mUsernameField.setText(state.qUsername);
                 mUsernameField.setHint(state.qUsername);
+            } else {
+                mUsernameField.setText("FooBar");
+
+
+
+
+
+
+
+
             }
         });
         return view;

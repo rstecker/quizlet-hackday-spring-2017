@@ -29,6 +29,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 import sixarmstudios.quizletcolors.logic.engine.GameEngine;
 import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
@@ -48,6 +49,7 @@ public class HostServiceConnection implements ServiceConnection {
     private IServerService mServerService;
     private IGameEngine mGameEngine;
     private IPlayerEngine mPlayerEngine;
+    private BehaviorSubject<Boolean> mBoundSubject = BehaviorSubject.create();
     private int msgCount = 0;
     private ObjectMapper mMapper;
 
@@ -86,11 +88,13 @@ public class HostServiceConnection implements ServiceConnection {
                 }
         );
         mServerBound = true;
+        mBoundSubject.onNext(true);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName arg0) {
         mServerBound = false;
+        mBoundSubject.onNext(false);
     }
 
     public String startHosting(IBluetoothHostListener listener, String username) {
@@ -102,6 +106,7 @@ public class HostServiceConnection implements ServiceConnection {
     public void unbindService(Context context) {
         context.unbindService(this);
         mServerBound = false;
+        mBoundSubject.onNext(false);
     }
 
     public boolean isBound() {
@@ -109,9 +114,10 @@ public class HostServiceConnection implements ServiceConnection {
     }
 
     public void makeMove(@NonNull String answer, @NonNull String color) {
-        if (isBound()) {
-            mPlayerEngine.makeMove(answer, color);
-        }
+        mBoundSubject
+                .filter((bound) -> bound)
+                .take(1)
+                .subscribe((bound) -> mPlayerEngine.makeMove(answer, color), (e) -> Log.e(TAG, "Error "+e));
     }
 
     public Observable<BoardState> getBoardStateUpdates() {

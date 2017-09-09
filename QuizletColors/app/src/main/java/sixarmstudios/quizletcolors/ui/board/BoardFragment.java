@@ -50,6 +50,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
     private String mString;
     private long mLastMoveUpdateTimestamp;
     private GridLayoutManager mOptionsLayoutManager;
+    private GridLayoutManager mPlayersLayoutManager;
 
     public static BoardFragment newInstance() {
         BoardFragment fragment = new BoardFragment();
@@ -74,17 +75,13 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
 
         mPlayerAdapter = new PlayerAdapter(this);
         mPlayerList.setAdapter(mPlayerAdapter);
-        LinearLayoutManager layoutManager1 = new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mPlayerList.setLayoutManager(layoutManager1);
+        mPlayersLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
+        mPlayerList.setLayoutManager(mPlayersLayoutManager);
 
 
         mOptionAdapter = new OptionAdapter(this);
         mOptionList.setAdapter(mOptionAdapter);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
-        } else {
-            mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.HORIZONTAL, false);
-        }
+        mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
         mOptionList.setLayoutManager(mOptionsLayoutManager);
 
         return view;
@@ -99,7 +96,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         mLastMoveUpdateTimestamp = move.timestamp;
-        Log.i(TAG, "Bad move update : "+move);
+        Log.i(TAG, "Bad move update : " + move);
         if (move.youAnsweredPoorly) {
             Toast.makeText(this.getContext(), "You submitted the wrong answer", Toast.LENGTH_SHORT).show();
         } else if (move.youWereGivenBadAnswer) {
@@ -121,7 +118,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         mLastMoveUpdateTimestamp = move.timestamp;
-        Log.i(TAG, "Good move update : "+move);
+        Log.i(TAG, "Good move update : " + move);
         if (move.youAnswered && move.youAsked) {
             Toast.makeText(this.getContext(), "Good job!", Toast.LENGTH_SHORT).show();
         } else if (move.youAsked) {
@@ -133,6 +130,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
 
     private void handlePlayerUpdates(List<Player> players) {
         Log.w(TAG, "I see players " + players);
+        mPlayersLayoutManager.setSpanCount(Math.max(1, players.size()));
         mPlayerAdapter.setPlayers(players);
     }
 
@@ -141,7 +139,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
         if (options == null) {
             return;
         }
-        mOptionsLayoutManager.setSpanCount(Math.max(1,options.size()));
+        mOptionsLayoutManager.setSpanCount(Math.max(1, options.size() / 2));
         mOptionAdapter.setOptions(options);
     }
 
