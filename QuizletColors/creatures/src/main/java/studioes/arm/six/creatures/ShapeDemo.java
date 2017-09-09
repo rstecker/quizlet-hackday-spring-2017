@@ -2,7 +2,6 @@ package studioes.arm.six.creatures;
 
 import android.content.Context;
 import android.graphics.drawable.Animatable;
-import android.graphics.drawable.shapes.PathShape;
 import android.support.v7.widget.AppCompatImageView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +28,7 @@ public class ShapeDemo  {
         return v;
     }
 
-    public void foo() {
-        PathShape p = new PathShape();
-    }
+//    public void foo() {
+//        PathShape p = new PathShape();
+//    }
 }
