@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="12dp"
+            android:text="@string/username" />
+
+        <EditText
+            android:id="@+id/username_text_field"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/username_hint"
+            android:minHeight="@dimen/min_tap_target_size"
+            android:minWidth="@dimen/min_tap_target_size" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:padding="12dp"
+        android:text="@string/join_explanation" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <LinearLayout
+            android:id="@+id/join_option_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@drawable/spacer_6dp_height"
+            android:orientation="vertical"
+            android:showDividers="middle">
+
+            <TextView
+                style="@style/GameOption"
+                tools:text="Sharks!" />
+
+            <TextView
+                style="@style/GameOption"
+                tools:text="Dogs!" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

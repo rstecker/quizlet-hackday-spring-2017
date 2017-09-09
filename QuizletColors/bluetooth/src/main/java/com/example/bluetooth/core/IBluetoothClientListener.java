@@ -7,11 +7,4 @@ import android.support.annotation.NonNull;
  */
 
 public interface IBluetoothClientListener {
-    void requestPermission(@NonNull String[] requestedPermissions);
-
-    /**
-     * All this stuff requires Bluetooth! This is called when we detect that the device does
-     * not have Bluetooth turned on
-     */
-    void requestBluetooth();
 }

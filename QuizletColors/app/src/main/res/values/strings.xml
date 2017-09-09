@@ -12,6 +12,33 @@
 
     <string name="not_connected_yet_try_again">The Bluetooth connection was not set up yet. Please try again.</string>
 
+    <!-- Start Text -->
+    <string name="check_bluetooth">… checking Bluetooth …</string>
+    <string name="no_bluetooth_error">Sadly your device does not support Bluetooth. This is not the game for you.</string>
+    <string name="bluetooth_off">This game requires Bluetooth. Please enable it now.</string>
+    <string name="bluetooth_on">Bluetooth is on</string>
+
+
+    <string name="check_permissions">… checking permissions …</string>
+    <string name="missing_permissions">more Application permissions required</string>
+    <string name="has_permissions">has needed permissions</string>
+
+    <string name="auth_with_quizlet">use a Quizlet account to host or play</string>
+    <string name="use_quizlet_host">host as <xliff:g id="username" example="username">%1$s</xliff:g></string>
+    <string name="use_quizlet_play">play as <xliff:g id="username" example="username">%1$s</xliff:g></string>
+    <string name="or">or</string>
+    <string name="play_anonymously">play anonymously</string>
+
+    <!-- Join Game -->
+    <string name="username">Username:</string>
+    <string name="join_explanation">Listed below are the devices available via Bluetooth. Check with your friend hosting the game for what their phone\'s name and address is.</string>
+
+    <!-- Host Game -->
+    <string name="auth_with_quizlet_dialog">Authenticate with Quizlet</string>
+    <string name="host_welcome">Welcome, <xliff:g id="username" example="username">%1$s</xliff:g>! Feel free to change your username for the game. Once you pick a set, the game lobby will start and other players will be able to join.</string>
+    <string name="term_count"><xliff:g id="count" example="10">%1$d</xliff:g> terms</string>
+    <string name="never_synced">unsynced</string>
+
     <!-- Lobby text -->
 
     <string name="username_hint">Enter username</string>
@@ -23,6 +50,7 @@
 
 
     <string name="join_button">Join Game</string>
+    <string name="start_oath">Start OAuth</string>
     <string name="join_button_looking">…Looking…</string>
 
 </resources>

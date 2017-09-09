@@ -48,7 +48,7 @@ public interface IGameEngine {
      * No filtering is done on the content to prevent buggy content from getting through
      * (Ex: multiple questions with matching answer)
      */
-    void setContent(@NonNull List<Pair<String, String>> content);
+    void setContent(@NonNull String setName, @NonNull List<Pair<String, String>> content);
 
     @NonNull List<QCMember> getPlayersWithAnswer(@NonNull String answer);
 

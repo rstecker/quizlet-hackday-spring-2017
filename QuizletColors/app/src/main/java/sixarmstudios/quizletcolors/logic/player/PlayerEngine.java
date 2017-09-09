@@ -134,7 +134,7 @@ public class PlayerEngine implements IPlayerEngine {
                     mUsername.equals(member.username())
             ));
         }
-        return LobbyState.build(players);
+        return LobbyState.build(message.setName(), message.factCount(), players);
     }
 
     private BoardState extractBoardState(QCGameMessage message) {

@@ -15,4 +15,18 @@
     <color name="background_color_accent">#FF4081</color>
     <color name="background_color_active">#830856</color>
     <color name="background_color_high_contrast">#ffffff</color>
+
+    <color name="creature_red">#d22d2d</color>
+    <color name="creature_blue">#2d5cd2</color>
+    <color name="creature_green">#228f1a</color>
+    <color name="creature_yellow">#d2b92d</color>
+    <color name="creature_purple">#802dd2</color>
+    <color name="creature_orange">#ff9100</color>
+    <color name="creature_white">#ffffff</color>
+    <color name="creature_grey">#7b7b7b</color>
+    <color name="creature_pink">#ff00d0</color>
+    <color name="creature_violet">#c905ff</color>
+    <color name="creature_cyan">#00ffe1</color>
+    <color name="creature_teal">#07a3ec</color>
+
 </resources>

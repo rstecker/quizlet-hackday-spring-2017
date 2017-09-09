@@ -99,9 +99,9 @@ public class DistributionLogic implements IDistributionLogic {
                                            @NonNull List<QCMember> members,
                                            @NonNull List<Pair<String, String>> content) {
 
-        Log.d(TAG, "Re allocating content in response to a bad move");
-        Map<String, Pair<String, String>> answerLookup = new HashMap<>();
-        Map<String, Pair<String, String>> questionLookup = new HashMap<>();
+        System.out.println("Re allocating content in response to a bad move [provided '" + providedAnswer + "'] [correct '" + correctAnswer + "']");
+        Map<String, Pair<String, String>> answerLookup = new HashMap<>(); // key is an answer, result is the pair
+        Map<String, Pair<String, String>> questionLookup = new HashMap<>(); // key is a question, result is the pair
         populateContentLists(content, answerLookup, questionLookup);
 
         List<Pair<String, String>> possibleAnswers = new ArrayList<>();
@@ -113,24 +113,31 @@ public class DistributionLogic implements IDistributionLogic {
 
         possibleAnswers.remove(answerLookup.get(correctAnswer));
         possibleAnswers.remove(answerLookup.get(providedAnswer));  // gotta' make sure we don't ask the answers we're removing from the board
+        System.out.println("Removing from possible answers [" + answerLookup.get(providedAnswer) + "] & [" + answerLookup.get(correctAnswer) + "], remaining :" + possibleAnswers.size());
 
-        Log.d(TAG, "Answer re-asignment - answered question was '" + questionLookup.get(providedAnswer) + "', asker was " + asker.username());
-        Log.d(TAG, "Member " + asker.username() + " had question " + memberQuestions.get(asker).first);
+        System.out.println("Answer re-asignment - answered question was '" + answerLookup.get(providedAnswer) + "', askers were '" + askersOfAnswer + "'");
+        System.out.println("Member '" + asker.username() + "' had question " + memberQuestions.get(asker).first);
         selectNewQuestion(possibleAnswers, answerLookup, correctAnswer, memberQuestions, memberHands, asker);
-        Log.d(TAG, "Member " + asker.username() + " just got question " + memberQuestions.get(asker).first);
+        System.out.println("Member '" + asker.username() + "' just got question " + memberQuestions.get(asker).first);
         for (QCMember member : askersOfAnswer) {
-            Log.d(TAG, "Member " + member.username() + " had question " + memberQuestions.get(member).first);
+            System.out.println("Member '" + member.username() + "' had question " + memberQuestions.get(member).first);
             selectNewQuestion(possibleAnswers, answerLookup, providedAnswer, memberQuestions, memberHands, member);
-            Log.d(TAG, "Member " + member.username() + " just got question " + memberQuestions.get(member).first);
+            System.out.println("Member '" + member.username() + "' just got question " + memberQuestions.get(member).first);
         }
-        Log.d(TAG, "Provided answer was " + providedAnswer + ", correct answer was " + correctAnswer);
-        Log.d(TAG, "Member " + answerer.username() + " had options " + memberHands.get(answerer));
+        System.out.println("Provided answer was " + providedAnswer + ", correct answer was " + correctAnswer);
+        System.out.println("Member " + answerer.username() + " had options " + memberHands.get(answerer));
         selectNewOption(stuffNotOnTheBoard, content, memberHands.get(answerer), providedAnswer);
-        Log.d(TAG, "Member " + answerer.username() + " just got options " + memberHands.get(answerer));
+        System.out.println("Member " + answerer.username() + " just got options " + memberHands.get(answerer));
         for (QCMember member : othersAtFault) {
-            Log.d(TAG, "Member " + member.username() + " had options " + memberHands.get(member));
-            selectNewOption(stuffNotOnTheBoard, content, memberHands.get(member), correctAnswer);
-            Log.d(TAG, "Member " + member.username() + " just got options " + memberHands.get(member));
+            System.out.println("Member '" + member.username() + "' had options " + memberHands.get(member));
+            if (member.equals(answerer)) {
+                List<Pair<String, String>>  tmpContent = new ArrayList<>(content);
+                tmpContent.remove(answerLookup.get(providedAnswer));
+                selectNewOption(stuffNotOnTheBoard, tmpContent, memberHands.get(member), correctAnswer);
+            } else {
+                selectNewOption(stuffNotOnTheBoard, content, memberHands.get(member), correctAnswer);
+            }
+            System.out.println("Member '" + member.username() + "' just got options " + memberHands.get(member));
 
         }
 
@@ -174,21 +181,34 @@ public class DistributionLogic implements IDistributionLogic {
      * @param allContent         will not be modified
      * @param optionsForMember   will be modified
      */
-    private void selectNewOption(@NonNull List<Pair<String, String>> stuffNotOnTheBoard,
-                                 @NonNull List<Pair<String, String>> allContent,
-                                 @NonNull List<String> optionsForMember,
-                                 @NonNull String oldAnswer) {
+    void selectNewOption(@NonNull List<Pair<String, String>> stuffNotOnTheBoard,
+                         @NonNull List<Pair<String, String>> allContent,
+                         @NonNull List<String> optionsForMember,
+                         @NonNull String oldAnswer) {
+        if (optionsForMember.indexOf(oldAnswer) == -1) {
+            throw new IllegalStateException("Tried to remove " + oldAnswer + " from answer list " + optionsForMember);
+        }
         // TODO : be aware we could be stranding a user with the same question as the 'asker' and no longer someone has the answer
         String newAnswer = null;
         if (stuffNotOnTheBoard.size() > 0) {    // ideally we want to add NEW stuff to the board
             Collections.shuffle(stuffNotOnTheBoard);
             newAnswer = stuffNotOnTheBoard.remove(0).second;
+            System.out.println("  > new answer (stuff not on the board) : " + newAnswer);
         } else {    // if everything is already on the board, just grab something random for now
             List<Pair<String, String>> tmpContent = new ArrayList<>(allContent);
+            for (int i = tmpContent.size() - 1; i >= 0; --i) {
+                String answer = tmpContent.get(i).second;
+                if (optionsForMember.contains(answer) || answer.equals(oldAnswer)) {
+                    System.out.println("  > trying to remove " + answer + " @ position " + i);
+                    tmpContent.remove(i);
+                }
+            }
             Collections.shuffle(tmpContent);
+            System.out.println("  > after avoiding old answer '" + oldAnswer + "' and hand: " + optionsForMember + " we pruned down to > " + tmpContent);
             Pair<String, String> newOption = tmpContent.remove(0);
             stuffNotOnTheBoard.remove(newOption);
             newAnswer = newOption.second;
+            System.out.println("  > new answer (everything is already on the board) : " + newAnswer);
         }
         optionsForMember.remove(oldAnswer);
         optionsForMember.add(newAnswer);
@@ -230,9 +250,9 @@ public class DistributionLogic implements IDistributionLogic {
      * @param answerLookup   should be empty, will be populated
      * @param questionLookup should be empty, will be populated
      */
-    private void populateContentLists(@NonNull List<Pair<String, String>> allContent,
-                                      @NonNull Map<String, Pair<String, String>> answerLookup,
-                                      @NonNull Map<String, Pair<String, String>> questionLookup) {
+    void populateContentLists(@NonNull List<Pair<String, String>> allContent,
+                              @NonNull Map<String, Pair<String, String>> answerLookup,
+                              @NonNull Map<String, Pair<String, String>> questionLookup) {
         for (Pair<String, String> pair : allContent) {
             questionLookup.put(pair.first, pair);
             answerLookup.put(pair.second, pair);

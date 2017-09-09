@@ -1,7 +1,12 @@
 package sixarmstudios.quizletcolors.network;
 
+import android.arch.lifecycle.LifecycleActivity;
+import android.support.v4.app.FragmentActivity;
+
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import quizlet.QSet;
+import quizlet.QUser;
 
 /**
  * Created by rebeccastecker on 6/12/17.
@@ -18,8 +23,26 @@ public interface IModelRetrievalService {
     Flowable<QSet> getQSetFlowable();
 
     /**
+     * @return observable that emits the user details of the latest user to auth with the app
+     */
+    Flowable<QUser> getQUserFlowable();
+
+    /**
      * Kicks off a server request. When the set is loaded, you can find the results over at
      * {@link IModelRetrievalService#getQSetFlowable()}
      */
+    @Deprecated
     void requestSet(long localId);
+
+    String getOauthUrl();
+
+    String getRedirectUrl();
+
+    void handelOauthCode(LifecycleActivity lifecycleActivity, String authCode);
+
+    void refreshSummary();
+
+    void restoreQuizletInfo(String accessCode, String username);
+
+    Completable fetchSetDetails(long setId);
 }

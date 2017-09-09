@@ -6,6 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import org.immutables.value.Value;
 
+import java.util.List;
+
+import io.reactivex.annotations.Nullable;
+
 /**
  * Created by rebeccastecker on 6/12/17.
  */
@@ -19,4 +23,8 @@ public interface QUser {
     @JsonProperty("username") String username();
     @JsonProperty("account_type") String accountType();
     @JsonProperty("profile_image") String profileImageUrl();
+
+    @Nullable @JsonProperty("sets") List<QSet> recentSets();
+    @Nullable @JsonProperty("favorite_sets") List<QSet> favoriteSets();
+    @Nullable @JsonProperty("studied") List<QStudied> studied();
 }

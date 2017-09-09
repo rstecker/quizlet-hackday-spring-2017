@@ -121,6 +121,7 @@ public class PlayerService extends Service implements IClientService {
     @Override
     public Flowable<String> getMessageUpdates() {
         return mIncomingMsgs
+                .distinctUntilChanged()
                 .filter((msg) -> {
                     if (msg.equals(INIT_MSG)) {
                         Log.i(TAG, "Init message received, connection established");

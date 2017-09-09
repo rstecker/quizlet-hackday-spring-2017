@@ -39,7 +39,7 @@ public class GameEngineTest {
         engine.addMember(member2);
         engine.addMember(member3);
         engine.addMember(member4);
-        engine.setContent(Arrays.asList(
+        engine.setContent("mock set name", Arrays.asList(
                 new Pair<>("q1", "a1"),
                 new Pair<>("q2", "a2"),
                 new Pair<>("q3", "a3"),

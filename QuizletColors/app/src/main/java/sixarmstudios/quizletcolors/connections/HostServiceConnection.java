@@ -1,6 +1,5 @@
 package sixarmstudios.quizletcolors.connections;
 
-import android.arch.lifecycle.LifecycleActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -23,22 +22,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import gamelogic.BoardState;
+import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 import sixarmstudios.quizletcolors.logic.engine.GameEngine;
 import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
-import gamelogic.BoardState;
 import ui.Fact;
-import gamelogic.LobbyState;
 
 /**
  * Created by rebeccastecker on 6/9/17.
  */
-
+@ParametersAreNonnullByDefault
 public class HostServiceConnection implements ServiceConnection {
     public static final String TAG = HostServiceConnection.class.getSimpleName();
 
@@ -46,14 +48,17 @@ public class HostServiceConnection implements ServiceConnection {
     private IServerService mServerService;
     private IGameEngine mGameEngine;
     private IPlayerEngine mPlayerEngine;
+    private BehaviorSubject<Boolean> mBoundSubject = BehaviorSubject.create();
     private int msgCount = 0;
     private ObjectMapper mMapper;
 
-    public HostServiceConnection(LifecycleActivity context) {
+    public HostServiceConnection() {
+        Log.i(TAG, "Starting the game engine and host service");
         mGameEngine = new GameEngine();
         mPlayerEngine = new PlayerEngine();
         mMapper = new ObjectMapper();
     }
+
 
     @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
@@ -84,21 +89,30 @@ public class HostServiceConnection implements ServiceConnection {
                 }
         );
         mServerBound = true;
+        mBoundSubject.onNext(true);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName arg0) {
         mServerBound = false;
+        mBoundSubject.onNext(false);
     }
 
     public String startHosting(IBluetoothHostListener listener, String username) {
+        // FIXME : I should PROBABLY check to make sure this is bound/wait for it... being lazy atm
         mPlayerEngine.initializePlayer(username);
         return mServerService.startHosting(listener);
     }
 
+    @Override public void onBindingDied(ComponentName name) {
+        Log.i(TAG, "Binding died : "+name);
+    }
+
     public void unbindService(Context context) {
+        Log.i(TAG, "Service ounbound "+context);
         context.unbindService(this);
         mServerBound = false;
+        mBoundSubject.onNext(false);
     }
 
     public boolean isBound() {
@@ -106,9 +120,10 @@ public class HostServiceConnection implements ServiceConnection {
     }
 
     public void makeMove(@NonNull String answer, @NonNull String color) {
-        if (isBound()) {
-            mPlayerEngine.makeMove(answer, color);
-        }
+        mBoundSubject
+                .filter((bound) -> bound)
+                .take(1)
+                .subscribe((bound) -> mPlayerEngine.makeMove(answer, color), (e) -> Log.e(TAG, "Error "+e));
     }
 
     public Observable<BoardState> getBoardStateUpdates() {
@@ -132,9 +147,9 @@ public class HostServiceConnection implements ServiceConnection {
         }
     }
 
-    public void setContent(@Nullable List<Fact> facts) {
+    public void setContent(@NonNull String setName, @Nullable List<Fact> facts) {
         if (facts == null) {
-            mGameEngine.setContent(new ArrayList<>());
+            mGameEngine.setContent("", new ArrayList<>());
             return;
         }
         List<Pair<String, String>> content = new ArrayList<>();
@@ -142,7 +157,7 @@ public class HostServiceConnection implements ServiceConnection {
             content.add(new Pair<>(fact.question, fact.answer));
         }
         // TODO : are we overriding? are we adding? where are we screening for conflicting values?
-        mGameEngine.setContent(content);
+        mGameEngine.setContent(setName, content);
     }
 
     public void startGame() {

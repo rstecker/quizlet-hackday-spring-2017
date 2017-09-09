@@ -27,6 +27,9 @@ android {
             def Properties localProperties = new Properties()
             localProperties.load(project.rootProject.file("local.properties").newDataInputStream())
             buildConfigField "String", "QUIZLET_API_KEY", localProperties.getProperty("quizletClientId")
+            buildConfigField "String", "QUIZLET_ENCODED_STRING_KEY", localProperties.getProperty("quizletEncodedString")
+            buildConfigField "String", "QUIZLET_REDIRECT_URL_KEY", localProperties.getProperty("quizletRedirectUrl")
+            buildConfigField "String", "QUIZLET_SECRET_CODE_KEY", localProperties.getProperty("quizletSecretCode")
         }
         release {
             minifyEnabled false

@@ -1,4 +1,4 @@
-package sixarmstudios.quizletcolors;
+package sixarmstudios.quizletcolors.logic.engine;
 
 import android.support.v4.util.Pair;
 
@@ -8,16 +8,17 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import sixarmstudios.quizletcolors.logic.engine.DistributionLogic;
-import sixarmstudios.quizletcolors.logic.engine.IDistributionLogic;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -78,7 +79,7 @@ public class DistributionLogicTest {
         answers.addAll(allocatedSet.get(3).options());
 
         for (String question : questions) {
-            String hackyAnswerCheck = question.replace('q','a');
+            String hackyAnswerCheck = question.replace('q', 'a');
             assertTrue("Failed to find '" + hackyAnswerCheck + "' in  '" + answers + "'", answers.contains(hackyAnswerCheck));
         }
     }
@@ -150,9 +151,180 @@ public class DistributionLogicTest {
         answers.addAll(allocatedSet.get(3).options());
 
         for (String question : questions) {
-            String hackyAnswerCheck = question.replace('q','a');
+            String hackyAnswerCheck = question.replace('q', 'a');
             assertTrue("Failed to find '" + hackyAnswerCheck + "' in  '" + answers + "'", answers.contains(hackyAnswerCheck));
         }
+    }
+
+    @Test
+    public void test_populateContentLists() {
+        List<Pair<String, String>> content = Arrays.asList(
+                new Pair<>("q0", "a0"),
+                new Pair<>("q1", "a1"),
+                new Pair<>("q2", "a2"),
+                new Pair<>("q3", "a3")
+        );
+        Map<String, Pair<String, String>> answerLookup = new HashMap<>();
+        Map<String, Pair<String, String>> questionLookup = new HashMap<>();
+        DistributionLogic logic = new DistributionLogic();
+
+        logic.populateContentLists(content, answerLookup, questionLookup);
+        assertEquals(4, answerLookup.size());
+        assertEquals(4, questionLookup.size());
+
+        assertEquals(content.get(0), answerLookup.get("a0"));
+        assertEquals(content.get(0), questionLookup.get("q0"));
+        assertNull(answerLookup.get("ash"));
+    }
+
+    @Test
+    public void test_selectNewOption_everythingIsOnBoard() {
+        List<Pair<String, String>> allContent = Arrays.asList(
+                new Pair<>("q0", "a0"),
+                new Pair<>("q1", "a1"),
+                new Pair<>("q2", "a2"),
+                new Pair<>("q3", "a3")
+        );
+
+        DistributionLogic logic = new DistributionLogic();
+        List<Pair<String, String>> stuffNotOnTheBoard = new ArrayList<>();
+        List<String> optionsForMember = new ArrayList<>();
+        optionsForMember.addAll(Arrays.asList("a0", "a1"));
+        logic.selectNewOption(stuffNotOnTheBoard, allContent, optionsForMember, "a1");
+
+        assertTrue("Retains old value 'a0' :" + optionsForMember, optionsForMember.indexOf("a0") > -1);
+        assertTrue("Does not have old value 'a1' :" + optionsForMember, optionsForMember.indexOf("a1") == -1);
+        assertEquals("All options are unique : " + optionsForMember, 2, new HashSet<>(optionsForMember).size());
+        assertEquals(0, stuffNotOnTheBoard.size());
+    }
+    @Test
+    public void test_selectNewOption_oneThingNotOnBoard() {
+        List<Pair<String, String>> allContent = Arrays.asList(
+                new Pair<>("q0", "a0"),
+                new Pair<>("q1", "a1"),
+                new Pair<>("q2", "a2"),
+                new Pair<>("q3", "a3")
+        );
+
+        DistributionLogic logic = new DistributionLogic();
+        List<Pair<String, String>> stuffNotOnTheBoard = new ArrayList<>();
+        stuffNotOnTheBoard.add(allContent.get(3));
+        List<String> optionsForMember = new ArrayList<>();
+        optionsForMember.addAll(Arrays.asList("a0", "a1"));
+        logic.selectNewOption(stuffNotOnTheBoard, allContent, optionsForMember, "a1");
+
+        assertEquals(2, optionsForMember.size());
+        assertTrue("Retains old value 'a0' :" + optionsForMember, optionsForMember.indexOf("a0") > -1);
+        assertTrue("Does not have old value 'a1' :" + optionsForMember, optionsForMember.indexOf("a1") == -1);
+        assertTrue("Grabs the only item not on the board :" + optionsForMember, optionsForMember.indexOf("a3") > -1);
+        assertEquals("All options are unique : " + optionsForMember, 2, new HashSet<>(optionsForMember).size());
+        assertEquals(0, stuffNotOnTheBoard.size());
+    }
+
+    @Test
+    public void test_selectNewOption_everythingOnBoard() {
+        List<Pair<String, String>> allContent = Arrays.asList(
+                new Pair<>("q0", "a0"),
+                new Pair<>("q1", "a1"),
+                new Pair<>("q2", "a2"),
+                new Pair<>("q3", "a3")
+        );
+
+        DistributionLogic logic = new DistributionLogic();
+        List<Pair<String, String>> stuffNotOnTheBoard = new ArrayList<>();
+        List<String> optionsForMember = new ArrayList<>();
+        optionsForMember.addAll(Arrays.asList("a0", "a1"));
+        logic.selectNewOption(stuffNotOnTheBoard, allContent, optionsForMember, "a1");
+
+        assertEquals(2, optionsForMember.size());
+        assertTrue("Retains old value 'a0' :" + optionsForMember, optionsForMember.indexOf("a0") > -1);
+        assertTrue("Does not have old value 'a1' :" + optionsForMember, optionsForMember.indexOf("a1") == -1);
+        assertEquals("All options are unique : " + optionsForMember, 2, new HashSet<>(optionsForMember).size());
+    }
+
+    @Test
+    public void test_updateForBadMove_2player_giveOtherPlayerBadAnswer() {
+        List<Pair<String, String>> content = Arrays.asList(
+                new Pair<>("q0", "a0"),
+                new Pair<>("q1", "a1"),
+                new Pair<>("q2", "a2"),
+                new Pair<>("q3", "a3")
+        );
+
+        QCMember member1 = QCMember.build("one", true, "r", "q0", Arrays.asList("a1", "a2"));
+        QCMember member2 = QCMember.build("two", false, "g", "q1", Arrays.asList("a0", "a3"));
+
+        List<QCMember> members = new ArrayList<>(Arrays.asList(member1, member2));
+
+        IDistributionLogic logic = new DistributionLogic();
+        // m2 gives "a3" to m1. Nobody wants that.  m1 WANTED "a0" (had by m1)
+        List<QCMember> allocatedSet = logic.updateForBadMove(member1, member2,
+                "a3", "a0",
+                Arrays.asList(member2), Collections.emptyList(),
+                members, content);
+
+        assertEquals(2, allocatedSet.size());
+        assertFalse(member1.equals(allocatedSet.get(0)));
+        assertFalse("Options should have changed away from: \n" + member2 + " :: " + allocatedSet.get(1), member2.equals(allocatedSet.get(1)));
+
+        assertTrue(member1.username().equals(allocatedSet.get(0).username()));
+        assertTrue(member2.username().equals(allocatedSet.get(1).username()));
+
+        // everyone has the same number of options
+        assertEquals(member1.options().size(), allocatedSet.get(0).options().size());
+        assertEquals(member2.options().size(), allocatedSet.get(1).options().size());
+
+        // asker only changes their question
+        assertFalse(member1.question().equals(allocatedSet.get(0).question()));
+        assertTrue(member1.options().equals(allocatedSet.get(0).options()));
+        assertEquals(member1.options().size(), new HashSet<>(allocatedSet.get(0).options()).size());
+
+        // person at fault got a new answer option
+        assertTrue(member2.question().equals(allocatedSet.get(1).question()));
+        assertFalse(member2.options().equals(allocatedSet.get(1).options()));
+        assertEquals(member2.options().size(), new HashSet<>(allocatedSet.get(1).options()).size());
+
+    }
+
+
+    @Test
+    public void test_updateForBadMove_2player_giveOtherPlayerYourAnswer() {
+        List<Pair<String, String>> content = Arrays.asList(
+                new Pair<>("q0", "a0"),
+                new Pair<>("q1", "a1"),
+                new Pair<>("q2", "a2"),
+                new Pair<>("q3", "a3")
+        );
+
+        QCMember member1 = QCMember.build("one", true, "r", "q0", Arrays.asList("a0", "a2"));
+        QCMember member2 = QCMember.build("two", false, "g", "q1", Arrays.asList("a3", "a1"));
+
+        List<QCMember> members = new ArrayList<>(Arrays.asList(member1, member2));
+
+        IDistributionLogic logic = new DistributionLogic();
+        // m2 gives "a3" to themselves. They HAD the right answer "a2" and fucked it up. M1 has nothing going on.
+        List<QCMember> allocatedSet = logic.updateForBadMove(member2, member2,
+                "a3", "a1",
+                Arrays.asList(member2), Collections.emptyList(),
+                members, content);
+
+        assertEquals(2, allocatedSet.size());
+        assertEquals(member1, allocatedSet.get(0));
+        assertFalse("Options should have changed away from: \n" + member2, member2.equals(allocatedSet.get(1)));
+
+        assertTrue(member1.username().equals(allocatedSet.get(0).username()));
+        assertTrue(member2.username().equals(allocatedSet.get(1).username()));
+
+        // everyone has the same number of options
+        assertEquals(member1.options().size(), allocatedSet.get(0).options().size());
+        assertEquals(member2.options().size(), allocatedSet.get(1).options().size());
+
+        // idiot has a new question and new answers
+        assertFalse(member2.question().equals(allocatedSet.get(1).question()));
+        assertFalse(member2.options().equals(allocatedSet.get(1).options()));
+        assertEquals(member2.options().size(), new HashSet<>(allocatedSet.get(1).options()).size());
+        assertEquals("incorrect answer is gone", -1, allocatedSet.get(1).options().indexOf("a3"));
+        assertEquals("old correct answer has been wiped",-1, allocatedSet.get(1).options().indexOf("a1"));
     }
 
     @Test
@@ -239,7 +411,7 @@ public class DistributionLogicTest {
         assertFalse(questions.contains("q2"));
 
         for (String question : questions) {
-            String hackyAnswerCheck = question.replace('q','a');
+            String hackyAnswerCheck = question.replace('q', 'a');
             assertTrue("Failed to find '" + hackyAnswerCheck + "' in  '" + answers + "'", answers.contains(hackyAnswerCheck));
         }
     }

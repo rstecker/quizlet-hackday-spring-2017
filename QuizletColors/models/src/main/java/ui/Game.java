@@ -36,11 +36,20 @@ public class Game {
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
+    @ColumnInfo(name = "q_set_id")
+    public long qSetId;
+
     @ColumnInfo(name = "game_state")
     public State gameState;
 
     @ColumnInfo(name = "host_name")
     public String hostName;
+
+    @ColumnInfo(name = "set_name")
+    public String qSetName;
+
+    @ColumnInfo(name = "fact_count")
+    public int factCount;
 
     @ColumnInfo(name = "is_host")
     public boolean isHost;
@@ -76,9 +85,10 @@ public class Game {
         return isHost;
     }
 
-    public void initForHost(String hostName) {
+    public void initForHost(String hostName, long qSetId) {
         gameState = State.WAITING;
         this.hostName = hostName;
+        this.qSetId = qSetId;
         this.isHost = true;
     }
 
