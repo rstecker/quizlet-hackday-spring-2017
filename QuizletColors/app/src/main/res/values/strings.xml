@@ -34,6 +34,7 @@
     <string name="join_explanation">Listed below are the devices available via Bluetooth. Check with your friend hosting the game for what their phone\'s name and address is.</string>
 
     <!-- Host Game -->
+    <string name="auth_with_quizlet_dialog">Authenticate with Quizlet</string>
     <string name="host_welcome">Welcome, <xliff:g id="username" example="username">%1$s</xliff:g>! Feel free to change your username for the game. Once you pick a set, the game lobby will start and other players will be able to join.</string>
     <string name="term_count"><xliff:g id="count" example="10">%1$d</xliff:g> terms</string>
     <string name="never_synced">unsynced</string>

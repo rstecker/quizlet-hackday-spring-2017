@@ -1,6 +1,5 @@
 package sixarmstudios.quizletcolors.connections;
 
-import android.arch.lifecycle.LifecycleActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -25,6 +24,8 @@ import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import gamelogic.BoardState;
+import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -34,9 +35,7 @@ import sixarmstudios.quizletcolors.logic.engine.GameEngine;
 import sixarmstudios.quizletcolors.logic.engine.IGameEngine;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
-import gamelogic.BoardState;
 import ui.Fact;
-import gamelogic.LobbyState;
 
 /**
  * Created by rebeccastecker on 6/9/17.
@@ -53,11 +52,13 @@ public class HostServiceConnection implements ServiceConnection {
     private int msgCount = 0;
     private ObjectMapper mMapper;
 
-    public HostServiceConnection(LifecycleActivity context) {
+    public HostServiceConnection() {
+        Log.i(TAG, "Starting the game engine and host service");
         mGameEngine = new GameEngine();
         mPlayerEngine = new PlayerEngine();
         mMapper = new ObjectMapper();
     }
+
 
     @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
@@ -103,7 +104,12 @@ public class HostServiceConnection implements ServiceConnection {
         return mServerService.startHosting(listener);
     }
 
+    @Override public void onBindingDied(ComponentName name) {
+        Log.i(TAG, "Binding died : "+name);
+    }
+
     public void unbindService(Context context) {
+        Log.i(TAG, "Service ounbound "+context);
         context.unbindService(this);
         mServerBound = false;
         mBoundSubject.onNext(false);

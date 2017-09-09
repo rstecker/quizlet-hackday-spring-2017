@@ -1,7 +1,5 @@
 package sixarmstudios.quizletcolors.connections;
 
-import android.arch.lifecycle.LifecycleActivity;
-import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,17 +15,14 @@ import com.example.myapplication.bluetooth.QCGameMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.security.auth.Subject;
 
 import gamelogic.BoardState;
 import gamelogic.LobbyState;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import sixarmstudios.quizletcolors.logic.player.IPlayerEngine;
 import sixarmstudios.quizletcolors.logic.player.PlayerEngine;
-import viewmodel.TopLevelViewModel;
 
 /**
  * Created by rebeccastecker on 6/10/17.
@@ -42,22 +37,9 @@ public class PlayerServiceConnection implements ServiceConnection {
     private ObjectMapper mMapper;
     private IPlayerEngine mEngine;
 
-    public PlayerServiceConnection(LifecycleActivity context) {
+    public PlayerServiceConnection() {
         mEngine = new PlayerEngine();
         mMapper = new ObjectMapper();
-
-        mEngine.getLobbyStateUpdates().observeOn(Schedulers.newThread()).subscribe(
-                (state) -> {
-                    TopLevelViewModel model = ViewModelProviders.of(context).get(TopLevelViewModel.class);
-                    if (model != null) {
-                        Log.i(TAG, "I'm going in : " + Thread.currentThread().getName());
-                        model.processLobbyUpdate(state);
-                    } else {
-                        Log.w(TAG, "I tried to look up the player vm but it was null");
-                    }
-                },
-                (e) -> Log.e(TAG, "Error updating view model [" + Thread.currentThread().getName() + "] " + e)
-        );
     }
 
     @Override

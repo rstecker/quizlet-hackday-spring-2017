@@ -1,6 +1,5 @@
 package sixarmstudios.quizletcolors;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.ViewModelProviders;
@@ -25,7 +24,6 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.example.bluetooth.client.PlayerService;
-import com.example.bluetooth.core.IBluetoothHostListener;
 import com.example.bluetooth.core.IBluetoothPlayerListener;
 import com.example.bluetooth.server.HostService;
 
@@ -73,8 +71,8 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
     IModelRetrievalService mModelService;
     boolean mModelBound = false;
     private PlayerState mPlayerState = PlayerState.UNKNOWN_INIT;
-    private HostServiceConnection mHostConnection = new HostServiceConnection(this);
-    private PlayerServiceConnection mPlayerConnection = new PlayerServiceConnection(this);
+    private static HostServiceConnection mHostConnection = new HostServiceConnection();
+    private static PlayerServiceConnection mPlayerConnection = new PlayerServiceConnection();
     private IBluetoothPlayerListener mPlayerBluetoothListener;
 
     // region Lifecycle stuff
@@ -231,6 +229,20 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mPlayerState = (PlayerState) savedInstanceState.get(PLAYER_STATE_KEY);
+
+        if (mPlayerState == PlayerState.FIND_SET) {
+            if (!mHostConnection.isBound()) {
+                Log.i(TAG, "Requesting the Host Service to bind (resume)");
+                bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
+                initHostConnectionObservables();
+            }
+        } else if (mPlayerState == PlayerState.FIND_GAME) {
+            if (!mPlayerConnection.isBound()) {
+                Log.i(TAG, "Requesting the Player Service to bind (resume)");
+                bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
+                initPlayerConnectionObservables();
+            }
+        }
     }
 
     @Override
@@ -252,14 +264,12 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
     @Override protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy, unbinding all services");
-        if (mHostConnection.isBound()) {
-            mHostConnection.unbindService(this);
-            mHostConnection = null;
-        }
-        if (mPlayerConnection.isBound()) {
-            mPlayerConnection.unbindService(this);
-            mPlayerConnection = null;
-        }
+//        if (mHostConnection.isBound()) {
+//            mHostConnection.unbindService(this);
+//        }
+//        if (mPlayerConnection.isBound()) {
+//            mPlayerConnection.unbindService(this);
+//        }
         if (mModelBound) {
             this.unbindService(mModelConnection);
         }
@@ -323,7 +333,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
             }
         });
         auth_dialog.show();
-        auth_dialog.setTitle("Sharks are fun");
+        auth_dialog.setTitle(R.string.auth_with_quizlet_dialog);
         auth_dialog.setCancelable(true);
     }
 
@@ -406,6 +416,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
                 },
                 (e) -> Log.e(TAG, "Error updating board view model [" + Thread.currentThread().getName() + "] " + e)
         );
+
         mPlayerConnection.getLobbyStateUpdates().subscribe(
                 (msg) -> {
                     TopLevelViewModel lobbyViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
