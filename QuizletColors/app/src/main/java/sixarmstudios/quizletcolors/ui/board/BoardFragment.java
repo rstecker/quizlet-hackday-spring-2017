@@ -13,18 +13,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.ui.player.PlayerAdapter;
 import ui.BadMove;
@@ -46,8 +43,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
     @BindView(R.id.board_question) TextView mQuestion;
     @BindView(R.id.player_list) RecyclerView mPlayerList;
     @BindView(R.id.option_list) RecyclerView mOptionList;
-    @BindView(R.id.wrong_question_popup) View mWrongQuestionPopup;
-    @BindView(R.id.wrong_question_details) TextView mWrongQuestionDetails;
+    @BindView(R.id.wrong_question_popup) FrameLayout mWrongQuestionPopup;
 
     private PlayerAdapter mPlayerAdapter;
     private OptionAdapter mOptionAdapter;
@@ -56,6 +52,7 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
     private long mLastMoveUpdateTimestamp;
     private GridLayoutManager mOptionsLayoutManager;
     private GridLayoutManager mPlayersLayoutManager;
+    private BadMoveViewHolder mBadMoveView;
 
     public static BoardFragment newInstance() {
         BoardFragment fragment = new BoardFragment();
@@ -89,10 +86,10 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
         mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
         mOptionList.setLayoutManager(mOptionsLayoutManager);
 
+        mBadMoveView = new BadMoveViewHolder(mWrongQuestionPopup);
         return view;
     }
 
-    Disposable mBadMoveDisposable;
 
     private void handleBadMoves(List<BadMove> badMoves) {
         if (badMoves == null || badMoves.size() == 0) {
@@ -103,49 +100,9 @@ public class BoardFragment extends LifecycleFragment implements IUserSelector, I
             return;
         }
         mLastMoveUpdateTimestamp = move.timestamp;
+        mBadMoveView.handleNewBadMove(move);
 
         Log.i(TAG, "Bad move update : " + move);
-//        if (move.youAnsweredPoorly) {
-//            Toast.makeText(this.getContext(), "You submitted the wrong answer", Toast.LENGTH_SHORT).show();
-//        } else if (move.youWereGivenBadAnswer) {
-//            Toast.makeText(this.getContext(), "Your question was incorrectly answered", Toast.LENGTH_SHORT).show();
-//        } else if (move.youFailedToAnswer) {
-//            Toast.makeText(this.getContext(), "You failed to help someone out", Toast.LENGTH_SHORT).show();
-//        } else if (move.yourAnswerWentToSomeoneElse) {
-//            Toast.makeText(this.getContext(), "Your correct answer went to the wrong person", Toast.LENGTH_SHORT).show();
-//        }
-        if (mBadMoveDisposable != null) {
-            mBadMoveDisposable.dispose();
-        }
-        StringBuilder sb = new StringBuilder();
-        if (move.youAnsweredPoorly) {
-            sb.append("You offered ").append(move.offeredAnswer).append("\n");
-            sb.append("as the answer to ").append(move.correctQuestion).append("\n");
-            sb.append("when actually ").append(move.correctAnswer).append(" is the correct answer").append("\n");
-            sb.append("\n");
-            sb.append("The question that goes with the answer you provided is ").append(move.incorrectQuestion);
-        } else if (move.youWereGivenBadAnswer) {
-            sb.append("Your question of ").append(move.correctQuestion).append("\n");
-            sb.append("has an answer of ").append(move.correctAnswer).append("\n");
-            sb.append("but the answer ").append(move.offeredAnswer).append("\n");
-            sb.append("was provided instead");
-        } else if (move.youFailedToAnswer) {
-            sb.append("Someone was asking ").append(move.correctQuestion).append("\n");
-            sb.append("and you had the answer of ").append(move.correctAnswer).append("\n");
-            sb.append("but didn't give it to them in time");
-        } else if (move.yourAnswerWentToSomeoneElse) {
-            sb.append("The answer to your question ").append(move.correctQuestion).append("\n");
-            sb.append("was ").append(move.correctQuestion).append("\n");
-            sb.append("but it was given to a different user");
-        }
-        mWrongQuestionDetails.setText(sb.toString());
-        mWrongQuestionPopup.setVisibility(View.VISIBLE);
-        mBadMoveDisposable = Single.timer(10, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((t) -> {
-                    mWrongQuestionPopup.setVisibility(View.GONE);
-                });
-
     }
 
     private void handleGoodMoves(List<GoodMove> goodMoves) {
