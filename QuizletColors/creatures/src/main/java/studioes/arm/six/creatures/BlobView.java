@@ -33,6 +33,7 @@ public class BlobView extends View {
     }
 
     Paint mPaint;
+    Path mPath = new Path();
 
     private void init() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -41,9 +42,22 @@ public class BlobView extends View {
 
     @Override protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Path p = new Path();
-        p.addCircle(0, 0, 20, Path.Direction.CCW);
+        canvas.drawPath(mPath, mPaint);
+    }
 
-        canvas.drawPath(p, mPaint);
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // Try for a width based on our minimum
+        int minw = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
+        int w = resolveSizeAndState(minw, widthMeasureSpec, 1);
+
+        // Whatever the width ends up being, ask for a height that would let the pie
+        // get as big as it can
+        int minh = MeasureSpec.getSize(w) + getPaddingBottom() + getPaddingTop();
+        int h = resolveSizeAndState(MeasureSpec.getSize(w), heightMeasureSpec, 0);
+        mPaint.reset();
+        mPath.addCircle(w/2, h/2, Math.min(w, h)/2, Path.Direction.CCW);
+
+        setMeasuredDimension(w, h);
     }
 }

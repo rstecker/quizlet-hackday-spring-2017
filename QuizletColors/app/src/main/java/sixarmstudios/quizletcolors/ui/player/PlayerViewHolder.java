@@ -12,6 +12,7 @@ import butterknife.ButterKnife;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.logic.player.CreatureCreation;
 import sixarmstudios.quizletcolors.ui.board.IUserSelector;
+import studioes.arm.six.creatures.BlobView;
 import ui.Player;
 
 /**
@@ -21,9 +22,12 @@ import ui.Player;
 public class PlayerViewHolder extends RecyclerView.ViewHolder {
     @LayoutRes public static final int LAYOUT_ID = R.layout.player;
 
+
+
     @BindView(R.id.player_name) TextView mName;
     @BindView(R.id.player_is_host) TextView mHost;
     @BindView(R.id.player_is_you) TextView mYou;
+    @BindView(R.id.player_creature) BlobView mCreature;
 
 
     public PlayerViewHolder(View view, IUserSelector selector) {
@@ -42,5 +46,6 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
         mName.setBackgroundResource(selected ? R.drawable.border : 0);
         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), color));
         itemView.setTag(player.color);
+
     }
 }

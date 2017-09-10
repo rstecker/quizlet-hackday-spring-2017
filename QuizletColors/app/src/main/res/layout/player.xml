@@ -30,4 +30,8 @@
         style="@style/DebugText"
         android:text="[YOU]"
         tools:text="is you" />
+    <studioes.arm.six.creatures.BlobView
+        android:id="@+id/player_creature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

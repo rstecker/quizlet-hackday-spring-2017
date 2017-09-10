@@ -1,35 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_color">
 
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/board_question"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:autoSizeMinTextSize="5sp"
-        app:autoSizeStepGranularity="1sp"
-        app:autoSizeTextType="uniform"
-        tools:text="Sharks sharks sharks Sharks " />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/board_question"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:autoSizeMinTextSize="5sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform"
+            tools:text="Sharks sharks sharks Sharks " />
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/option_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:minHeight="@dimen/min_tap_target_size" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/option_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:minHeight="@dimen/min_tap_target_size" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/player_list"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/player_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="@dimen/min_tap_target_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/wrong_question_popup"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:minHeight="@dimen/min_tap_target_size" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:background="@color/wrong_question_overlay"
+        android:padding="50dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/wrong_question_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/wrong_question_background"
+            android:gravity="center"
+            tools:text="This is where the answer details go" />
+    </LinearLayout>
+</FrameLayout>
