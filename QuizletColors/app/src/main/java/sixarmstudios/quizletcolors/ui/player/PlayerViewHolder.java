@@ -76,8 +76,8 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
                             .start();
                 })
         ;
-        mCreature.requestLayout();
-        itemView.requestLayout();
+//        mCreature.invalidate();
+//        itemView.requestLayout();
     }
 
     private Disposable mAnimation;

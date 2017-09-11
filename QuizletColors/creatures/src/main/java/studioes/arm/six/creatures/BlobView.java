@@ -49,25 +49,26 @@ public class BlobView extends View {
 
     @Override protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        setUpPath();
         canvas.drawPath(mPath, mPaint);
     }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // Try for a width based on our minimum
-        int minw = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
-        int w = resolveSizeAndState(minw, widthMeasureSpec, 1);
-
-        // Whatever the width ends up being, ask for a height that would let the pie
-        // get as big as it can
-        int minh = MeasureSpec.getSize(w) + getPaddingBottom() + getPaddingTop();
-        int h = resolveSizeAndState(MeasureSpec.getSize(w), heightMeasureSpec, 0);
-
-        Log.i(TAG, " pre : "+getWidth()+", "+getHeight()+" :: "+w+":"+h);
-        setMeasuredDimension(w, h);
-        Log.i(TAG, " post : "+getWidth()+", "+getHeight()+" :: "+w+":"+h);
-        setUpPath();
-    }
+//
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        // Try for a width based on our minimum
+//        int minw = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
+//        int w = resolveSizeAndState(minw, widthMeasureSpec, 1);
+//
+//        // Whatever the width ends up being, ask for a height that would let the pie
+//        // get as big as it can
+//        int minh = MeasureSpec.getSize(w) + getPaddingBottom() + getPaddingTop();
+//        int h = resolveSizeAndState(MeasureSpec.getSize(w), heightMeasureSpec, 0);
+//
+//        Log.i(TAG, " pre : "+getWidth()+", "+getHeight()+" :: "+w+":"+h);
+//        setMeasuredDimension(w, h);
+//        Log.i(TAG, " post : "+getWidth()+", "+getHeight()+" :: "+w+":"+h);
+//        setUpPath();
+//    }
 
     public void setDetails(String username, @ColorRes int colorRes) {
         mPaint.setColor(getResources().getColor(colorRes));
@@ -101,9 +102,7 @@ public class BlobView extends View {
             mPath.lineTo(torsoCenterX - radius, torsoCenterY + radius / 2f);
             mPath.close();
         }
-
     }
-
 
     public float getDampingRatio() {
         int hash = mUsername.hashCode();
