@@ -89,7 +89,7 @@ dependencies {
 
     compile "com.android.support:recyclerview-v7:26.0.2"
 
-
+    compile "com.android.support:support-dynamic-animation:26.0.2"
 
     compile 'com.android.support:support-vector-drawable:26.0.2'
 

@@ -2,36 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/player_is_host"
+        style="@style/DebugText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="[HOST]"
         android:padding="10dp"
-        style="@style/DebugText"
+        android:text="[HOST]"
         tools:text="is host" />
+
+    <studioes.arm.six.creatures.BlobView
+        android:id="@+id/player_creature"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:baselineAligned="false" />
 
     <TextView
         android:id="@+id/player_name"
         android:layout_width="wrap_content"
-        android:padding="10dp"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         tools:text="username" />
 
     <TextView
         android:id="@+id/player_is_you"
+        style="@style/DebugText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        style="@style/DebugText"
         android:text="[YOU]"
         tools:text="is you" />
-    <studioes.arm.six.creatures.BlobView
-        android:id="@+id/player_creature"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+
 </LinearLayout>

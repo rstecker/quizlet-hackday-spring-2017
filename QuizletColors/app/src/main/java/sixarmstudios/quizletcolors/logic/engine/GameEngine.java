@@ -14,13 +14,15 @@ import com.example.myapplication.bluetooth.QCPlayerMessage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created by rebeccastecker on 6/8/17.
  */
-
+@ParametersAreNonnullByDefault
 public class GameEngine implements IGameEngine {
     public static final String TAG = GameEngine.class.getSimpleName();
     public static final int MIN_CONTENT_SIZE = 10;
