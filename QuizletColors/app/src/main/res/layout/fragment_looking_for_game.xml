@@ -31,30 +31,65 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textAlignment="center"
         android:padding="12dp"
-        android:text="@string/join_explanation" />
+        android:text="@string/join_explanation"
+        android:textAlignment="center" />
 
-    <ScrollView
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:text="@string/join_warning"
+        android:textAlignment="center" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-        <LinearLayout
-            android:id="@+id/join_option_list"
-            android:layout_width="match_parent"
+        <ScrollView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:divider="@drawable/spacer_6dp_height"
-            android:orientation="vertical"
-            android:showDividers="middle">
+            android:layout_weight="1">
 
-            <TextView
-                style="@style/GameOption"
-                tools:text="Sharks!" />
+            <LinearLayout
+                android:id="@+id/join_option_list_bonded"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/spacer_6dp_height"
+                android:orientation="vertical"
+                android:showDividers="middle">
 
-            <TextView
-                style="@style/GameOption"
-                tools:text="Dogs!" />
-        </LinearLayout>
-    </ScrollView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bonded_title"
+                    android:textAlignment="center" />
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:id="@+id/join_option_list_unbonded"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/spacer_6dp_height"
+                android:orientation="vertical"
+                android:showDividers="middle">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unbonded_title"
+                    android:textAlignment="center" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
 </LinearLayout>

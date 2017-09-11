@@ -32,6 +32,9 @@
     <!-- Join Game -->
     <string name="username">Username:</string>
     <string name="join_explanation">Listed below are the devices available via Bluetooth. Check with your friend hosting the game for what their phone\'s name and address is.</string>
+    <string name="join_warning">Make sure your friend\'s phone is showing the Lobby screen BEFORE you try to join their game!</string>
+    <string name="bonded_title">Phones you\'ve paired with before</string>
+    <string name="unbonded_title">Phones you haven\'t paired with yet</string>
 
     <!-- Host Game -->
     <string name="auth_with_quizlet_dialog">Authenticate with Quizlet</string>

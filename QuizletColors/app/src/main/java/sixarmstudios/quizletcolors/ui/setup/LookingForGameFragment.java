@@ -1,6 +1,5 @@
 package sixarmstudios.quizletcolors.ui.setup;
 
-import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothDevice;
@@ -9,14 +8,12 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,7 +30,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import appstate.AppState;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.StartActivity;
 import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
@@ -50,7 +46,8 @@ public class LookingForGameFragment extends LifecycleFragment implements IBlueto
     private PlayerServiceConnection mPlayerConnection;
     private Set<String> mSeenSets = new HashSet<>();
 
-    @BindView(R.id.join_option_list) LinearLayout mJoinList;
+    @BindView(R.id.join_option_list_bonded) LinearLayout mJoinListBonded;
+    @BindView(R.id.join_option_list_unbonded) LinearLayout mJoinListUnbonded;
     @BindView(R.id.username_text_field) EditText mUsernameField;
 
 
@@ -66,7 +63,6 @@ public class LookingForGameFragment extends LifecycleFragment implements IBlueto
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(LAYOUT_ID, container, false);
         ButterKnife.bind(this, view);
-        mJoinList.removeAllViews();
         mUsernameField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -90,14 +86,6 @@ public class LookingForGameFragment extends LifecycleFragment implements IBlueto
                 mUsernameField.setHint(state.qUsername);
             } else {
                 mUsernameField.setText("FooBar");
-
-
-
-
-
-
-
-
             }
         });
         return view;
@@ -130,7 +118,8 @@ public class LookingForGameFragment extends LifecycleFragment implements IBlueto
 
     private void updateEnabledState() {
         boolean noName = StringUtils.isEmpty(mUsernameField.getText());
-        mJoinList.setVisibility(noName ? View.GONE : View.VISIBLE);
+        mJoinListBonded.setVisibility(noName ? View.GONE : View.VISIBLE);
+        mJoinListUnbonded.setVisibility(noName ? View.GONE : View.VISIBLE);
     }
 
     private void addToGameOptionList(@NonNull BluetoothDevice device, @Nullable String name, int bondState, @NonNull String address) {
@@ -145,12 +134,13 @@ public class LookingForGameFragment extends LifecycleFragment implements IBlueto
         v.setText(sb.toString());
         v.setLayoutParams(layoutParams);
         if (bondState == BluetoothDevice.BOND_BONDED) {
-            mJoinList.addView(v, 0);
+            mJoinListBonded.addView(v);
         } else {
-            mJoinList.addView(v);
+            mJoinListUnbonded.addView(v);
         }
         v.setOnClickListener((view) -> {
-            mJoinList.removeAllViews();
+            mJoinListBonded.removeAllViews();
+            mJoinListUnbonded.removeAllViews();
             mPlayerConnection.connectToServer(device, mUsernameField.getText().toString());
 
             TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
