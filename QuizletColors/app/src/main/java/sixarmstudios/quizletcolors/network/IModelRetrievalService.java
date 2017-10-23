@@ -1,7 +1,6 @@
 package sixarmstudios.quizletcolors.network;
 
-import android.arch.lifecycle.LifecycleActivity;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -38,7 +37,7 @@ public interface IModelRetrievalService {
 
     String getRedirectUrl();
 
-    void handelOauthCode(LifecycleActivity lifecycleActivity, String authCode);
+    void handelOauthCode(AppCompatActivity lifecycleActivity, String authCode);
 
     void refreshSummary();
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffff</color>
+    <color name="grey_light">#cecece</color>
+    <color name="grey_dark">#5c5c5c</color>
+    <color name="black">#202020</color>
+
+    <color name="red_neon">#fe5900</color>
+    <color name="green_neon">#3BC536</color>
+    <color name="blue_neon">#0892A5</color>
+    <color name="yellow_neon">#FDE95C</color>
+    <color name="orange_neon">#EF3E36</color>
+    <color name="violet_neon">#C234C2</color>
+
+    <color name="red_pastel">#ffb3ba</color>
+    <color name="green_pastel">#baffc9</color>
+    <color name="blue_pastel">#bae1ff</color>
+    <color name="yellow_pastel">#ffffba</color>
+    <color name="orange_pastel">#ffdfba</color>
+    <color name="violet_pastel">#e5baff</color>
+
+    <color name="red_earth">#c94d4d</color>
+    <color name="green_earth">#406244</color>
+    <color name="blue_earth">#181baf</color>
+    <color name="yellow_earth">#dab71f</color>
+    <color name="orange_earth">#d8832b</color>
+    <color name="violet_earth">#7731c2</color>
+
+</resources>

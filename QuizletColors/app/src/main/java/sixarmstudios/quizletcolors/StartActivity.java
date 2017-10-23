@@ -1,7 +1,7 @@
 package sixarmstudios.quizletcolors;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
@@ -17,6 +17,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.webkit.WebView;
@@ -57,7 +58,7 @@ import ui.Game;
 import viewmodel.TopLevelViewModel;
 
 @ParametersAreNonnullByDefault
-public class StartActivity extends LifecycleActivity implements IBluetoothPlayerListener {
+public class StartActivity extends AppCompatActivity implements IBluetoothPlayerListener {
     @LayoutRes
     public static final int LAYOUT_ID = R.layout.activity_start;
     public static final String TAG = StartActivity.class.getSimpleName();
@@ -299,6 +300,7 @@ public class StartActivity extends LifecycleActivity implements IBluetoothPlayer
     //endregion
 
 
+    @SuppressLint("SetJavaScriptEnabled")
     public void handleOAuthStart() {
         Dialog auth_dialog;
         WebView web;

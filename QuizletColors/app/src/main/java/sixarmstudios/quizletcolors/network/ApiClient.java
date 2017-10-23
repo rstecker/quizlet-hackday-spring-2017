@@ -1,38 +1,25 @@
 package sixarmstudios.quizletcolors.network;
 
-import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.util.StringUtil;
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Locale;
 
-import appstate.PlayerState;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.BehaviorProcessor;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.CompletableSubject;
-import okhttp3.Authenticator;
-import okhttp3.Credentials;
-import okhttp3.Interceptor;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.Route;
 import quizlet.QOAuthResponse;
 import quizlet.QSet;
 import quizlet.QUser;
@@ -107,7 +94,7 @@ public class ApiClient {
     }
 
 
-    void handleOAuthCode(LifecycleActivity context, String authCode, String redirectUrl) {
+    void handleOAuthCode(AppCompatActivity context, String authCode, String redirectUrl) {
         mToken = null;
         Request request = new Request.Builder()
                 .url("https://api.quizlet.com/oauth/token")

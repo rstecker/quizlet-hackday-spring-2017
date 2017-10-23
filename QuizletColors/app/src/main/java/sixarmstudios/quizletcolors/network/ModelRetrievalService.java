@@ -1,13 +1,11 @@
 package sixarmstudios.quizletcolors.network;
 
 import android.app.Service;
-import android.arch.lifecycle.LifecycleActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.widget.Toast;
@@ -18,11 +16,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.BehaviorProcessor;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.CompletableSubject;
 import quizlet.QSet;
 import quizlet.QUser;
 import sixarmstudios.quizletcolors.BuildConfig;
@@ -156,7 +152,7 @@ public class ModelRetrievalService extends Service implements IModelRetrievalSer
     }
 
     @Override
-    public void handelOauthCode(LifecycleActivity context, String authCode) {
+    public void handelOauthCode(AppCompatActivity context, String authCode) {
         Completable
                 .defer(() -> {
                     mClient.handleOAuthCode(context, authCode, mRedirectUrl);

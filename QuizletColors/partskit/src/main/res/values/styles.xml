@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Question">
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:background">?questionBg</item>
+        <item name="android:textColor">?questionText</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:elevation">6dp</item>
+    </style>
+
+    <style name="Answer">
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:background">?answerBg</item>
+        <item name="android:textColor">?answerText</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <style name="playerBox">
+        <item name="android:textAlignment">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <style name="playerRedBox" parent="playerBox">
+        <item name="android:background">?playerRed</item>
+        <item name="android:textColor">?playerText</item>
+    </style>
+
+    <style name="playerGreenBox" parent="playerBox">
+        <item name="android:background">?playerGreen</item>
+        <item name="android:textColor">?playerText</item>
+    </style>
+
+    <style name="playerBlueBox" parent="playerBox">
+        <item name="android:background">?playerBlue</item>
+        <item name="android:textColor">?playerText</item>
+    </style>
+
+    <style name="playerYellowBox" parent="playerBox">
+        <item name="android:background">?playerYellow</item>
+        <item name="android:textColor">?playerText</item>
+    </style>
+
+    <style name="playerOrangeBox" parent="playerBox">
+        <item name="android:background">?playerOrange</item>
+        <item name="android:textColor">?playerText</item>
+    </style>
+
+    <style name="playerVioletBox" parent="playerBox">
+        <item name="android:background">?playerViolet</item>
+        <item name="android:textColor">?playerText</item>
+    </style>
+
+</resources>

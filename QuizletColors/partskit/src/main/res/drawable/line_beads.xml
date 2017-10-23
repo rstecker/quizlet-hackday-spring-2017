@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="150dp"
+    android:viewportHeight="150.0"
+    android:viewportWidth="50.0">
+    <path
+        android:name="draw"
+        android:fillColor="#FF000000"
+        android:pathData="
+        M 25, 18
+        m -18, 0
+        a 18,18 0 1,0 36,0
+        a 18,18 0 1,0 -36,0
+        M 25, 54
+        m -20, 0
+        a 20,20 0 1,0 40,0
+        a 20,20 0 1,0 -40,0
+        M 25, 90
+        m -20, 0
+        a 20,20 0 1,0 40,0
+        a 20,20 0 1,0 -40,0
+        M 25, 126
+        m -18, 0
+        a 18,18 0 1,0 36,0
+        a 18,18 0 1,0 -36,0
+
+
+"
+        android:strokeColor="@color/violet_neon"
+        android:strokeWidth="0" />
+</vector>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="answerBg" format="reference" />
+    <attr name="answerText" format="reference" />
+    <attr name="questionBg" format="reference" />
+    <attr name="questionText" format="reference" />
+
+    <attr name="playerRed" format="reference" />
+    <attr name="playerGreen" format="reference" />
+    <attr name="playerBlue" format="reference" />
+    <attr name="playerYellow" format="reference" />
+    <attr name="playerOrange" format="reference" />
+    <attr name="playerViolet" format="reference" />
+
+    <attr name="playerText" format="reference" />
+
+    <declare-styleable name="CompasRose">
+        <attr name="lineColor" format="reference" />
+        <attr name="lineType" format="reference"/>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.QC.Light" parent="Theme.AppCompat.Light">
+        <item name="android:background">@color/white</item>
+        <item name="android:colorControlNormal">@color/black</item>
+        <item name="android:colorAccent">@color/grey_dark</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="answerBg">@color/grey_light</item>
+        <item name="answerText">@color/grey_dark</item>
+        <item name="questionBg">@color/grey_dark</item>
+        <item name="questionText">@color/grey_light</item>
+    </style>
+
+    <style name="Theme.QC.Dark" parent="Theme.AppCompat.Light">
+        <item name="android:background">@color/black</item>
+        <item name="android:colorControlNormal">@color/white</item>
+        <item name="android:colorAccent">@color/grey_light</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="questionBg">@color/grey_light</item>
+        <item name="questionText">@color/grey_dark</item>
+        <item name="answerBg">@color/grey_dark</item>
+        <item name="answerText">@color/grey_light</item>
+
+    </style>
+
+    <!-- Pastel -->
+
+    <style name="Theme.QC.Dark.Pastel" parent="Theme.QC.Dark">
+        <item name="playerRed">@color/red_pastel</item>
+        <item name="playerGreen">@color/green_pastel</item>
+        <item name="playerBlue">@color/blue_pastel</item>
+        <item name="playerYellow">@color/yellow_pastel</item>
+        <item name="playerOrange">@color/orange_pastel</item>
+        <item name="playerViolet">@color/violet_pastel</item>
+        <item name="playerText">@color/black</item>
+    </style>
+
+    <style name="Theme.QC.Light.Pastel" parent="Theme.QC.Light">
+        <item name="playerRed">@color/red_pastel</item>
+        <item name="playerGreen">@color/green_pastel</item>
+        <item name="playerBlue">@color/blue_pastel</item>
+        <item name="playerYellow">@color/yellow_pastel</item>
+        <item name="playerOrange">@color/orange_pastel</item>
+        <item name="playerViolet">@color/violet_pastel</item>
+        <item name="playerText">@color/black</item>
+    </style>
+
+    <!-- Neon -->
+
+    <style name="Theme.QC.Dark.Neon" parent="Theme.QC.Dark">
+        <item name="playerRed">@color/red_neon</item>
+        <item name="playerGreen">@color/green_neon</item>
+        <item name="playerBlue">@color/blue_neon</item>
+        <item name="playerYellow">@color/yellow_neon</item>
+        <item name="playerOrange">@color/orange_neon</item>
+        <item name="playerViolet">@color/violet_neon</item>
+        <item name="playerText">@color/black</item>
+    </style>
+
+    <style name="Theme.QC.Light.Neon" parent="Theme.QC.Light">
+        <item name="playerRed">@color/red_neon</item>
+        <item name="playerGreen">@color/green_neon</item>
+        <item name="playerBlue">@color/blue_neon</item>
+        <item name="playerYellow">@color/yellow_neon</item>
+        <item name="playerOrange">@color/orange_neon</item>
+        <item name="playerViolet">@color/violet_neon</item>
+        <item name="playerText">@color/black</item>
+    </style>
+
+    <!-- Earth -->
+
+    <style name="Theme.QC.Light.Earth" parent="Theme.QC.Light">
+        <item name="playerRed">@color/red_earth</item>
+        <item name="playerGreen">@color/green_earth</item>
+        <item name="playerBlue">@color/blue_earth</item>
+        <item name="playerYellow">@color/yellow_earth</item>
+        <item name="playerOrange">@color/orange_earth</item>
+        <item name="playerViolet">@color/violet_earth</item>
+        <item name="playerText">@color/white</item>
+    </style>
+
+    <style name="Theme.QC.Dark.Earth" parent="Theme.QC.Dark">
+        <item name="playerRed">@color/red_earth</item>
+        <item name="playerGreen">@color/green_earth</item>
+        <item name="playerBlue">@color/blue_earth</item>
+        <item name="playerYellow">@color/yellow_earth</item>
+        <item name="playerOrange">@color/orange_earth</item>
+        <item name="playerViolet">@color/violet_earth</item>
+        <item name="playerText">@color/white</item>
+    </style>
+
+</resources>

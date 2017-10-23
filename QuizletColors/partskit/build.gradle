@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 
+
 repositories {
     jcenter()
     maven { url 'https://maven.google.com' }
@@ -10,16 +11,19 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
 
+
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
+
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -27,54 +31,37 @@ android {
         }
     }
 
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-
     }
 
     packagingOptions {
         exclude 'META-INF/NOTICE' // will not include NOTICE file
         exclude 'META-INF/LICENSE' // will not include LICENSE file
     }
+
 }
 
 dependencies {
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    testImplementation 'junit:junit:4.12'
-
-
-    annotationProcessor "org.immutables:value:2.5.5" // <-- for annotation processor
-    compile "org.immutables:value:2.5.5" // <-- for annotation API
-    compile "org.immutables:builder:2.5.5" // for annotations
-
-    // Model utilities
-    compile "org.parceler:parceler-api:1.1.6"
-    annotationProcessor "org.parceler:parceler:1.1.6"
-
-    // RX <3
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.0.8'
-
-    // JSON parsing
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.5'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.5'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.5'
-
-    // lifecycle android stuff
     compile "android.arch.lifecycle:runtime:1.0.3"
     compile "android.arch.lifecycle:extensions:1.0.0-alpha9-1"
     annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha9-1"
 
-    // room / database stuff
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha9-1"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha9-1"
     compile 'com.google.code.findbugs:jsr305:2.0.1'
-    compile 'org.apache.commons:commons-lang3:3.4'
+
+
+    compile "com.android.support:support-dynamic-animation:26.1.0"
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+
+    compile 'com.android.support:design:26.1.0'
+
 }
