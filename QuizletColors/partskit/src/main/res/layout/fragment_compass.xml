@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/shape_1"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_beads"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_2"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_dimond"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_3"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_oval"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_4"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_rect"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_5"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_squiggle"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_6"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_triangle_up"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_7"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_triangle_down"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+
+        <FrameLayout
+            android:id="@+id/shape_8"
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:background="@drawable/line_zig_zag"
+            android:backgroundTint="@color/green_neon"
+            android:elevation="6dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:orientation="horizontal">
+
+        <studioes.arm.six.partskit.CompasRose
+            android:id="@+id/rose_1"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:lineColor="?playerBlue"
+            app:lineType="@drawable/line_dimond" />
+
+        <studioes.arm.six.partskit.CompasRose
+            android:id="@+id/rose_2"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:lineColor="?playerOrange"
+            app:lineType="@drawable/line_triangle_down" />
+    </LinearLayout>
+</LinearLayout>

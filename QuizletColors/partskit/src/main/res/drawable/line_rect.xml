@@ -7,7 +7,8 @@
     <path
         android:name="draw"
         android:fillColor="#FF000000"
-        android:pathData="M12,0 L24,0 L24,150 L12,150z"
+        android:pathData="M5,0 L45,0 L45,150 L5
+        ,150z"
         android:strokeColor="@color/violet_neon"
         android:strokeWidth="0" />
 </vector>

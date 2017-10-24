@@ -1,28 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frame_base"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:clipChildren="false"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
     <FrameLayout
         android:id="@+id/compass_rose_lvl_1"
         android:layout_width="match_parent"
-        android:elevation="5dp"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:layout_gravity="center"
+        android:clipChildren="false" />
+
+    <FrameLayout
+        android:id="@+id/compass_rose_lvl_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:clipChildren="false"
+        android:background="@null"
+        android:scaleX="0.75"
+        android:scaleY="0.75" />
+
+
+    <FrameLayout
+        android:id="@+id/compass_rose_lvl_3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:clipChildren="false"
+        android:background="@null"
+        android:scaleX="0.5"
+        android:scaleY="0.5" />
 
     <!--<FrameLayout-->
-        <!--android:id="@+id/compass_rose_lvl_2"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
+    <!--android:id="@+id/compass_rose_lvl_3"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 
     <!--<FrameLayout-->
-        <!--android:id="@+id/compass_rose_lvl_3"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
+    <!--android:id="@+id/compass_rose_lvl_4"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 
-    <!--<FrameLayout-->
-        <!--android:id="@+id/compass_rose_lvl_4"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
 </FrameLayout>
