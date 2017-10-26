@@ -10,6 +10,10 @@
         <item name="answerText">@color/grey_dark</item>
         <item name="questionBg">@color/grey_dark</item>
         <item name="questionText">@color/grey_light</item>
+        <item name="gradeBg">@color/dark_fade</item>
+        <item name="gradeLineCorrect">@color/green</item>
+        <item name="gradeLineIncorrect">@color/red</item>
+
     </style>
 
     <style name="Theme.QC.Dark" parent="Theme.AppCompat.Light">
@@ -21,6 +25,9 @@
         <item name="questionText">@color/grey_dark</item>
         <item name="answerBg">@color/grey_dark</item>
         <item name="answerText">@color/grey_light</item>
+        <item name="gradeBg">@color/light_fade</item>
+        <item name="gradeLineCorrect">@color/green</item>
+        <item name="gradeLineIncorrect">@color/red</item>
 
     </style>
 
@@ -34,6 +41,7 @@
         <item name="playerOrange">@color/orange_pastel</item>
         <item name="playerViolet">@color/violet_pastel</item>
         <item name="playerText">@color/black</item>
+        <item name="gradeNoPlayerBg">@color/grey_light</item>
     </style>
 
     <style name="Theme.QC.Light.Pastel" parent="Theme.QC.Light">
@@ -44,6 +52,7 @@
         <item name="playerOrange">@color/orange_pastel</item>
         <item name="playerViolet">@color/violet_pastel</item>
         <item name="playerText">@color/black</item>
+        <item name="gradeNoPlayerBg">@color/grey_light</item>
     </style>
 
     <!-- Neon -->
@@ -56,6 +65,7 @@
         <item name="playerOrange">@color/orange_neon</item>
         <item name="playerViolet">@color/violet_neon</item>
         <item name="playerText">@color/black</item>
+        <item name="gradeNoPlayerBg">@color/grey_light</item>
     </style>
 
     <style name="Theme.QC.Light.Neon" parent="Theme.QC.Light">
@@ -66,6 +76,7 @@
         <item name="playerOrange">@color/orange_neon</item>
         <item name="playerViolet">@color/violet_neon</item>
         <item name="playerText">@color/black</item>
+        <item name="gradeNoPlayerBg">@color/grey_light</item>
     </style>
 
     <!-- Earth -->
@@ -78,6 +89,7 @@
         <item name="playerOrange">@color/orange_earth</item>
         <item name="playerViolet">@color/violet_earth</item>
         <item name="playerText">@color/white</item>
+        <item name="gradeNoPlayerBg">@color/grey_dark</item>
     </style>
 
     <style name="Theme.QC.Dark.Earth" parent="Theme.QC.Dark">
@@ -88,6 +100,7 @@
         <item name="playerOrange">@color/orange_earth</item>
         <item name="playerViolet">@color/violet_earth</item>
         <item name="playerText">@color/white</item>
+        <item name="gradeNoPlayerBg">@color/grey_dark</item>
     </style>
 
 </resources>

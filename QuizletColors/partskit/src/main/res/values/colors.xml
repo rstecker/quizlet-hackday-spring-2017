@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="hidden">#00ffffff</color>
     <color name="white">#ffffff</color>
     <color name="grey_light">#cecece</color>
     <color name="grey_dark">#5c5c5c</color>
     <color name="black">#202020</color>
+    <color name="dark_fade">#e933201d</color>
+    <color name="light_fade">#f3d4bebb</color>
+    <color name="red">#ff1f00</color>
+    <color name="green">#00ff00</color>
 
     <color name="red_neon">#fe5900</color>
     <color name="green_neon">#3BC536</color>

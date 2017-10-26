@@ -5,6 +5,11 @@
     <attr name="questionBg" format="reference" />
     <attr name="questionText" format="reference" />
 
+    <attr name="gradeBg" format="reference" />
+    <attr name="gradeNoPlayerBg" format="reference" />
+    <attr name="gradeLineCorrect" format="reference" />
+    <attr name="gradeLineIncorrect" format="reference" />
+
     <attr name="playerRed" format="reference" />
     <attr name="playerGreen" format="reference" />
     <attr name="playerBlue" format="reference" />

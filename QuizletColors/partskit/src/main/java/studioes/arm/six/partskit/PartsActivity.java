@@ -77,13 +77,15 @@ public class PartsActivity extends AppCompatActivity {
                 Bundle args = new Bundle();
                 frag.setArguments(args);
                 return frag;
-            } else {
+            } else if (position == 2) {
                 return new CompassFragment();
+            } else {
+                return new GradingFragment();
             }
         }
 
         @Override public int getCount() {
-            return 2;
+            return 3;
         }
     }
 }

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sharks sharks sharks" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut condimentum dolor luctus ligula lobortis, eu vulputate nibh imperdiet. In ullamcorper velit dolor, non interdum diam rutrum et. Nulla facilisis vehicula velit. Donec dignissim porttitor eros ut tincidunt. Phasellus imperdiet neque ligula, at ultrices nisl faucibus a. Cras ut volutpat sapien. Fusce blandit sapien a lectus aliquam elementum. Etiam sodales rhoncus purus et iaculis. Donec ligula mi, aliquet quis dolor in, gravida elementum augue. In ornare odio id elit lacinia tincidunt. Donec ornare nisi ante, a sodales tortor iaculis in. Donec non velit id libero porttitor ornare. Mauris vel justo non est sagittis vulputate. Integer nec elementum est, eu tincidunt metus. Aliquam erat volutpat. Ut vel purus consequat, sodales dolor vitae, consequat libero." />
+
+        <TextView
+            style="@style/Question"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sharks sharks sharks" />
+
+        <TextView
+            style="@style/Answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Donec pellentesque, mi vitae posuere." />
+
+        <TextView
+            style="@style/Answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sed et dignissim ipsum. Sed bibendum sit amet est non fringilla. Nulla in sollicitudin nunc, id volutpat leo. Donec porta erat id nibh facilisis, vel." />
+
+        <TextView
+            style="@style/Question"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Donec finibus, velit sit amet ornare tempor, nisl lorem finibus purus, a pellentesque quam nisi." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sharks sharks sharks" />
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:id="@+id/grade_box"
+        style="@style/Grade"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/boxCenter"
+            style="@style/Question"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:autoSizeTextType="uniform"
+            android:maxLines="3"
+            android:backgroundTint="?playerOrange"
+            android:text="Connecticut"
+            android:textColor="?playerText" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null" />
+
+            <ImageView
+                android:id="@+id/line_a"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:background="@drawable/line_a"
+                android:backgroundTint="?gradeLineCorrect"
+                android:importantForAccessibility="no"
+                android:scaleType="centerInside"
+                android:textColor="@color/hidden" />
+
+            <ImageView
+                android:id="@+id/line_b"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/line_a"
+                android:backgroundTint="?gradeLineIncorrect"
+                android:importantForAccessibility="no"
+                android:scaleType="centerInside"
+                android:scaleX="-1"
+                android:textColor="@color/hidden" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="2"
+            android:background="@null"
+            android:gravity="top|center_horizontal"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/boxRight"
+                style="@style/Answer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:autoSizeTextType="uniform"
+                android:backgroundTint="?gradeNoPlayerBg"
+                android:text="Florida"
+                android:textColor="?playerText" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/boxLeft"
+                style="@style/Answer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="?playerBlue"
+                android:text="Tallahassee"
+                android:textColor="?playerText" />
+
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
