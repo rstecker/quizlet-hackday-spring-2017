@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/grade_box_outer"
+    style="@style/Grade"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/boxCenter"
+        style="@style/Question"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:autoSizePresetSizes="@array/autosize_text_sizes"
+        android:autoSizeTextType="uniform"
+        android:backgroundTint="?playerOrange"
+        android:maxLines="3"
+        android:text="Connecticut"
+        android:textColor="?playerText" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:background="@null"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null" />
+
+        <ImageView
+            android:id="@+id/line_a"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:background="@drawable/line_a"
+            android:backgroundTint="?gradeLineCorrect"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:textColor="@color/hidden" />
+
+        <ImageView
+            android:id="@+id/line_b"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/line_a"
+            android:backgroundTint="?gradeLineIncorrect"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:scaleX="-1"
+            android:textColor="@color/hidden" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="2"
+        android:background="@null"
+        android:gravity="top|center_horizontal"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/boxRight"
+            style="@style/Answer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autoSizePresetSizes="@array/autosize_text_sizes"
+            android:autoSizeTextType="uniform"
+            android:backgroundTint="?gradeNoPlayerBg"
+            android:breakStrategy="high_quality"
+            android:hyphenationFrequency="none"
+            android:text="Florida"
+            android:textColor="?playerText" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/boxLeft"
+            style="@style/Answer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autoSizePresetSizes="@array/autosize_text_sizes"
+            android:autoSizeTextType="uniform"
+            android:backgroundTint="?playerBlue"
+            android:breakStrategy="high_quality"
+            android:text="Tallahassee"
+            android:textColor="?playerText" />
+
+    </LinearLayout>
+</LinearLayout>

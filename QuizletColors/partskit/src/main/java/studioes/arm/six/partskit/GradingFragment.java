@@ -1,9 +1,6 @@
 package studioes.arm.six.partskit;
 
 import android.os.Bundle;
-import android.support.animation.DynamicAnimation;
-import android.support.animation.SpringAnimation;
-import android.support.animation.SpringForce;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -55,48 +52,23 @@ public class GradingFragment extends Fragment {
 
     private void lockIt() {
         Log.i(TAG, "Stop!");
-        View v = findThing();
+        GradeBox v = findThing();
         if (v == null) {
             return;
         }
-        v.animate().cancel();
-        v.setScaleX(0);
-        v.setScaleY(0);
+        v.lockIt();
     }
-
     private void popIt() {
         Log.i(TAG, "GO!");
-        View v = findThing();
+        GradeBox v = findThing();
         if (v == null) {
             return;
         }
-//        new SpringAnimation(v, DynamicAnimation.SCALE_X, 1)
-//                .setStartVelocity(500)
-//                .setMinValue(0)
-//                .start();
-//        ;
-//        new SpringAnimation(v, DynamicAnimation.SCALE_Y, 1)
-//                .setStartVelocity(200)
-//                .setMinValue(0)
-//                .start();
-//        ;
-        SpringForce spring = new SpringForce(1)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW);
-        new SpringAnimation(v, DynamicAnimation.SCALE_X)
-                .setMinValue(0)
-                .setSpring(spring)
-                .start()
-        ;
-        new SpringAnimation(v, DynamicAnimation.SCALE_Y)
-                .setMinValue(0)
-                .setSpring(spring)
-                .start()
-        ;
-
+        v.popIt();
     }
 
-    private @Nullable ViewGroup findThing() {
+
+    private @Nullable GradeBox findThing() {
         View v = getView();
         if (v == null) {
             return null;

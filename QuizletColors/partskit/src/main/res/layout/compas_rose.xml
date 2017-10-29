@@ -36,14 +36,4 @@
         android:scaleX="0.5"
         android:scaleY="0.5" />
 
-    <!--<FrameLayout-->
-    <!--android:id="@+id/compass_rose_lvl_3"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
-
-    <!--<FrameLayout-->
-    <!--android:id="@+id/compass_rose_lvl_4"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
-
 </FrameLayout>

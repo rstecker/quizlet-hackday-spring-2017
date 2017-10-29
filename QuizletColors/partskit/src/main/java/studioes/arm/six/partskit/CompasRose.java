@@ -1,34 +1,62 @@
 package studioes.arm.six.partskit;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.support.animation.DynamicAnimation;
+import android.support.animation.FlingAnimation;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
+import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import static android.view.DragEvent.ACTION_DRAG_ENDED;
+import static android.view.DragEvent.ACTION_DRAG_ENTERED;
+import static android.view.DragEvent.ACTION_DRAG_EXITED;
+import static android.view.DragEvent.ACTION_DRAG_LOCATION;
+import static android.view.DragEvent.ACTION_DRAG_STARTED;
+import static android.view.DragEvent.ACTION_DROP;
+
 /**
  * Created by sithel on 10/22/17.
  */
 
-public class CompasRose extends FrameLayout {
+public class CompasRose extends FrameLayout implements View.OnDragListener {
     public static final String TAG = CompasRose.class.getSimpleName();
     @LayoutRes private static final int LAYOUT_ID = R.layout.compas_rose;
 
+    public static final int[] PLAYER_COLOR_ATTRS = {
+            R.attr.playerRed, R.attr.playerGreen,
+            R.attr.playerBlue, R.attr.playerYellow,
+            R.attr.playerOrange, R.attr.playerViolet
+    };
+    public static final int[] PLAYER_SHAPE_DRAWABLE_RES = {
+            R.drawable.line_beads, R.drawable.line_dimond, R.drawable.line_oval,
+            R.drawable.line_rect, R.drawable.line_squiggle, R.drawable.line_triangle,
+            R.drawable.line_triangle_down, R.drawable.line_triangle_up, R.drawable.line_zig_zag
+    };
 
-    @ColorRes int mBaseLineColor;
-    Drawable mBaseDrawable;
+    private @ColorRes int mBaseLineColor;
+    private Drawable mBaseDrawable;
+    /**
+     * Ranges from 0 - 1
+     */
+    private float mCurrentEnergy = 0;
 
     public CompasRose(Context context) {
         super(context);
@@ -65,7 +93,12 @@ public class CompasRose extends FrameLayout {
         }
 
         inflate(context, LAYOUT_ID, this);
-
+        mAni1 = new FlingAnimation(findViewById(R.id.compass_rose_lvl_1), DynamicAnimation.ROTATION)
+                .setFriction(0.0001f).setStartVelocity(0).setStartValue(0);
+        mAni2 = new FlingAnimation(findViewById(R.id.compass_rose_lvl_2), DynamicAnimation.ROTATION)
+                .setFriction(0.0001f).setStartVelocity(0).setStartValue(0);
+        mAni3 = new FlingAnimation(findViewById(R.id.compass_rose_lvl_3), DynamicAnimation.ROTATION)
+                .setFriction(0.0001f).setStartVelocity(0).setStartValue(0);
         populateLayer(context, findViewById(R.id.compass_rose_lvl_1), 2, 15, 5);
         populateLayer(context, findViewById(R.id.compass_rose_lvl_2), 1, 6, 4);
         populateLayer(context, findViewById(R.id.compass_rose_lvl_3), 0, 10, 6);
@@ -95,12 +128,20 @@ public class CompasRose extends FrameLayout {
         }
     }
 
+    public void setPlayer(@AttrRes int playerColorAttr, @DrawableRes int playerLineShapeRes) {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getContext().getTheme();
+        theme.resolveAttribute(playerColorAttr, typedValue, true);
+        @ColorRes int color = typedValue.resourceId;
+        mBaseLineColor = color;
+        setLine(getContext().getDrawable(playerLineShapeRes));
+    }
+
     public void setLine(Drawable drawable) {
         mBaseDrawable = drawable.mutate();
         setDrawable(findViewById(R.id.compass_rose_lvl_1), 2);
         setDrawable(findViewById(R.id.compass_rose_lvl_2), 1);
         setDrawable(findViewById(R.id.compass_rose_lvl_3), 0);
-
     }
 
     /**
@@ -115,14 +156,18 @@ public class CompasRose extends FrameLayout {
         }
     }
 
+    private FlingAnimation mAni1;
+    private FlingAnimation mAni2;
+    private FlingAnimation mAni3;
+
     public void boop() {
-        shuffleStars(findViewById(R.id.compass_rose_lvl_1), 2);
-        shuffleStars(findViewById(R.id.compass_rose_lvl_2), 1);
-        shuffleStars(findViewById(R.id.compass_rose_lvl_3), 0);
+        shuffleStars(findViewById(R.id.compass_rose_lvl_1), 2, mAni1);
+        shuffleStars(findViewById(R.id.compass_rose_lvl_2), 1, mAni2);
+        shuffleStars(findViewById(R.id.compass_rose_lvl_3), 0, mAni3);
     }
 
     private @ColorInt int getColorVariant(int lvl) {
-        @ColorInt int colorInt = getResources().getColor(mBaseLineColor);
+        @ColorInt int colorInt = ContextCompat.getColor(getContext(), mBaseLineColor);
         float[] hsl = new float[3];
         ColorUtils.colorToHSL(colorInt, hsl);
         double skew = 0.01 * lvl;
@@ -135,17 +180,14 @@ public class CompasRose extends FrameLayout {
         return colorInt;
     }
 
-    private void shuffleStars(FrameLayout frame, int lvl) {
-        frame.animate()
-                .rotationBy((float) (360 + 360*Math.random()))
-                .setDuration((long) (2*1000+Math.random()*2*1000))
-                .start();
+    private void shuffleStars(FrameLayout frame, int lvl, FlingAnimation frameAnimation) {
+        updateBasics(frame, lvl, frameAnimation);
 
 //        Resources r = getResources();
 //        float px25 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, r.getDisplayMetrics());
 
         Log.i(TAG, "Rebecca : [" + lvl + "] " + frame.getWidth() + ", " + frame.getHeight() + " --> " + frame.getChildAt(0).getWidth() + ", " + frame.getChildAt(0).getHeight());
-        int r = frame.getHeight() / 5;//int) (Math.random() * 30 + 5);
+        int r = frame.getHeight() / 5;
         int max = frame.getChildCount();
         int star = Math.min(max, Math.max(1, (int) (Math.random() * max / 2 + max / 2)));
 
@@ -158,6 +200,7 @@ public class CompasRose extends FrameLayout {
             float newX = (float) (Math.cos(rad) * r);
             float newY = (float) (Math.sin(rad) * r);
             float newRot = deg + 90;
+
 
             new SpringAnimation(v, DynamicAnimation.TRANSLATION_X)
                     .setStartVelocity(200)
@@ -199,5 +242,65 @@ public class CompasRose extends FrameLayout {
 
     }
 
+    private void updateBasics(FrameLayout frame, int lvl, FlingAnimation frameAnimation) {
+        frameAnimation
+                .setStartVelocity(mCurrentEnergy == 0 ? 0 : mCurrentEnergy * 600)
+                .start();
+        float newScale = (float) (lvl == 2 ? 1 : lvl == 1 ? 0.75 : 0.5);
+        newScale = (float) (Math.max(0.02, mCurrentEnergy) * newScale);
+        new SpringAnimation(frame, DynamicAnimation.SCALE_X)
+                .setMaxValue(Float.MAX_VALUE)
+                .setStartVelocity(1f)
+                .setSpring(new SpringForce()
+                        .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY)
+                        .setStiffness(SpringForce.STIFFNESS_LOW)
+                        .setFinalPosition(newScale))
+                .start();
 
+        new SpringAnimation(frame, DynamicAnimation.SCALE_Y)
+                .setMaxValue(Float.MAX_VALUE)
+                .setStartVelocity(1f)
+                .setSpring(new SpringForce()
+                        .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY)
+                        .setStiffness(SpringForce.STIFFNESS_LOW)
+                        .setFinalPosition(newScale))
+                .start();
+    }
+
+    public void setEnergy(float i) {
+        mCurrentEnergy = i;
+
+        updateBasics(findViewById(R.id.compass_rose_lvl_1), 2, mAni1);
+        updateBasics(findViewById(R.id.compass_rose_lvl_2), 1, mAni2);
+        updateBasics(findViewById(R.id.compass_rose_lvl_3), 0, mAni3);
+    }
+
+    @Override public boolean onDragEvent(DragEvent event) {
+        Log.i(TAG, "Rose saw onDragEvent : "+event);
+        return super.onDragEvent(event);
+    }
+
+    @Override public boolean onDrag(View v, DragEvent event) {
+        int action = event.getAction();
+        switch (action) {
+            case ACTION_DRAG_STARTED:
+            case ACTION_DRAG_EXITED:
+                setEnergy(0.6f);
+                break;
+            case ACTION_DRAG_ENTERED:
+            case ACTION_DRAG_LOCATION:
+                setEnergy(0.8f);
+                break;
+            case ACTION_DROP:
+                setEnergy(1f);
+                break;
+            case ACTION_DRAG_ENDED:
+                setEnergy(0.4f);
+                break;
+            default:
+                Log.e(TAG, "Unknown drag action: " + action);
+        }
+        Log.i(TAG, "Rose saw  onDrag " + action + " :: " + this);
+        return true;
+    }
 }

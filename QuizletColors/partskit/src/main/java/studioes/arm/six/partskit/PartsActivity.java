@@ -72,7 +72,9 @@ public class PartsActivity extends AppCompatActivity {
         }
 
         @Override public Fragment getItem(int position) {
-            if (position == 1) {
+            if (position == 0) {
+                return new BoardFragment();
+            } else if (position == 1) {
                 ColorFragment frag = new ColorFragment();
                 Bundle args = new Bundle();
                 frag.setArguments(args);
@@ -85,7 +87,7 @@ public class PartsActivity extends AppCompatActivity {
         }
 
         @Override public int getCount() {
-            return 3;
+            return 4;
         }
     }
 }
