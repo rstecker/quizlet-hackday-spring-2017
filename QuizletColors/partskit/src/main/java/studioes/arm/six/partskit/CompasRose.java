@@ -19,32 +19,36 @@ import android.support.v4.graphics.ColorUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import static android.view.DragEvent.ACTION_DRAG_ENDED;
-import static android.view.DragEvent.ACTION_DRAG_ENTERED;
-import static android.view.DragEvent.ACTION_DRAG_EXITED;
-import static android.view.DragEvent.ACTION_DRAG_LOCATION;
-import static android.view.DragEvent.ACTION_DRAG_STARTED;
-import static android.view.DragEvent.ACTION_DROP;
-
 /**
  * Created by sithel on 10/22/17.
  */
 
-public class CompasRose extends FrameLayout implements View.OnDragListener {
+public class CompasRose extends FrameLayout {
     public static final String TAG = CompasRose.class.getSimpleName();
     @LayoutRes private static final int LAYOUT_ID = R.layout.compas_rose;
 
-    public static final int[] PLAYER_COLOR_ATTRS = {
-            R.attr.playerRed, R.attr.playerGreen,
-            R.attr.playerBlue, R.attr.playerYellow,
-            R.attr.playerOrange, R.attr.playerViolet
-    };
+    public enum RoseColor {
+        RED(R.attr.playerRed, "red"),
+        GREEN(R.attr.playerGreen, "green"),
+        BLUE(R.attr.playerBlue, "blue"),
+        YELLOW(R.attr.playerYellow, "yellow"),
+        ORANGE(R.attr.playerOrange, "orange"),
+        VIOLET(R.attr.playerViolet, "violet"),
+        ;
+        @AttrRes int colorAttr;
+        String colorName;
+
+        RoseColor(@AttrRes int colorAttr, String colorName) {
+            this.colorAttr = colorAttr;
+            this.colorName = colorName;
+        }
+    }
+
     public static final int[] PLAYER_SHAPE_DRAWABLE_RES = {
             R.drawable.line_beads, R.drawable.line_dimond, R.drawable.line_oval,
             R.drawable.line_rect, R.drawable.line_squiggle, R.drawable.line_triangle,
@@ -128,13 +132,14 @@ public class CompasRose extends FrameLayout implements View.OnDragListener {
         }
     }
 
-    public void setPlayer(@AttrRes int playerColorAttr, @DrawableRes int playerLineShapeRes) {
+    public void setPlayer(RoseColor roseColor, @DrawableRes int playerLineShapeRes) {
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = getContext().getTheme();
-        theme.resolveAttribute(playerColorAttr, typedValue, true);
+        theme.resolveAttribute(roseColor.colorAttr, typedValue, true);
         @ColorRes int color = typedValue.resourceId;
         mBaseLineColor = color;
         setLine(getContext().getDrawable(playerLineShapeRes));
+        setTag(R.id.player_color_key, roseColor.colorName);
     }
 
     public void setLine(Drawable drawable) {
@@ -244,10 +249,10 @@ public class CompasRose extends FrameLayout implements View.OnDragListener {
 
     private void updateBasics(FrameLayout frame, int lvl, FlingAnimation frameAnimation) {
         frameAnimation
-                .setStartVelocity(mCurrentEnergy == 0 ? 0 : mCurrentEnergy * 600)
+                .setStartVelocity(mCurrentEnergy == 0 ? 0 : mCurrentEnergy * 150 + 150)
                 .start();
         float newScale = (float) (lvl == 2 ? 1 : lvl == 1 ? 0.75 : 0.5);
-        newScale = (float) (Math.max(0.02, mCurrentEnergy) * newScale);
+        newScale = (float) (Math.max(0.02, mCurrentEnergy * 2) * newScale);
         new SpringAnimation(frame, DynamicAnimation.SCALE_X)
                 .setMaxValue(Float.MAX_VALUE)
                 .setStartVelocity(1f)
@@ -273,34 +278,18 @@ public class CompasRose extends FrameLayout implements View.OnDragListener {
         updateBasics(findViewById(R.id.compass_rose_lvl_1), 2, mAni1);
         updateBasics(findViewById(R.id.compass_rose_lvl_2), 1, mAni2);
         updateBasics(findViewById(R.id.compass_rose_lvl_3), 0, mAni3);
+        this.invalidate();
     }
 
-    @Override public boolean onDragEvent(DragEvent event) {
-        Log.i(TAG, "Rose saw onDragEvent : "+event);
-        return super.onDragEvent(event);
+    public Drawable getPlayerShape() {
+        return mBaseDrawable;
     }
 
-    @Override public boolean onDrag(View v, DragEvent event) {
-        int action = event.getAction();
-        switch (action) {
-            case ACTION_DRAG_STARTED:
-            case ACTION_DRAG_EXITED:
-                setEnergy(0.6f);
-                break;
-            case ACTION_DRAG_ENTERED:
-            case ACTION_DRAG_LOCATION:
-                setEnergy(0.8f);
-                break;
-            case ACTION_DROP:
-                setEnergy(1f);
-                break;
-            case ACTION_DRAG_ENDED:
-                setEnergy(0.4f);
-                break;
-            default:
-                Log.e(TAG, "Unknown drag action: " + action);
-        }
-        Log.i(TAG, "Rose saw  onDrag " + action + " :: " + this);
-        return true;
+    public @ColorRes int getColorRes() {
+        return mBaseLineColor;
+    }
+
+    public String getPlayerColor() {
+        return (String) getTag(R.id.player_color_key);
     }
 }
