@@ -44,6 +44,8 @@
 
     <!-- Lobby text -->
 
+    <string name="host_designation">[HOST]</string>
+    <string name="you_designation">[YOU]</string>
     <string name="username_hint">Enter username</string>
     <string name="set_field_hint">Enter a Quizlet set ID</string>
 
