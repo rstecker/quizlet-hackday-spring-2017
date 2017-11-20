@@ -1,12 +1,12 @@
 package sixarmstudios.quizletcolors.ui.lobby;
 
-import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,7 +47,7 @@ import viewmodel.LobbyViewModel;
  * <li> All current players
  */
 @ParametersAreNonnullByDefault
-public class LobbyFragment extends LifecycleFragment implements IUserSelector {
+public class LobbyFragment extends Fragment implements IUserSelector {
     public static final String TAG = LobbyFragment.class.getSimpleName();
     @LayoutRes public static final int LAYOUT_ID = R.layout.lobby_users_fragment;
     private static final String SET_ID_ARG = "setIdArg";

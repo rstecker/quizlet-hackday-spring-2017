@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/blue_earth"
         android:orientation="vertical">
 
         <android.support.v7.widget.AppCompatTextView
@@ -26,6 +27,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/option_list"
             android:layout_width="match_parent"
+            android:background="@color/blue_neon"
             android:layout_height="0dp"
             android:layout_weight="2"
             android:minHeight="@dimen/min_tap_target_size" />
@@ -34,6 +36,7 @@
             android:id="@+id/player_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@color/blue_pastel"
             android:layout_weight="1"
             android:minHeight="@dimen/min_tap_target_size" />
     </LinearLayout>
