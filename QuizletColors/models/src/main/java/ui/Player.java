@@ -3,6 +3,7 @@ package ui;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 /**
  * Created by rebeccastecker on 6/9/17.
@@ -11,7 +12,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class Player {
     @PrimaryKey
     @ColumnInfo(name = "username")
-    public String username;
+    @NonNull public String username;
 
     @ColumnInfo(name = "color")
     public String color;
@@ -22,7 +23,7 @@ public class Player {
     @ColumnInfo(name = "is_you")
     public boolean isYou;
 
-    public Player(String username, String color, boolean isHost, boolean isYou) {
+    public Player(@NonNull String username, String color, boolean isHost, boolean isYou) {
         this.username = username;
         this.color = color;
         this.isHost = isHost;
