@@ -23,10 +23,7 @@
         android:layout_height="75dp"
         android:background="@null"
         android:clipChildren="false"
-        android:translationX="-100dp"
-        android:translationY="-100dp"
         app:lineColor="?playerBlue"
-        android:layout_gravity="center"
         app:lineType="@drawable/line_dimond" />
 
     <TextView
