@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import sixarmstudios.quizletcolors.logic.player.CreatureCreation;
+import studioes.arm.six.partskit.CompasRose;
 
 /**
  * Created by rebeccastecker on 6/8/17.
@@ -57,11 +57,12 @@ public class LobbyLogic implements ILobbyLogic {
     }
 
     private QCMember generateNewMember(String username, boolean isHost) {
-        Collections.shuffle(CreatureCreation.COLORS);
+        List<CompasRose.RoseColor> colors = Arrays.asList(CompasRose.RoseColor.values());
+        Collections.shuffle(colors);
         return ImmutableQCMember.builder()
                 .username(username)
                 .isHost(isHost)
-                .color(CreatureCreation.COLORS.get(0).colorName)
+                .color(colors.get(0).colorName())
                 .build();
     }
 }

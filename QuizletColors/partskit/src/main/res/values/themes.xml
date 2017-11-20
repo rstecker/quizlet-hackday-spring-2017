@@ -13,6 +13,7 @@
         <item name="gradeBg">@color/dark_fade</item>
         <item name="gradeLineCorrect">@color/green</item>
         <item name="gradeLineIncorrect">@color/red</item>
+        <item name="background">@color/white</item>
 
     </style>
 
@@ -28,6 +29,7 @@
         <item name="gradeBg">@color/light_fade</item>
         <item name="gradeLineCorrect">@color/green</item>
         <item name="gradeLineIncorrect">@color/red</item>
+        <item name="background">@color/black</item>
 
     </style>
 

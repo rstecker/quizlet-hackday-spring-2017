@@ -8,7 +8,6 @@
       <module fileurl="file://$PROJECT_DIR$/creatures/creatures.iml" filepath="$PROJECT_DIR$/creatures/creatures.iml" />
       <module fileurl="file://$PROJECT_DIR$/models/models.iml" filepath="$PROJECT_DIR$/models/models.iml" />
       <module fileurl="file://$PROJECT_DIR$/partskit/partskit.iml" filepath="$PROJECT_DIR$/partskit/partskit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/partskit/partskit.iml" filepath="$PROJECT_DIR$/partskit/partskit.iml" />
     </modules>
   </component>
 </project>

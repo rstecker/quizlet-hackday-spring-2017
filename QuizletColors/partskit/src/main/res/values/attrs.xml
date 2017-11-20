@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="background" format="reference" />
+
     <attr name="answerBg" format="reference" />
     <attr name="answerText" format="reference" />
     <attr name="questionBg" format="reference" />

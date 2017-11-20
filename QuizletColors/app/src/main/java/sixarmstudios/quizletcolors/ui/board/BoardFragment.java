@@ -3,20 +3,17 @@ package sixarmstudios.quizletcolors.ui.board;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +21,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.ui.player.PlayerAdapter;
+import studioes.arm.six.partskit.BoardView;
+import studioes.arm.six.partskit.CompasRose;
 import ui.BadMove;
 import ui.Game;
 import ui.GoodMove;
@@ -35,15 +34,17 @@ import viewmodel.BoardViewModel;
  * Created by rebeccastecker on 6/11/17.
  */
 
-public class BoardFragment extends Fragment implements IUserSelector, IOptionSelector {
+public class BoardFragment extends Fragment implements BoardView.IBoardListener {
 
     public static final String TAG = BoardFragment.class.getSimpleName();
-    @LayoutRes public static final int LAYOUT_ID = R.layout.board_fragment;
+    @LayoutRes
+    private static final int LAYOUT_ID = R.layout.board_fragment;
 
-    @BindView(R.id.board_question) TextView mQuestion;
-    @BindView(R.id.player_list) RecyclerView mPlayerList;
-    @BindView(R.id.option_list) RecyclerView mOptionList;
-    @BindView(R.id.wrong_question_popup) FrameLayout mWrongQuestionPopup;
+//    @BindView(R.id.player_list) RecyclerView mPlayerList;
+//    @BindView(R.id.option_list) RecyclerView mOptionList;
+//    @BindView(R.id.wrong_question_popup) FrameLayout mWrongQuestionPopup;
+    @BindView(R.id.board_view)
+    BoardView mBoard;
 
     private PlayerAdapter mPlayerAdapter;
     private OptionAdapter mOptionAdapter;
@@ -67,29 +68,19 @@ public class BoardFragment extends Fragment implements IUserSelector, IOptionSel
         View view = inflater.inflate(LAYOUT_ID, container, false);
         ButterKnife.bind(this, view);
 
+        mBoard.setMoveCallback(this);
+
         mLastMoveUpdateTimestamp = new Date().getTime();
         BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
         viewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         viewModel.getGame().observe(this, this::handleGameUpdates);
         viewModel.getOptions().observe(this, this::handleOptionUpdates);
-        viewModel.getMyBadMoves().observe(this, this::handleBadMoves);
-        viewModel.getMyGoodMoves().observe(this, this::handleGoodMoves);
+//        viewModel.getMyBadMoves().observe(this, this::handleBadMoves);
+//        viewModel.getMyGoodMoves().observe(this, this::handleGoodMoves);
 
-        mPlayerAdapter = new PlayerAdapter(this);
-        mPlayerList.setAdapter(mPlayerAdapter);
-        mPlayersLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
-        mPlayerList.setLayoutManager(mPlayersLayoutManager);
-
-
-        mOptionAdapter = new OptionAdapter(this);
-        mOptionList.setAdapter(mOptionAdapter);
-        mOptionsLayoutManager = new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false);
-        mOptionList.setLayoutManager(mOptionsLayoutManager);
-
-        mBadMoveView = new BadMoveViewHolder(mWrongQuestionPopup);
+//        mBadMoveView = new BadMoveViewHolder(mWrongQuestionPopup);
         return view;
     }
-
 
     private void handleBadMoves(List<BadMove> badMoves) {
         if (badMoves == null || badMoves.size() == 0) {
@@ -126,8 +117,12 @@ public class BoardFragment extends Fragment implements IUserSelector, IOptionSel
 
     private void handlePlayerUpdates(List<Player> players) {
         Log.w(TAG, "I see players " + players);
-        mPlayersLayoutManager.setSpanCount(Math.max(1, players.size()));
-        mPlayerAdapter.setPlayers(players);
+        List<Pair<CompasRose.RoseColor, Integer>> uiPlayers = new ArrayList<>();
+        for(Player p : players) {
+            // TODO : they shouldn't ALL be diamond lines... ?
+            uiPlayers.add(new Pair<>(CompasRose.RoseColor.findByColorName(p.color), R.drawable.line_dimond));
+        }
+        mBoard.setPlayers(uiPlayers);
     }
 
     private void handleOptionUpdates(List<Option> options) {
@@ -135,44 +130,29 @@ public class BoardFragment extends Fragment implements IUserSelector, IOptionSel
         if (options == null) {
             return;
         }
-        mOptionsLayoutManager.setSpanCount(Math.max(1, options.size() / 2));
-        mOptionAdapter.setOptions(options);
+        List<String> strOptions = new ArrayList<>();
+        for(Option o : options) {
+            Log.i(TAG, "I see options : "+o.index+" :: "+o.option);
+            strOptions.add(o.option);
+        }
+        mBoard.setOptions(strOptions);
     }
 
     private void handleGameUpdates(List<Game> games) {
         if (games == null || games.size() != 1) {
             return;
         }
-
         Game game = games.get(0);
         Log.w(TAG, "I see game update " + game.selected_option + " / " + game.selected_color);
-        mQuestion.setText(game.question);
-        mQuestion.setTag(game.question);
-        mPlayerAdapter.setSelectedPlayer(game.selected_color);
-        mPlayerColor = game.selected_color;
-        mOptionAdapter.setSelectedOption(game.selected_option);
-        mString = game.selected_option;
+        mBoard.setQuestion(game.question);
     }
 
-    @Override public void playerClicked(@NonNull String playerColor) {
+    @Override
+    public void handleMove(String playerMove, String playerColor) {
         BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
-        if (playerColor.equals(mPlayerColor)) {
-            viewModel.setSelectedPlayer(null);
-            mPlayerColor = null;
-        } else {
-            viewModel.setSelectedPlayer(playerColor);
-            mPlayerColor = playerColor;
-        }
-    }
-
-    @Override public void optionClicked(@NonNull String optionText) {
-        BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
-        if (optionText.equals(mString)) {
-            viewModel.setSubmittedOption(null);
-            mString = null;
-        } else {
-            viewModel.setSubmittedOption(optionText);
-            mString = optionText;
-        }
+        viewModel.setSubmittedOption(null);
+        viewModel.setSelectedPlayer(null);
+        viewModel.setSubmittedOption(playerMove);
+        viewModel.setSelectedPlayer(playerColor);
     }
 }

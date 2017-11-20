@@ -32,6 +32,7 @@ public class CompasRose extends FrameLayout {
     public static final String TAG = CompasRose.class.getSimpleName();
     @LayoutRes private static final int LAYOUT_ID = R.layout.compas_rose;
 
+
     public enum RoseColor {
         RED(R.attr.playerRed, "red"),
         GREEN(R.attr.playerGreen, "green"),
@@ -46,6 +47,19 @@ public class CompasRose extends FrameLayout {
         RoseColor(@AttrRes int colorAttr, String colorName) {
             this.colorAttr = colorAttr;
             this.colorName = colorName;
+        }
+        public String colorName() {
+            return colorName;
+        }
+
+        public static RoseColor findByColorName(String color) {
+            for(RoseColor rc : values()) {
+                if (rc.colorName.equals(color)) {
+                    return rc;
+                }
+            }
+            Log.e(TAG, "Failed to find a matching rose color to '"+color+"' - going with RED for now");
+            return RED;
         }
     }
 
@@ -106,6 +120,17 @@ public class CompasRose extends FrameLayout {
         populateLayer(context, findViewById(R.id.compass_rose_lvl_1), 2, 15, 5);
         populateLayer(context, findViewById(R.id.compass_rose_lvl_2), 1, 6, 4);
         populateLayer(context, findViewById(R.id.compass_rose_lvl_3), 0, 10, 6);
+    }
+
+    public void disable() {
+        this.setVisibility(INVISIBLE);
+
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getContext().getTheme();
+        theme.resolveAttribute(R.attr.background, typedValue, true);
+        @ColorRes int color = typedValue.resourceId;
+        mBaseLineColor = color;
+        Log.i(TAG, "Setting rose color to "+color+" : "+this);
     }
 
     private Drawable newDrawable() {
