@@ -1,6 +1,7 @@
 package sixarmstudios.quizletcolors.logic.engine;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.myapplication.bluetooth.ImmutableQCMember;
 import com.example.myapplication.bluetooth.QCGameMessage;
@@ -9,6 +10,7 @@ import com.example.myapplication.bluetooth.QCPlayerMessage;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,7 @@ import studioes.arm.six.partskit.CompasRose;
 
 public class LobbyLogic implements ILobbyLogic {
     private IGameEngine mEngine;
+    public static final String TAG = LobbyLogic.class.getSimpleName();
 
      LobbyLogic(IGameEngine gameEngine) {
         mEngine = gameEngine;
@@ -57,12 +60,18 @@ public class LobbyLogic implements ILobbyLogic {
     }
 
     private QCMember generateNewMember(String username, boolean isHost) {
-        List<CompasRose.RoseColor> colors = Arrays.asList(CompasRose.RoseColor.values());
+        List<CompasRose.RoseColor> colors = new ArrayList<>();
+        colors.addAll(Arrays.asList(CompasRose.RoseColor.values()));
         Collections.shuffle(colors);
+        String color = colors.remove(0).colorName();
+        while(mEngine.findMemberByColor(color) != null) {
+            Log.i(TAG, "Color conflict. There is already a "+color+", trying again");
+            color = colors.remove(0).colorName();
+        }
         return ImmutableQCMember.builder()
                 .username(username)
                 .isHost(isHost)
-                .color(colors.get(0).colorName())
+                .color(color)
                 .build();
     }
 }

@@ -135,6 +135,19 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             Log.i(TAG, "I see options : "+o.index+" :: "+o.option);
             strOptions.add(o.option);
         }
+        List<String> curOptions = mBoard.getCurrentOptions();
+        for(int i = 0; i < strOptions.size();++i){
+            String s = strOptions.get(i);
+            int preExistingIndex = curOptions.indexOf(s);
+            if (preExistingIndex > -1 && i != preExistingIndex) {
+                String temp = strOptions.get(preExistingIndex);
+                Log.i(TAG,"Swaping option positions: "+s+" ["+i+"] <->"+temp+" ["+preExistingIndex+"]");
+                strOptions.set(preExistingIndex, s);
+                strOptions.set(i, temp);
+            } else {
+                Log.i(TAG, "Removed option : "+s);
+            }
+        }
         mBoard.setOptions(strOptions);
     }
 

@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static android.view.DragEvent.ACTION_DRAG_ENDED;
@@ -37,8 +38,6 @@ public class BoardView extends RelativeLayout {
     public static final String TAG = BoardView.class.getSimpleName();
     @LayoutRes
     private static final int LAYOUT_ID = R.layout.fragment_board;
-
-
 
     public interface IBoardListener {
         void handleMove(String playerMove, String playerColor);
@@ -112,6 +111,15 @@ public class BoardView extends RelativeLayout {
         setOption(getRootView().findViewById(R.id.board_a_3), strOptions.get(2));
         setOption(getRootView().findViewById(R.id.board_a_4), strOptions.get(3));
 
+    }
+
+    public @NonNull List<String> getCurrentOptions() {
+        return Arrays.asList(
+                ((TextView)getRootView().findViewById(R.id.board_a_1)).getText().toString(),
+                ((TextView)getRootView().findViewById(R.id.board_a_2)).getText().toString(),
+                ((TextView)getRootView().findViewById(R.id.board_a_3)).getText().toString(),
+                ((TextView)getRootView().findViewById(R.id.board_a_4)).getText().toString()
+        );
     }
     private void setOption(@NonNull TextView view, @NonNull String option) {
         if (view.getText().toString().equals(option)) {
