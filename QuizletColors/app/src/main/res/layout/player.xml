@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center"
     android:orientation="vertical">
 
@@ -15,11 +16,18 @@
         android:text="[HOST]"
         tools:text="is host" />
 
-    <studioes.arm.six.creatures.BlobView
-        android:id="@+id/player_creature"
+
+    <studioes.arm.six.partskit.CompasRose
+        android:id="@+id/player_icon"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:baselineAligned="false" />
+        android:background="@null"
+        android:clipChildren="false"
+        android:translationX="-100dp"
+        android:translationY="-100dp"
+        app:lineColor="?playerBlue"
+        android:layout_gravity="center"
+        app:lineType="@drawable/line_dimond" />
 
     <TextView
         android:id="@+id/player_name"

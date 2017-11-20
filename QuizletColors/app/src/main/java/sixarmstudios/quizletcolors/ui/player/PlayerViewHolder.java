@@ -4,6 +4,7 @@ import android.support.animation.DynamicAnimation;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -20,7 +21,10 @@ import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.logic.player.CreatureCreation;
 import sixarmstudios.quizletcolors.ui.board.IUserSelector;
 import studioes.arm.six.creatures.BlobView;
+import studioes.arm.six.partskit.CompasRose;
 import ui.Player;
+
+import static studioes.arm.six.partskit.CompasRose.PLAYER_SHAPE_DRAWABLE_RES;
 
 /**
  * Created by rebeccastecker on 6/11/17.
@@ -34,7 +38,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.player_name) TextView mName;
     @BindView(R.id.player_is_host) TextView mHost;
     @BindView(R.id.player_is_you) TextView mYou;
-    @BindView(R.id.player_creature) BlobView mCreature;
+    @BindView(R.id.player_icon) CompasRose mPlayerIcon;
 
 
     public PlayerViewHolder(View view, IUserSelector selector) {
@@ -54,30 +58,19 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
         mName.setBackgroundResource(selected ? R.drawable.border : 0);
 //        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), color));
         itemView.setTag(player.color);
-        mCreature.setDetails(player.username, color);
+        mPlayerIcon.setPlayer(randomPlayerColor(), getRandomShape());
+    }
 
-        // Create a low stiffness, low bounce spring at position 0.
-        SpringForce spring = new SpringForce(0)
-                .setDampingRatio(mCreature.getDampingRatio())
-                .setStiffness(mCreature.getStiffness());
 
-        final SpringAnimation anim = new SpringAnimation(mCreature, DynamicAnimation.TRANSLATION_Y)
-                .setMinValue(-500).setSpring(spring).setStartValue(mCreature.getStartY());
-        anim.start();
+    private CompasRose.RoseColor randomPlayerColor() {
+        int i = (int) Math.max(0, Math.min(CompasRose.RoseColor.values().length, Math.random() * CompasRose.RoseColor.values().length));
+        return CompasRose.RoseColor.values()[i];
+    }
 
-        mAnimation = Observable.interval(1, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .filter((t) -> Math.random() > mCreature.getTwitchynessThreshold())
-                .subscribe((t) -> {
-                    new SpringAnimation(mCreature, DynamicAnimation.TRANSLATION_Y)
-                            .setMinValue(-500)
-                            .setSpring(spring)
-                            .setStartVelocity(mCreature.getStartVelocity())
-                            .start();
-                })
-        ;
-//        mCreature.invalidate();
-//        itemView.requestLayout();
+    private @DrawableRes
+    int getRandomShape() {
+        int i = (int) Math.max(0, Math.min(PLAYER_SHAPE_DRAWABLE_RES.length, Math.random() * PLAYER_SHAPE_DRAWABLE_RES.length));
+        return PLAYER_SHAPE_DRAWABLE_RES[i];
     }
 
     private Disposable mAnimation;
