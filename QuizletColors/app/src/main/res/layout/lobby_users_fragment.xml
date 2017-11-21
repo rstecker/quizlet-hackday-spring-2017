@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_color">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/game_state_text_field"
