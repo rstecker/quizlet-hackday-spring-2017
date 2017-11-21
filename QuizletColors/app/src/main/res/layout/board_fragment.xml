@@ -11,44 +11,9 @@
         android:id="@+id/board_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-    <!---->
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:background="@color/blue_earth"-->
-        <!--android:orientation="vertical">-->
 
-        <!--<android.support.v7.widget.AppCompatTextView-->
-            <!--android:id="@+id/board_question"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_weight="1"-->
-            <!--app:autoSizeMinTextSize="5sp"-->
-            <!--app:autoSizeStepGranularity="1sp"-->
-            <!--app:autoSizeTextType="uniform"-->
-            <!--tools:text="Sharks sharks sharks Sharks " />-->
-
-
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/option_list"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:background="@color/blue_neon"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_weight="2"-->
-            <!--android:minHeight="@dimen/min_tap_target_size" />-->
-
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/player_list"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:background="@color/blue_pastel"-->
-            <!--android:layout_weight="1"-->
-            <!--android:minHeight="@dimen/min_tap_target_size" />-->
-    <!--</LinearLayout>-->
-
-    <!--<FrameLayout-->
-        <!--android:id="@+id/wrong_question_popup"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-    <!--</FrameLayout>-->
+    <studioes.arm.six.partskit.GradeBox
+        android:id="@+id/grade_box"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </FrameLayout>
