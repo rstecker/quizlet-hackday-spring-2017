@@ -178,7 +178,7 @@ public class PlayerEngine implements IPlayerEngine {
         bm.incorrectQuestion = message.answeredQuestion();
         bm.incorrectQuestionColor = message.providedColor();
         bm.correctQuestion = message.question();
-        bm.correctQuestion = message.questionColor();
+        bm.correctQuestionColor = message.questionColor();
         bm.correctAnswer = message.correctAnswer();
         bm.correctAnswerColor = message.correctAnswerColor();
         bm.youWereGivenBadAnswer = currentPlayer.reaction() == QCMember.Reaction.RECEIVED_BAD_ANSWER;

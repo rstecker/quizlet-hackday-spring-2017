@@ -96,20 +96,16 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
         Log.i(TAG, "Bad move update : " + move);
 
         if (move.youAnsweredPoorly) {
-            mGrade.populateWrongAnswer(move.offeredAnswer, move.incorrectQuestion, move.correctQuestion);
-            mGrade.populateBlame();
+            mGrade.populateWrongAnswer(move.offeredAnswer, move.offeredAnswerColor, move.incorrectQuestion, move.incorrectQuestionColor, move.correctQuestion, move.correctQuestionColor);
             // current player owns offered answer
         } else if (move.youWereGivenBadAnswer) {
-            mGrade.populateWrongAnswer(move.incorrectQuestion, move.offeredAnswer, move.correctAnswer);
-            mGrade.populateBlame();
+            mGrade.populateWrongAnswer(move.incorrectQuestion, move.incorrectQuestionColor, move.offeredAnswer, move.offeredAnswerColor, move.correctAnswer, move.correctAnswerColor);
             // current player owns incorrect question
         } else if (move.yourAnswerWentToSomeoneElse) {
-            mGrade.populateWrongAnswer(move.offeredAnswer, move.incorrectQuestion, move.correctQuestion);
-            mGrade.populateBlame();
+            mGrade.populateWrongAnswer(move.offeredAnswer, move.offeredAnswerColor, move.incorrectQuestion, move.incorrectQuestionColor, move.correctQuestion, move.correctQuestionColor);
             // current player owns the "correct question"
         } else if (move.youFailedToAnswer) {
-            mGrade.populateWrongAnswer(move.offeredAnswer, move.incorrectQuestion, move.correctAnswer);
-            mGrade.populateBlame();
+            mGrade.populateWrongAnswer(move.offeredAnswer, move.offeredAnswerColor, move.incorrectQuestion, move.incorrectQuestionColor, move.correctAnswer, move.correctAnswerColor);
             // current player owns "correct answer"
         }
         mGrade.popIt();
@@ -121,7 +117,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         (v) -> mGrade.lockIt(),
-                        (e) -> Log.e(TAG, "Error encountered w/ grade "+e)
+                        (e) -> Log.e(TAG, "Error encountered w/ grade " + e)
                 );
 
     }
@@ -157,7 +153,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
                     p.isHost(),
                     p.isYou(),
                     R.drawable.line_dimond
-                    ));
+            ));
         }
         mBoard.setPlayers(uiPlayers);
     }

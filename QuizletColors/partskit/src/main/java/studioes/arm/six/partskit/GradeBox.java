@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
+import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -85,22 +86,25 @@ public class GradeBox extends LinearLayout {
                 .start()
         ;
     }
-
-    public void populateWrongAnswer(String top, String wrong, String correct) {
-        ((TextView) findViewById(R.id.boxCenter)).setText(top);
-        ((TextView) findViewById(R.id.boxRight)).setText(correct);
-        ((TextView) findViewById(R.id.boxLeft)).setText(wrong);
+    public void populateWrongAnswer(@NonNull String top, @Nullable String topColor, @NonNull String wrong, @Nullable String wrongColor, @NonNull String correct, @Nullable String correctColor) {
+        setBoxDetails(R.id.boxCenter, top, topColor);
+        setBoxDetails(R.id.boxRight, correct, correctColor);
+        setBoxDetails(R.id.boxLeft, wrong, wrongColor);
     }
 
-    public void populateBlame() {
+    private void setBoxDetails(@IdRes int id, @NonNull String text, @Nullable String color) {
+        TextView view = findViewById(R.id.boxCenter);
+        view.setText(text);
+        int colorAttr = R.attr.gradeNoPlayerBg;
+        if (color != null) {
+            colorAttr = CompasRose.RoseColor.findByColorName(color).colorAttr;
+        }
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = getContext().getTheme();
-        theme.resolveAttribute(R.attr.gradeNoPlayerBg, typedValue, true);
+        theme.resolveAttribute(colorAttr, typedValue, true);
         int[][] states = new int[][]{new int[]{android.R.attr.state_activated}, new int[]{-android.R.attr.state_activated}};
         int[] colors = new int[]{typedValue.data, typedValue.data};
         ColorStateList list = new ColorStateList(states, colors);
-        ((TextView) findViewById(R.id.boxCenter)).setBackgroundTintList(list);
-        ((TextView) findViewById(R.id.boxRight)).setBackgroundTintList(list);
-        ((TextView) findViewById(R.id.boxLeft)).setBackgroundTintList(list);
+        view.setBackgroundTintList(list);
     }
 }
