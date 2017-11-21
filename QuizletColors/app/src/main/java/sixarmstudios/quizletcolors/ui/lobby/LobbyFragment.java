@@ -14,8 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.example.myapplication.bluetooth.QCGameMessage;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,11 +61,16 @@ public class LobbyFragment extends Fragment implements IUserSelector {
     @BindView(R.id.game_set_fact_count) TextView mFactCount;
     @BindView(R.id.start_game_button) View mStartGameButton;
     @BindView(R.id.player_list) RecyclerView mPlayerList;
+    @BindView(R.id.target_elements) View mTargetElements;
+    @BindView(R.id.target_number_picker) EditText mTargetChoice;
+    @BindView(R.id.target_entry_description) TextView mTargetDescription;
     @BindView(R.id.game_type_selector) RadioGroup mGameTypeSelector;
+
 
     private PlayerAdapter mAdapter;
     private GridLayoutManager mPlayersLayoutManager;
     private HostServiceConnection mHostConnection;
+    private QCGameMessage.GameType gameType = QCGameMessage.GameType.INFINITE;
 
     public static LobbyFragment newInstance(@Nullable Long qSetId) {
         LobbyFragment fragment = new LobbyFragment();
@@ -82,6 +90,35 @@ public class LobbyFragment extends Fragment implements IUserSelector {
 
         mStartGameButton.setVisibility(View.INVISIBLE);
         mGameTypeSelector.check(0);
+        mGameTypeSelector.setOnCheckedChangeListener((radioGroup, checkedId) -> {
+
+            switch (checkedId) {
+                case 1:
+                    //infinity game
+                    gameType = QCGameMessage.GameType.INFINITE;
+                    mTargetElements.setVisibility(View.GONE);
+                    break;
+                case 2:
+                    //first player to target points
+                    gameType = QCGameMessage.GameType.FIRST_PLAYER_TO_POINTS;
+                    mTargetDescription.setText("Player needs to score this many points to win");
+                    mTargetElements.setVisibility(View.VISIBLE);
+                    break;
+                case 3:
+                    //all players to target points
+                    gameType = QCGameMessage.GameType.ALL_PLAYERS_TO_POINTS;
+                    mTargetDescription.setText("All players need to score this many points to win");
+                    mTargetElements.setVisibility(View.VISIBLE);
+                    break;
+                case 4:
+                    //certain number of minutes
+                    gameType = QCGameMessage.GameType.TIMED_GAME;
+                    mTargetDescription.setText("Game will continue for this many minutes");
+                    mTargetElements.setVisibility(View.VISIBLE);
+                    break;
+            }
+
+        });
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         lobbyViewModel.getGame().observe(this, this::handleGameUpdates);
@@ -108,6 +145,9 @@ public class LobbyFragment extends Fragment implements IUserSelector {
     public void handleStartClick() {
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.setGameState(Game.State.START);
+
+        int gameTypeSelected = mGameTypeSelector.getCheckedRadioButtonId();
+
         mHostConnection.startGame();
     }
 
@@ -139,6 +179,7 @@ public class LobbyFragment extends Fragment implements IUserSelector {
         StringBuilder sb = new StringBuilder("I see a game w/ state " + game.getState().toString() + " that ");
         if (game.isHost()) {
             sb.append("you are hosting : ");
+            mGameTypeSelector.setVisibility(View.VISIBLE);
         } else {
             sb.append("you have joined : ");
         }
