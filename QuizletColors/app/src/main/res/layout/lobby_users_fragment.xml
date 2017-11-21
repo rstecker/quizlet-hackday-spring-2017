@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_color">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/game_state_text_field"
@@ -28,7 +27,8 @@
         android:id="@+id/game_type_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <RadioButton
             android:layout_width="0dp"
@@ -67,6 +67,28 @@
             android:button="@null" />
 
     </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/target_elements"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/target_entry_description"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/target_number_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="2"/>
+
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/start_game_button"
