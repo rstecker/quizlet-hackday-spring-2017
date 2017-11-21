@@ -149,7 +149,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             uiPlayers.add(new studioes.arm.six.partskit.Player(
                     p.username,
                     CompasRose.RoseColor.findByColorName(p.color),
-                    0,
+                    p.score(),
                     p.isHost(),
                     p.isYou(),
                     R.drawable.line_dimond

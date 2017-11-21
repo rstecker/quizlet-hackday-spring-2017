@@ -20,6 +20,7 @@ import appstate.AppState;
 import appstate.PlayerState;
 import database.AppDatabase;
 import gamelogic.BoardState;
+import gamelogic.EndState;
 import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
@@ -131,6 +132,17 @@ public class TopLevelViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
+    public void processEndGameUpdate(EndState state) {
+        Completable.defer(
+                () -> {
+                    mAppDatabase.playerDao().insertAll(state.players());
+                    mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.GAME_OVER.toDBVal());
+                    return Completable.complete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+    }
+
     public void processGameUpdate(BoardState state) {
         Completable.defer(
                 () -> {
@@ -149,13 +161,14 @@ public class TopLevelViewModel extends AndroidViewModel {
                         mAppDatabase.badMovesDao().insertAll(state.badMove());
                     }
                     mAppDatabase.optionsDao().insertAll(options);
+                    mAppDatabase.playerDao().insertAll(state.players());    // do I need to update players all the time?
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(Game.State.PLAYING));
                     mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.PLAYING.toDBVal());
 
                     if (state.gameType() != null) {
                         int target = state.gameTarget() == null ? -1 : state.gameTarget();
                         mAppDatabase.gameDao().setGameTypeAndTarget(state.gameType().toString(), target);
-                        Log.i(TAG, "Setting game to "+state.gameType()+" : "+target);
+                        Log.i(TAG, "Setting game to " + state.gameType() + " : " + target);
                     }
                     return Completable.complete();
                 })
@@ -266,4 +279,5 @@ public class TopLevelViewModel extends AndroidViewModel {
                 .subscribe();
 
     }
+
 }

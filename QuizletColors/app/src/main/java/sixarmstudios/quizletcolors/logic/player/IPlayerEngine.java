@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.example.myapplication.bluetooth.QCGameMessage;
 import com.example.myapplication.bluetooth.QCPlayerMessage;
 
+import gamelogic.EndState;
 import io.reactivex.Observable;
 import gamelogic.BoardState;
 import gamelogic.LobbyState;
@@ -19,5 +20,6 @@ public interface IPlayerEngine {
     public void makeMove(@NonNull String answer, @NonNull String color);
     public Observable<BoardState> getBoardStateUpdates();
     public Observable<LobbyState> getLobbyStateUpdates();
+    public Observable<EndState> getEndStateUpdates();
     public Observable<QCPlayerMessage> getOutgoingBluetoothMessages();
 }

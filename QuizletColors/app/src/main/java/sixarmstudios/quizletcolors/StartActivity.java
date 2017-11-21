@@ -49,6 +49,7 @@ import sixarmstudios.quizletcolors.connections.PlayerServiceConnection;
 import sixarmstudios.quizletcolors.network.IModelRetrievalService;
 import sixarmstudios.quizletcolors.network.ModelRetrievalService;
 import sixarmstudios.quizletcolors.ui.board.BoardFragment;
+import sixarmstudios.quizletcolors.ui.endGame.EndGameFragment;
 import sixarmstudios.quizletcolors.ui.lobby.LobbyFragment;
 import sixarmstudios.quizletcolors.ui.setup.LookingForGameFragment;
 import sixarmstudios.quizletcolors.ui.setup.LookingForSetFragment;
@@ -213,6 +214,9 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
                                 bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
                                 initPlayerConnectionObservables();
                             }
+                            break;
+                        case GAME_OVER:
+                            mPlayerState = dbAppState;
                             break;
                         default:
                             throw new IllegalStateException("Unknown transition from " + mPlayerState + " -> " + dbAppState);
@@ -397,8 +401,12 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
                     newFragment = LobbyFragment.newInstance(appState.currentQSetId);
                 }
                 break;
-
             case GAME_OVER:
+                if (!EndGameFragment.TAG.equals(currentTag)) {
+                    newTag = EndGameFragment.TAG;
+                    newFragment = EndGameFragment.newInstance();
+                }
+                break;
             default:
                 throw new IllegalStateException("Unable to handle state: " + mPlayerState);
         }
@@ -428,6 +436,15 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
                 (e) -> {
                     Log.e(TAG, "Received error from Player service : " + e);
                 });
+
+        mPlayerConnection.getEndStateUpdates().subscribe(
+                (msg) -> {
+                    TopLevelViewModel lobbyViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+                    lobbyViewModel.processEndGameUpdate(msg);
+                },
+                (e) -> {
+                    Log.e(TAG, "Received error from Player service : " + e);
+                });
     }
 
     private void initHostConnectionObservables() {
@@ -445,6 +462,15 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
                 },
                 (e) -> Log.e(TAG, "Error updating board view model [" + Thread.currentThread().getName() + "] " + e)
         );
+
+        mHostConnection.getEndStateUpdates().subscribe(
+                (msg) -> {
+                    TopLevelViewModel lobbyViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
+                    lobbyViewModel.processEndGameUpdate(msg);
+                },
+                (e) -> {
+                    Log.e(TAG, "Received error from Player service : " + e);
+                });
         mHostConnection.getStartStatusUpdates().observeOn(Schedulers.newThread()).subscribe(
                 (canStart) -> {
                     TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);

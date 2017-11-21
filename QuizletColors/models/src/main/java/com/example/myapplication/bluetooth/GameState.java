@@ -5,5 +5,6 @@ package com.example.myapplication.bluetooth;
  */
 public enum GameState {
     LOBBY,
-    PLAYING
+    PLAYING,
+    ENDED
 }

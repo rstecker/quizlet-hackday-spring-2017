@@ -20,16 +20,20 @@ import io.reactivex.Observable;
  */
 public interface IGameEngine {
     // region Outside of logic consumable methods
-    public QCGameMessage startGame(QCGameMessage.GameType gameType, Integer gameTarget);
+    public QCGameMessage startGame(@NonNull QCGameMessage.GameType gameType, int gameTarget);
 
     public QCGameMessage processMessage(@NonNull QCPlayerMessage message);
 
     public Observable<Boolean> isAbleToStart();
 
     public boolean isGameInProgress();
+
+    public boolean isGameHasEnded();
     // endregion
 
     @NonNull QCGameMessage generateBaseLobbyMessage(@NonNull QCGameMessage.Action action);
+
+    @NonNull QCGameMessage generateBaseEndGameMessage(@NonNull QCGameMessage.Action action);
 
     @NonNull QCGameMessage generateBasePlayMessage(@NonNull QCGameMessage.Action action);
 

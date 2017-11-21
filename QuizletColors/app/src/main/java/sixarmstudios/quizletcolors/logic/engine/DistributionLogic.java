@@ -1,6 +1,7 @@
 package sixarmstudios.quizletcolors.logic.engine;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
@@ -20,7 +21,8 @@ import java.util.Map;
 public class DistributionLogic implements IDistributionLogic {
     public static final String TAG = DistributionLogic.class.getSimpleName();
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public List<QCMember> allocateContent(int handSize, @NonNull List<QCMember> members,
                                           @NonNull List<Pair<String, String>> content) {
         List<Pair<String, String>> possibleAnswers = new ArrayList<>();
@@ -58,7 +60,8 @@ public class DistributionLogic implements IDistributionLogic {
         return result;
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public List<QCMember> updateForCorrectMove(@NonNull QCMember asker,
                                                @NonNull QCMember answerer,
                                                @NonNull String answer,
@@ -84,12 +87,12 @@ public class DistributionLogic implements IDistributionLogic {
         selectNewOption(stuffNotOnTheBoard, content, memberHands.get(answerer), answer);
         Log.d(TAG, "Member " + answerer.username() + " just got options " + memberHands.get(answerer));
 
-
-        return buildResultList(members, memberHands, memberQuestions);
+        return buildResultList(members, memberHands, memberQuestions, answerer);
     }
 
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public List<QCMember> updateForBadMove(@NonNull QCMember asker,
                                            @NonNull QCMember answerer,
                                            @NonNull String providedAnswer,
@@ -131,7 +134,7 @@ public class DistributionLogic implements IDistributionLogic {
         for (QCMember member : othersAtFault) {
             System.out.println("Member '" + member.username() + "' had options " + memberHands.get(member));
             if (member.equals(answerer)) {
-                List<Pair<String, String>>  tmpContent = new ArrayList<>(content);
+                List<Pair<String, String>> tmpContent = new ArrayList<>(content);
                 tmpContent.remove(answerLookup.get(providedAnswer));
                 selectNewOption(stuffNotOnTheBoard, tmpContent, memberHands.get(member), correctAnswer);
             } else {
@@ -262,12 +265,24 @@ public class DistributionLogic implements IDistributionLogic {
     private List<QCMember> buildResultList(@NonNull List<QCMember> members,
                                            @NonNull Map<QCMember, List<String>> memberHands,
                                            @NonNull Map<QCMember, Pair<String, String>> memberQuestions) {
+        return buildResultList(members, memberHands, memberQuestions, null);
+    }
+
+    private List<QCMember> buildResultList(@NonNull List<QCMember> members,
+                                           @NonNull Map<QCMember, List<String>> memberHands,
+                                           @NonNull Map<QCMember, Pair<String, String>> memberQuestions,
+                                           @Nullable QCMember pointScorer) {
         List<QCMember> result = new ArrayList<>();
         for (QCMember member : members) {
+            int score = member.score() == null ? 0 : member.score();
+            if (member.equals(pointScorer)) {
+                ++score;
+            }
             result.add(ImmutableQCMember.builder()
                     .from(member)
                     .options(memberHands.get(member))
                     .question(memberQuestions.get(member).first)
+                    .score(score)
                     .build());
         }
         return result;

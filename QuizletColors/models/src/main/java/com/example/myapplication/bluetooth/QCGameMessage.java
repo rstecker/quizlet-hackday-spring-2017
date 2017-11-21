@@ -80,8 +80,9 @@ public abstract class QCGameMessage {
         BAD_ANSWER,
         WRONG_USER,
         CORRECT_ANSWER,
-        OUT_OF_SYNC
+        OUT_OF_SYNC,
 
+        GAME_OVER
     }
 
     @JsonProperty("action")
@@ -214,13 +215,11 @@ public abstract class QCGameMessage {
             return this;
         }
         List<QCMember> newMemberList = new ArrayList<>();
-        int currentScore = member.score() == null ? 0 : member.score();
         newMemberList.addAll(members());
         newMemberList.set(index,
                 ImmutableQCMember.builder()
                         .from(member)
                         .reaction(reaction)
-                        .score(currentScore + reaction.getScoreImpact())
                         .build()
         );
         return ImmutableQCGameMessage.builder()
