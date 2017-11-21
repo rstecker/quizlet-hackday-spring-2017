@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 
 import gamelogic.BoardState;
+import gamelogic.EndState;
+import gamelogic.ImmutableEndState;
 import gamelogic.LobbyState;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -23,17 +25,20 @@ import ui.Player;
 
 public class PlayerEngine implements IPlayerEngine {
     public static final String TAG = PlayerEngine.class.getSimpleName();
+    private final Subject<EndState> mEndState = BehaviorSubject.create();
     private final Subject<BoardState> mBoardState = BehaviorSubject.create();
     private final Subject<LobbyState> mLobbyState = BehaviorSubject.create();
     private final Subject<QCPlayerMessage> mOutgoingMsgs = BehaviorSubject.create();
     private String mUsername;
 
-    @Override public void initializePlayer(@NonNull String username) {
+    @Override
+    public void initializePlayer(@NonNull String username) {
         mUsername = username;
         mOutgoingMsgs.onNext(QCPlayerMessage.build(QCPlayerMessage.Action.JOIN_GAME, GameState.LOBBY, username));
     }
 
-    @Override public void processMessage(@NonNull QCGameMessage message) {
+    @Override
+    public void processMessage(@NonNull QCGameMessage message) {
         synchronized (TAG) {
             switch (message.state()) {
                 case PLAYING:
@@ -42,13 +47,17 @@ public class PlayerEngine implements IPlayerEngine {
                 case LOBBY:
                     handleLobbyUpdate(message);
                     break;
+                case ENDED:
+                    handleEndUpdate(message);
+                    break;
                 default:
                     throw new UnsupportedOperationException("Unable to handle engine state : " + message.state());
             }
         }
     }
 
-    @Override public void makeMove(@NonNull String answer, @NonNull String color) {
+    @Override
+    public void makeMove(@NonNull String answer, @NonNull String color) {
         mOutgoingMsgs.onNext(
                 QCPlayerMessage.build(
                         QCPlayerMessage.Action.PLAYER_MOVE,
@@ -58,15 +67,23 @@ public class PlayerEngine implements IPlayerEngine {
                 ));
     }
 
-    @Override public Observable<BoardState> getBoardStateUpdates() {
+    @Override
+    public Observable<BoardState> getBoardStateUpdates() {
         return mBoardState;
     }
 
-    @Override public Observable<LobbyState> getLobbyStateUpdates() {
+    @Override
+    public Observable<LobbyState> getLobbyStateUpdates() {
         return mLobbyState;
     }
 
-    @Override public Observable<QCPlayerMessage> getOutgoingBluetoothMessages() {
+    @Override
+    public Observable<EndState> getEndStateUpdates() {
+        return mEndState;
+    }
+
+    @Override
+    public Observable<QCPlayerMessage> getOutgoingBluetoothMessages() {
         return mOutgoingMsgs;
     }
 
@@ -93,6 +110,11 @@ public class PlayerEngine implements IPlayerEngine {
                 throw new UnsupportedOperationException("Unable to handle lobby action : " + message.action());
 
         }
+    }
+
+
+    private void handleEndUpdate(QCGameMessage message) {
+        mEndState.onNext(extractEndGameBoardState(message));
     }
 
 
@@ -163,7 +185,28 @@ public class PlayerEngine implements IPlayerEngine {
                 message.gameType(), message.gameTarget(),
                 extractPossibleGoodMove(message, currentPlayer),
                 extractPossibleBadMove(message, currentPlayer)
-                );
+        );
+    }
+
+    private EndState extractEndGameBoardState(QCGameMessage message) {
+        List<Player> players = new ArrayList<>();
+        QCMember currentPlayer = null;
+        for (QCMember member : message.members()) {
+            boolean isCurrentPlayer = mUsername.equals(member.username());
+            players.add(new Player(
+                    member.username(),
+                    member.color(),
+                    member.isHost(),
+                    isCurrentPlayer,
+                    member.score() == null ? 0 : member.score()
+            ));
+        }
+        // TODO : handle player missing. Either we lost our username or we got kicked
+        return ImmutableEndState.builder()
+                .players(players)
+                .gameTarget(message.gameTarget())
+                .gameType(message.gameType())
+                .build();
     }
 
     private BadMove extractPossibleBadMove(@NonNull QCGameMessage message, @NonNull QCMember currentPlayer) {

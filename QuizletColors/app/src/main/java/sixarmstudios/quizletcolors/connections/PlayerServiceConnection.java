@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import gamelogic.BoardState;
+import gamelogic.EndState;
 import gamelogic.LobbyState;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -123,5 +124,9 @@ public class PlayerServiceConnection implements ServiceConnection {
 
     public Observable<LobbyState> getLobbyStateUpdates() {
         return mEngine.getLobbyStateUpdates().observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<EndState> getEndStateUpdates() {
+        return mEngine.getEndStateUpdates().observeOn(AndroidSchedulers.mainThread());
     }
 }

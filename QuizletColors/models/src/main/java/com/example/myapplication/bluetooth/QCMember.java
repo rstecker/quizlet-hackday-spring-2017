@@ -90,6 +90,9 @@ public abstract class QCMember {
         return build(username, isHost, color, question, options, Reaction.NONE, 0);
     }
 
+    public int getIntScore() {
+        return score() == null ? 0 : score();
+    }
     public static QCMember build(@NonNull String username, boolean isHost) {
         return ImmutableQCMember.builder()
                 .username(username)

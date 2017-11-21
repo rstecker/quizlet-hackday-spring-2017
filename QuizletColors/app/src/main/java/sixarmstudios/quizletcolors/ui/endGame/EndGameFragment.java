@@ -28,6 +28,7 @@ import ui.Player;
 
 public class EndGameFragment extends Fragment {
     @LayoutRes private static final int LAYOUT_RES = R.layout.fragment_end_game;
+    public static final String TAG = EndGameFragment.class.getSimpleName();
 
     @BindView(R.id.player_scores_view) RecyclerView mScoreList;
     @BindView(R.id.score_main_menu_button) Button mMainMenuButton;

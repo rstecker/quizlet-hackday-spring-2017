@@ -25,6 +25,7 @@ import java.util.List;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import gamelogic.BoardState;
+import gamelogic.EndState;
 import gamelogic.LobbyState;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -85,6 +86,7 @@ public class HostServiceConnection implements ServiceConnection {
                     sendOutResponse(mGameEngine.processMessage(msg));   // we want to wait till we're bound before we try and send things
                 },
                 (e) -> {
+                    e.printStackTrace(System.out);
                     Log.e(TAG, "Error handling outgoing Player msg : " + e);
                 }
         );
@@ -124,6 +126,11 @@ public class HostServiceConnection implements ServiceConnection {
                 .filter((bound) -> bound)
                 .take(1)
                 .subscribe((bound) -> mPlayerEngine.makeMove(answer, color), (e) -> Log.e(TAG, "Error "+e));
+    }
+
+
+    public Observable<EndState> getEndStateUpdates() {
+        return mPlayerEngine.getEndStateUpdates().observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<BoardState> getBoardStateUpdates() {

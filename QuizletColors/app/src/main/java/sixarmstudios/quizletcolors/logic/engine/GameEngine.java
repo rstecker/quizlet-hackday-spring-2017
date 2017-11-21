@@ -12,7 +12,9 @@ import com.example.myapplication.bluetooth.QCMember;
 import com.example.myapplication.bluetooth.QCPlayerMessage;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -29,30 +31,85 @@ public class GameEngine implements IGameEngine {
 
     private ILobbyLogic mLobbyLogic;
     private IPlayLogic mPlayLogic;
+    private IEndLogic mEndLogic;
     private IDistributionLogic mDistributionLogic;
     private List<QCMember> mMembers;
     private List<Pair<String, String>> mContent;
     private BehaviorSubject<Boolean> mCanStart;
     private String mSetName;
+    @Nullable
+    private QCGameMessage.GameType mGameType;
+    private int mGameTarget;
+    @Nullable
+    private Date mGameStart;
 
     public GameEngine() {
         mLobbyLogic = new LobbyLogic(this);
         mPlayLogic = new PlayLogic(this);
+        mEndLogic = new EndLogic(this);
         mDistributionLogic = new DistributionLogic();
         mMembers = new ArrayList<>();
         mContent = new ArrayList<>();
         mCanStart = BehaviorSubject.createDefault(false);
     }
 
-    @Override public Observable<Boolean> isAbleToStart() {
+    @Override
+    public Observable<Boolean> isAbleToStart() {
         return mCanStart.distinctUntilChanged();
     }
 
-    @Override public boolean isGameInProgress() {
-        return false;
+    @Override
+    public boolean isGameInProgress() {
+        return mGameStart != null && !isGameHasEnded();
     }
 
-    @NonNull @Override
+    @Override
+    public boolean isGameHasEnded() {
+        if (mGameType == null || mGameStart == null) {
+            return false;
+        }
+        Log.i(TAG, "Checking for game end... "+mGameType+" : "+mGameTarget);
+        switch (mGameType) {
+            case INFINITE:
+                return false;
+            case TIMED_GAME:
+                Log.i(TAG, " >> "+(mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget))+" vs "+new Date().getTime());
+                return (mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget)) < new Date().getTime();
+            case ALL_PLAYERS_TO_POINTS:
+                for (QCMember member : mMembers) {
+                    Log.i(TAG, " >> "+member.getIntScore()+" vs "+mGameTarget);
+                    if (member.getIntScore() < mGameTarget) {
+                        return false;
+                    }
+                }
+                return true;
+            case FIRST_PLAYER_TO_POINTS:
+                for (QCMember member : mMembers) {
+                    Log.i(TAG, " >> "+member.getIntScore()+" vs "+mGameTarget);
+                    if (member.getIntScore() >= mGameTarget) {
+                        return true;
+                    }
+                }
+                return false;
+            default:
+                throw new IllegalStateException("Unknown game type :" + mGameType);
+        }
+    }
+
+    @NonNull
+    @Override
+    public QCGameMessage generateBaseEndGameMessage(@NonNull QCGameMessage.Action action) {
+        return ImmutableQCGameMessage.builder()
+                .action(action)
+                .state(GameState.ENDED)
+                .members(mMembers)
+                .setName(mSetName)
+                .factCount(mContent == null ? 0 : mContent.size())
+                .build();
+    }
+
+    @NonNull
+    @Override
     public QCGameMessage generateBaseLobbyMessage(@NonNull QCGameMessage.Action action) {
         return ImmutableQCGameMessage.builder()
                 .action(action)
@@ -63,7 +120,8 @@ public class GameEngine implements IGameEngine {
                 .build();
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public QCGameMessage generateBasePlayMessage(@NonNull QCGameMessage.Action action) {
         return ImmutableQCGameMessage.builder()
                 .action(action)
@@ -72,7 +130,9 @@ public class GameEngine implements IGameEngine {
                 .build();
     }
 
-    @Nullable @Override public QCMember findMemberByUsername(@NonNull String username) {
+    @Nullable
+    @Override
+    public QCMember findMemberByUsername(@NonNull String username) {
         for (QCMember member : mMembers) {
             if (username.equals(member.username())) {
                 return member;
@@ -81,7 +141,9 @@ public class GameEngine implements IGameEngine {
         return null;
     }
 
-    @Nullable @Override public QCMember findMemberByColor(@NonNull String color) {
+    @Nullable
+    @Override
+    public QCMember findMemberByColor(@NonNull String color) {
         for (QCMember member : mMembers) {
             if (color.equals(member.color())) {
                 return member;
@@ -90,27 +152,42 @@ public class GameEngine implements IGameEngine {
         return null;
     }
 
-    @Override public QCGameMessage startGame(QCGameMessage.GameType gameType, Integer gameTarget) {
+    @Override
+    public QCGameMessage startGame(@NonNull QCGameMessage.GameType gameType, int gameTarget) {
         if (!canStart()) {
             throw new IllegalStateException("Game is not valid to start");
         }
+        mGameTarget = gameTarget;
+        mGameType = gameType;
+        mGameStart = new Date();
         return mPlayLogic.startGame(gameType, gameTarget);
     }
 
-    @Override public QCGameMessage processMessage(@NonNull QCPlayerMessage message) {
+    @Override
+    public synchronized QCGameMessage processMessage(@NonNull QCPlayerMessage message) {
         synchronized (TAG) {
             switch (message.state()) {
                 case LOBBY:
                     return mLobbyLogic.processMessage(message);
                 case PLAYING:
-                    return mPlayLogic.processMessage(message);
+                    if (isGameHasEnded()) {
+                        return mEndLogic.processMessage(message);
+                    }
+                    QCGameMessage outMessage = mPlayLogic.processMessage(message);
+                    if (isGameHasEnded()) {
+                        return mEndLogic.processMessage(message);
+                    }
+                    return outMessage;
+                case ENDED:
+                    return mEndLogic.processMessage(message);
                 default:
                     throw new UnsupportedOperationException("I don't know how to handle : " + message.state());
             }
         }
     }
 
-    @Override public void addMember(@NonNull QCMember newMember) {
+    @Override
+    public void addMember(@NonNull QCMember newMember) {
         if (mMembers.contains(newMember)) {
             return;
         }
@@ -118,29 +195,34 @@ public class GameEngine implements IGameEngine {
         mCanStart.onNext(canStart());
     }
 
-    @Override public void removeMember(@NonNull QCMember existingMember) {
+    @Override
+    public void removeMember(@NonNull QCMember existingMember) {
         mMembers.remove(existingMember);
         mCanStart.onNext(canStart());
     }
 
-    @Override public int getMemberCount() {
+    @Override
+    public int getMemberCount() {
         return mMembers.size();
     }
 
-    @Override public void setContent(@NonNull String setName, @NonNull List<Pair<String, String>> content) {
+    @Override
+    public void setContent(@NonNull String setName, @NonNull List<Pair<String, String>> content) {
         mSetName = setName;
         // TODO : don't allow duplicate values or values with ambigious results!!
-        Log.i(TAG, "Content has been set : "+content.size()+" pairs");
+        Log.i(TAG, "Content has been set : " + content.size() + " pairs");
         mContent = content;
         mCanStart.onNext(canStart());
     }
 
     private boolean canStart() {
-        Log.v(TAG, "Checking to see if we can start... Players: "+mMembers.size()+" > 1 && "+mContent.size() +" > "+MIN_CONTENT_SIZE+" = ?");
+        Log.v(TAG, "Checking to see if we can start... Players: " + mMembers.size() + " > 1 && " + mContent.size() + " > " + MIN_CONTENT_SIZE + " = ?");
         return mMembers.size() > 1 && mContent.size() > MIN_CONTENT_SIZE;
     }
 
-    @NonNull @Override public String getQuestionForAnswer(@NonNull String answer) {
+    @NonNull
+    @Override
+    public String getQuestionForAnswer(@NonNull String answer) {
         for (Pair<String, String> pair : mContent) {
             if (answer.equals(pair.second)) {
                 return pair.first;
@@ -149,7 +231,9 @@ public class GameEngine implements IGameEngine {
         throw new IllegalStateException("Unable to find question for answer '" + answer + "'");
     }
 
-    @NonNull @Override public String getAnswerForPlayer(@NonNull QCMember member) {
+    @NonNull
+    @Override
+    public String getAnswerForPlayer(@NonNull QCMember member) {
         String question = member.question();
         if (question == null) {
             throw new IllegalStateException("Player is not asking a question : " + member);
@@ -162,7 +246,9 @@ public class GameEngine implements IGameEngine {
         throw new IllegalStateException("Unable to find answer for question '" + question + "', asked by player " + member);
     }
 
-    @NonNull @Override public List<QCMember> getPlayersWithAnswer(@NonNull String answer) {
+    @NonNull
+    @Override
+    public List<QCMember> getPlayersWithAnswer(@NonNull String answer) {
         List<QCMember> result = new ArrayList<>();
         for (QCMember member : mMembers) {
             List<String> options = member.options();
@@ -178,7 +264,9 @@ public class GameEngine implements IGameEngine {
         return result;
     }
 
-    @NonNull @Override public List<QCMember> askersLookingForAnswer(@NonNull String answer) {
+    @NonNull
+    @Override
+    public List<QCMember> askersLookingForAnswer(@NonNull String answer) {
         List<QCMember> result = new ArrayList<>();
         String question = null;
         for (Pair<String, String> pair : mContent) {    // first find the question to the answer
@@ -198,7 +286,8 @@ public class GameEngine implements IGameEngine {
         return result;
     }
 
-    @Override public void allocateContent() {
+    @Override
+    public void allocateContent() {
         mMembers = mDistributionLogic.allocateContent(4, new ArrayList<>(mMembers), mContent);
     }
 
