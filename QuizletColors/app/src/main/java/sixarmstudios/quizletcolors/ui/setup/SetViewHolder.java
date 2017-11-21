@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -58,7 +59,7 @@ class SetViewHolder extends RecyclerView.ViewHolder {
         Resources r = itemView.getContext().getResources();
         Date d = new Date(lastSynced);
         boolean hasSynced = lastSynced != 0;
-        mSyncedInfo.setText(hasSynced ?  d.toString() : r.getString(R.string.never_synced));
+        mSyncedInfo.setText(hasSynced ?  new SimpleDateFormat("MM/dd/yy").format(d).toString() : r.getString(R.string.never_synced));
         mSyncBtn.setImageResource(hasSynced ? R.drawable.ic_sync : R.drawable.ic_download);
         mStartBtn.setVisibility(hasSynced ? View.VISIBLE : View.INVISIBLE);
     }

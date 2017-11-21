@@ -23,11 +23,11 @@
     <string name="missing_permissions">more Application permissions required</string>
     <string name="has_permissions">has needed permissions</string>
 
-    <string name="auth_with_quizlet">use a Quizlet account to host or play</string>
-    <string name="use_quizlet_host">host as <xliff:g id="username" example="username">%1$s</xliff:g></string>
-    <string name="use_quizlet_play">play as <xliff:g id="username" example="username">%1$s</xliff:g></string>
+    <string name="auth_with_quizlet">Use a Quizlet account to host or play</string>
+    <string name="use_quizlet_host">Host as <xliff:g id="username" example="username">%1$s</xliff:g></string>
+    <string name="use_quizlet_play">Play as <xliff:g id="username" example="username">%1$s</xliff:g></string>
     <string name="or">or</string>
-    <string name="play_anonymously">play anonymously</string>
+    <string name="play_anonymously">Play Anonymously</string>
 
     <!-- Join Game -->
     <string name="username">Username:</string>

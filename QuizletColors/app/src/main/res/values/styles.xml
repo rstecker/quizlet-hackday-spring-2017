@@ -12,6 +12,7 @@
         <item name="android:textColor">@color/text_color_inverted</item>
         <item name="android:background">@color/button_colors</item>
         <item name="android:minHeight">@dimen/min_tap_target_size</item>
+        <item name="android:layout_margin">@dimen/button_margin</item>
     </style>
 
     <style name="GameOption">
