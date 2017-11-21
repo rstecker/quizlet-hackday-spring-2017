@@ -1,6 +1,8 @@
 package studioes.arm.six.partskit;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.SpringAnimation;
@@ -9,7 +11,9 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * Created by sithel on 10/26/17.
@@ -17,7 +21,8 @@ import android.widget.LinearLayout;
 
 public class GradeBox extends LinearLayout {
     public static final String TAG = GradeBox.class.getSimpleName();
-    @LayoutRes private static final int LAYOUT_ID = R.layout.view_grade_box;
+    @LayoutRes
+    private static final int LAYOUT_ID = R.layout.view_grade_box;
 
     public GradeBox(@NonNull Context context) {
         super(context);
@@ -58,12 +63,14 @@ public class GradeBox extends LinearLayout {
     }
 
     public void lockIt() {
+        this.setClickable(false);
         animate().cancel();
         setScaleX(0);
         setScaleY(0);
     }
 
     public void popIt() {
+        this.setClickable(true);
         SpringForce spring = new SpringForce(1)
                 .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY)
                 .setStiffness(SpringForce.STIFFNESS_LOW);
@@ -77,5 +84,23 @@ public class GradeBox extends LinearLayout {
                 .setSpring(spring)
                 .start()
         ;
+    }
+
+    public void populateWrongAnswer(String top, String wrong, String correct) {
+        ((TextView) findViewById(R.id.boxCenter)).setText(top);
+        ((TextView) findViewById(R.id.boxRight)).setText(correct);
+        ((TextView) findViewById(R.id.boxLeft)).setText(wrong);
+    }
+
+    public void populateBlame() {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getContext().getTheme();
+        theme.resolveAttribute(R.attr.gradeNoPlayerBg, typedValue, true);
+        int[][] states = new int[][]{new int[]{android.R.attr.state_activated}, new int[]{-android.R.attr.state_activated}};
+        int[] colors = new int[]{typedValue.data, typedValue.data};
+        ColorStateList list = new ColorStateList(states, colors);
+        ((TextView) findViewById(R.id.boxCenter)).setBackgroundTintList(list);
+        ((TextView) findViewById(R.id.boxRight)).setBackgroundTintList(list);
+        ((TextView) findViewById(R.id.boxLeft)).setBackgroundTintList(list);
     }
 }

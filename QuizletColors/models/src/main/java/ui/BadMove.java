@@ -38,4 +38,18 @@ public class BadMove {
 
     @ColumnInfo(name = "your_answer_went_to_someone_else")
     public boolean yourAnswerWentToSomeoneElse;
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("Offered Answer: ").append(offeredAnswer).append("\n")
+                .append("Incorrect Question: ").append(incorrectQuestion).append("\n")
+                .append("Correct Question: ").append(correctQuestion).append("\n")
+                .append("Correct Answer: ").append(correctAnswer).append("\n")
+                .append("Given Bad Answer: ").append(youWereGivenBadAnswer).append("\n")
+                .append("Answered Poorly: ").append(youAnsweredPoorly).append("\n")
+                .append("Failed to Answer: ").append(youFailedToAnswer).append("\n")
+                .append("Answer went to someone else: ").append(yourAnswerWentToSomeoneElse)
+                .toString();
+    }
 }

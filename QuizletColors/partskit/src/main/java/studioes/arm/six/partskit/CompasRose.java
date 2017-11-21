@@ -130,7 +130,6 @@ public class CompasRose extends FrameLayout {
         theme.resolveAttribute(R.attr.background, typedValue, true);
         @ColorRes int color = typedValue.resourceId;
         mBaseLineColor = color;
-        Log.i(TAG, "Setting rose color to "+color+" : "+this);
     }
 
     private Drawable newDrawable() {

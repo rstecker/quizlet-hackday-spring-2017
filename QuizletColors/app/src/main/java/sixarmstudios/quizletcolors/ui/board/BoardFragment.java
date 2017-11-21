@@ -6,7 +6,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
-import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +15,18 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.R;
-import sixarmstudios.quizletcolors.ui.player.PlayerAdapter;
 import studioes.arm.six.partskit.BoardView;
 import studioes.arm.six.partskit.CompasRose;
+import studioes.arm.six.partskit.GradeBox;
 import ui.BadMove;
 import ui.Game;
 import ui.GoodMove;
@@ -40,20 +44,17 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
     @LayoutRes
     private static final int LAYOUT_ID = R.layout.board_fragment;
 
-//    @BindView(R.id.player_list) RecyclerView mPlayerList;
-//    @BindView(R.id.option_list) RecyclerView mOptionList;
-//    @BindView(R.id.wrong_question_popup) FrameLayout mWrongQuestionPopup;
     @BindView(R.id.board_view)
     BoardView mBoard;
 
-    private PlayerAdapter mPlayerAdapter;
-    private OptionAdapter mOptionAdapter;
+    @BindView(R.id.grade_box)
+    GradeBox mGrade;
+
+
     private String mPlayerColor;
     private String mString;
     private long mLastMoveUpdateTimestamp;
-    private GridLayoutManager mOptionsLayoutManager;
-    private GridLayoutManager mPlayersLayoutManager;
-    private BadMoveViewHolder mBadMoveView;
+    private Disposable mGradeDisposable;
 
     public static BoardFragment newInstance() {
         BoardFragment fragment = new BoardFragment();
@@ -69,13 +70,14 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
         ButterKnife.bind(this, view);
 
         mBoard.setMoveCallback(this);
+        mGrade.lockIt();
 
         mLastMoveUpdateTimestamp = new Date().getTime();
         BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
         viewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         viewModel.getGame().observe(this, this::handleGameUpdates);
         viewModel.getOptions().observe(this, this::handleOptionUpdates);
-//        viewModel.getMyBadMoves().observe(this, this::handleBadMoves);
+        viewModel.getMyBadMoves().observe(this, this::handleBadMoves);
 //        viewModel.getMyGoodMoves().observe(this, this::handleGoodMoves);
 
 //        mBadMoveView = new BadMoveViewHolder(mWrongQuestionPopup);
@@ -91,9 +93,38 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             return;
         }
         mLastMoveUpdateTimestamp = move.timestamp;
-        mBadMoveView.handleNewBadMove(move);
 
         Log.i(TAG, "Bad move update : " + move);
+
+        if (move.youAnsweredPoorly) {
+            mGrade.populateWrongAnswer(move.offeredAnswer, move.incorrectQuestion, move.correctQuestion);
+            mGrade.populateBlame();
+            // current player owns offered answer
+        } else if (move.youWereGivenBadAnswer) {
+            mGrade.populateWrongAnswer(move.incorrectQuestion, move.offeredAnswer, move.correctAnswer);
+            mGrade.populateBlame();
+            // current player owns incorrect question
+        } else if (move.yourAnswerWentToSomeoneElse) {
+            mGrade.populateWrongAnswer(move.offeredAnswer, move.incorrectQuestion, move.correctQuestion);
+            mGrade.populateBlame();
+            // current player owns the "correct question"
+        } else if (move.youFailedToAnswer) {
+            mGrade.populateWrongAnswer(move.offeredAnswer, move.incorrectQuestion, move.correctAnswer);
+            mGrade.populateBlame();
+            // current player owns "correct answer"
+        }
+        mGrade.popIt();
+        if (mGradeDisposable != null) {
+            mGradeDisposable.dispose();
+        }
+        mGradeDisposable = Single.timer(6, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        (v) -> mGrade.lockIt(),
+                        (e) -> Log.e(TAG, "Error encountered w/ grade "+e)
+                );
+
     }
 
     private void handleGoodMoves(List<GoodMove> goodMoves) {
@@ -118,7 +149,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
     private void handlePlayerUpdates(List<Player> players) {
         Log.w(TAG, "I see players " + players);
         List<Pair<CompasRose.RoseColor, Integer>> uiPlayers = new ArrayList<>();
-        for(Player p : players) {
+        for (Player p : players) {
             // TODO : they shouldn't ALL be diamond lines... ?
             uiPlayers.add(new Pair<>(CompasRose.RoseColor.findByColorName(p.color), R.drawable.line_dimond));
         }
@@ -131,21 +162,21 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             return;
         }
         List<String> strOptions = new ArrayList<>();
-        for(Option o : options) {
-            Log.i(TAG, "I see options : "+o.index+" :: "+o.option);
+        for (Option o : options) {
+            Log.i(TAG, "I see options : " + o.index + " :: " + o.option);
             strOptions.add(o.option);
         }
         List<String> curOptions = mBoard.getCurrentOptions();
-        for(int i = 0; i < strOptions.size();++i){
+        for (int i = 0; i < strOptions.size(); ++i) {
             String s = strOptions.get(i);
             int preExistingIndex = curOptions.indexOf(s);
             if (preExistingIndex > -1 && i != preExistingIndex) {
                 String temp = strOptions.get(preExistingIndex);
-                Log.i(TAG,"Swaping option positions: "+s+" ["+i+"] <->"+temp+" ["+preExistingIndex+"]");
+                Log.i(TAG, "Swaping option positions: " + s + " [" + i + "] <->" + temp + " [" + preExistingIndex + "]");
                 strOptions.set(preExistingIndex, s);
                 strOptions.set(i, temp);
             } else {
-                Log.i(TAG, "Removed option : "+s);
+                Log.i(TAG, "Removed option : " + s);
             }
         }
         mBoard.setOptions(strOptions);
