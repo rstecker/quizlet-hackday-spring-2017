@@ -21,6 +21,12 @@ public class GoodMove {
     @ColumnInfo(name = "answer")
     public String answer;
 
+    @ColumnInfo(name = "asker_color")
+    public String askerColor;
+
+    @ColumnInfo(name = "answerer_color")
+    public String answererColor;
+
     @ColumnInfo(name = "you_asked")
     public boolean youAsked;
 

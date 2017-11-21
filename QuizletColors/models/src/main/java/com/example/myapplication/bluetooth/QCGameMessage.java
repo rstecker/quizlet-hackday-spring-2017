@@ -58,6 +58,7 @@ public abstract class QCGameMessage {
                 .build();
     }
 
+
     public enum GameType {
         INFINITE,
         FIRST_PLAYER_TO_POINTS,
@@ -121,6 +122,9 @@ public abstract class QCGameMessage {
     @Nullable
     public abstract String question();
 
+    /**
+     * This is the color of the user with the "correct" question to the offered answer (if they exist)
+     */
     @JsonProperty("question_color")
     @Nullable
     public abstract String questionColor();
@@ -153,6 +157,9 @@ public abstract class QCGameMessage {
     @Nullable
     public abstract String correctAnswer();
 
+    /**
+     * this is the color of the first user with the "correct" answer (null if no-one had it?)
+     */
     @JsonProperty("correct_answer_color")
     @Nullable
     public abstract String correctAnswerColor();
@@ -164,6 +171,9 @@ public abstract class QCGameMessage {
     @Nullable
     public abstract String answeredQuestion();
 
+    /**
+     * ????
+     */
     @JsonProperty("answered_question_color")
     @Nullable
     public abstract String answeredQuestionColor();
@@ -224,14 +234,12 @@ public abstract class QCGameMessage {
      *
      * @param answer   the PROVIDED answer
      * @param question the CORRECT question for the provided answer
+     * @param answerer the player who answered the question
+     * @param asker    the player who was asking the question
      */
-    public QCGameMessage setCorrectInfo(@NonNull String answer, @NonNull String question, @NonNull List<QCMember> askersOfSubmittedQuestion) {
-        Set<String> correctColors = new HashSet<>();
-        for (QCMember member : askersOfSubmittedQuestion) {
-            if (member.color() != null) {
-                correctColors.add(member.color());
-            }
-        }
+    public QCGameMessage setCorrectInfo(@NonNull String answer, @NonNull String question,
+                                        @NonNull QCMember answerer, @NonNull QCMember asker,
+                                        @NonNull List<QCMember> askersOfSubmittedQuestion) {
         if (answer.equals(providedAnswer()) && question.equals(question())
                 && correctAnswer() == null && answeredQuestion() == null) {
             return this;
@@ -239,7 +247,9 @@ public abstract class QCGameMessage {
         return ImmutableQCGameMessage.builder()
                 .from(this)
                 .providedAnswer(answer)
+                .providedColor(answerer.color())
                 .question(question)
+                .questionColor(asker.color())
                 .correctAnswer(null)
                 .answeredQuestion(null)
                 .build();
@@ -289,6 +299,20 @@ public abstract class QCGameMessage {
                 .providedColor(askerColor)
                 .build();
 
+    }
+
+
+    public QCGameMessage setBadAnswerColors(@NonNull QCMember asker,
+                                            @NonNull QCMember answerer,
+                                            @NonNull List<QCMember> askersOfAnswer,
+                                            @NonNull List<QCMember> othersAtFault) {
+        return ImmutableQCGameMessage.builder()
+                .from(this)
+                .providedColor(asker.color())
+                .answererColor(answerer.color())
+                .answeredQuestionColor(askersOfAnswer.isEmpty() ? null : askersOfAnswer.get(0).color())
+                .correctAnswerColor(othersAtFault.isEmpty() ? null : othersAtFault.get(0).color())
+                .build();
     }
 
 }

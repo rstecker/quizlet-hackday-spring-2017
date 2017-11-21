@@ -174,9 +174,13 @@ public class PlayerEngine implements IPlayerEngine {
         BadMove bm = new BadMove();
         bm.timestamp = new Date().getTime();
         bm.offeredAnswer = message.providedAnswer();
+        bm.offeredAnswerColor = message.answererColor();
         bm.incorrectQuestion = message.answeredQuestion();
+        bm.incorrectQuestionColor = message.providedColor();
         bm.correctQuestion = message.question();
+        bm.correctQuestion = message.questionColor();
         bm.correctAnswer = message.correctAnswer();
+        bm.correctAnswerColor = message.correctAnswerColor();
         bm.youWereGivenBadAnswer = currentPlayer.reaction() == QCMember.Reaction.RECEIVED_BAD_ANSWER;
         bm.youAnsweredPoorly = currentPlayer.reaction() == QCMember.Reaction.WRONG_CHOICE || currentPlayer.reaction() == QCMember.Reaction.WRONG_USER;
         bm.youFailedToAnswer = currentPlayer.reaction() == QCMember.Reaction.FAILED_TO_ANSWER;

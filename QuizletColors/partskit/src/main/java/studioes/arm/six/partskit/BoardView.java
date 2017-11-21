@@ -17,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.List;
@@ -218,10 +217,6 @@ public class BoardView extends RelativeLayout {
                     int answerIndex = Integer.valueOf(event.getClipData().getDescription().getLabel().toString());
                     // Gets the text data from the item.
                     CharSequence dragData = item.getText();
-
-
-                    // Displays a message containing the dragged data.
-                    Toast.makeText(getContext(), "Dragged data is " + dragData + " set to quad " + quadNum, Toast.LENGTH_LONG).show();
 
                     handleMove(quadNum, answerIndex, dragData.toString(), rose.getPlayerColor());
                     break;

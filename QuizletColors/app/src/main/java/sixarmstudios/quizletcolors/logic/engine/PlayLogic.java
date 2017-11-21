@@ -2,6 +2,7 @@ package sixarmstudios.quizletcolors.logic.engine;
 
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.myapplication.bluetooth.QCGameMessage;
 import com.example.myapplication.bluetooth.QCMember;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 
 public class PlayLogic implements IPlayLogic {
+    public static final String TAG = PlayLogic.class.getSimpleName();
     private IGameEngine mEngine;
 
     PlayLogic(IGameEngine gameEngine) {
@@ -70,7 +72,7 @@ public class PlayLogic implements IPlayLogic {
     QCGameMessage handleCorrectMove(@NonNull QCMember player, @NonNull QCMember asker, @NonNull String answer, @NonNull String question) {
         mEngine.updatePlayersForCorrectStatus(asker, player, answer);
         return mEngine.generateBasePlayMessage(QCGameMessage.Action.CORRECT_ANSWER)
-                .setCorrectInfo(answer, question, mEngine.askersLookingForAnswer(answer))
+                .setCorrectInfo(answer, question, player, asker, mEngine.askersLookingForAnswer(answer))
                 .setReactionPlayer(mEngine.findMemberByUsername(asker.username()), QCMember.Reaction.CORRECT_ANSWER_RECEIVED)
                 .setReactionPlayer(mEngine.findMemberByUsername(player.username()), QCMember.Reaction.CORRECT_ANSWER_PROVIDED)
                 ;
@@ -87,8 +89,11 @@ public class PlayLogic implements IPlayLogic {
         mEngine.updatePlayersForBadMove(asker, player, providedAnswer, correctAnswer, othersAtFault, askersOfAnswer);
 
         QCGameMessage.Action action = askersOfAnswer.size() > 0 ? QCGameMessage.Action.WRONG_USER : QCGameMessage.Action.BAD_ANSWER;
+        Log.i(TAG, "Seeing answered question as "+answeredQuestion);
         QCGameMessage msg = mEngine.generateBasePlayMessage(action)
-                .setInfoForBadMove(providedAnswer, answeredQuestion, correctAnswer, correctQuestion, asker.color(), player.color(), askersOfAnswer);
+                .setInfoForBadMove(providedAnswer, answeredQuestion, correctAnswer, correctQuestion, asker.color(), player.color(), askersOfAnswer)
+                ;
+
 
         for (QCMember member : othersAtFault) {
             msg = msg.setReactionPlayer(mEngine.findMemberByUsername(member.username()), QCMember.Reaction.FAILED_TO_ANSWER);
@@ -99,6 +104,7 @@ public class PlayLogic implements IPlayLogic {
         // these have to come AFTER the loops above because these reactions "trump" the others
         msg = msg.setReactionPlayer(mEngine.findMemberByUsername(asker.username()), QCMember.Reaction.RECEIVED_BAD_ANSWER);
         msg = msg.setReactionPlayer(mEngine.findMemberByUsername(player.username()), askersOfAnswer.size() > 0 ? QCMember.Reaction.WRONG_USER : QCMember.Reaction.WRONG_CHOICE);
+        msg = msg.setBadAnswerColors(asker, player, askersOfAnswer, othersAtFault);
         return msg;
     }
 

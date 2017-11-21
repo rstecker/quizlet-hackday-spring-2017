@@ -117,6 +117,9 @@ public class GameEngineTest {
         assertEquals("a2", result.providedAnswer());
         assertEquals("red", result.providedColor());
         assertEquals("green", result.answererColor());
+        assertEquals(null, result.answeredQuestionColor());
+        assertEquals("red", result.correctAnswerColor());
+        assertEquals(null, result.questionColor());
         assertEquals("a1", result.correctAnswer());
         assertEquals("q1", result.answeredQuestion());
 
@@ -147,6 +150,9 @@ public class GameEngineTest {
         assertEquals("a6", result.providedAnswer());
         assertEquals("red", result.providedColor());
         assertEquals("white", result.answererColor());
+        assertEquals("green", result.answeredQuestionColor());
+        assertEquals("red", result.correctAnswerColor());
+        assertEquals(null, result.questionColor());
         assertEquals("a1", result.correctAnswer());
         assertEquals("q1", result.answeredQuestion());
 
