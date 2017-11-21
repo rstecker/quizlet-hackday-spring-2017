@@ -137,15 +137,9 @@ public class StartFragment extends LifecycleFragment {
 
     @OnClick(R.id.start_anonymous_btn)
     public void handleStartAnonymousClick() {
-        Fragment fragment = EndGameFragment.newInstance();
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
-
-        /*
         TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
         viewModel.updatePlayerState(PlayerState.FIND_GAME);
-        mStartAnonymousButton.setOnContextClickListener(null);*/
+        mStartAnonymousButton.setOnContextClickListener(null);
 
     }
 
