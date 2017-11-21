@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +58,7 @@ public class LobbyFragment extends Fragment implements IUserSelector {
     @BindView(R.id.game_set_fact_count) TextView mFactCount;
     @BindView(R.id.start_game_button) View mStartGameButton;
     @BindView(R.id.player_list) RecyclerView mPlayerList;
+    @BindView(R.id.game_type_selector) RadioGroup mGameTypeSelector;
 
     private PlayerAdapter mAdapter;
     private GridLayoutManager mPlayersLayoutManager;
@@ -79,6 +81,7 @@ public class LobbyFragment extends Fragment implements IUserSelector {
         ButterKnife.bind(this, view);
 
         mStartGameButton.setVisibility(View.INVISIBLE);
+        mGameTypeSelector.check(0);
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         lobbyViewModel.getGame().observe(this, this::handleGameUpdates);

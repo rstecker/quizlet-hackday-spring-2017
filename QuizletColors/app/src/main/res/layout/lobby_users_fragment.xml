@@ -24,6 +24,50 @@
         android:layout_height="wrap_content"
         tools:text="There will be 5 monkies" />
 
+    <RadioGroup
+        android:id="@+id/game_type_selector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_selector"
+            android:text="Infinity"
+            android:textAlignment="center"
+            android:button="@null" />
+
+        <RadioButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="N player points"
+            android:textAlignment="center"
+            android:background="@drawable/button_selector"
+            android:button="@null"/>
+
+        <RadioButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="N all points"
+            android:textAlignment="center"
+            android:background="@drawable/button_selector"
+            android:button="@null" />
+
+        <RadioButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="N minutes"
+            android:textAlignment="center"
+            android:background="@drawable/button_selector"
+            android:button="@null" />
+
+    </RadioGroup>
+
     <TextView
         android:id="@+id/start_game_button"
         style="@style/LobbyButtons"

@@ -58,6 +58,13 @@ public abstract class QCGameMessage {
                 .build();
     }
 
+    public enum GameType {
+        INFINITE,
+        FIRST_PLAYER_TO_POINTS,
+        ALL_PLAYERS_TO_POINTS,
+        TIMED_GAME
+    }
+
     public enum Action {
         LOBBY_WELCOME,
         INVALID_STATE,
