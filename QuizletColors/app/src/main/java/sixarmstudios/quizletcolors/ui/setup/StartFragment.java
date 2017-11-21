@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,7 @@ import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.StartActivity;
+import sixarmstudios.quizletcolors.ui.endGame.EndGameFragment;
 import sixarmstudios.quizletcolors.ui.lobby.LobbyFragment;
 import viewmodel.TopLevelViewModel;
 
