@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.example.myapplication.bluetooth.QCGameMessage;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -108,7 +110,7 @@ public class LobbyFragment extends Fragment implements IUserSelector {
     public void handleStartClick() {
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.setGameState(Game.State.START);
-        mHostConnection.startGame();
+        mHostConnection.startGame(QCGameMessage.GameType.ALL_PLAYERS_TO_POINTS, 7);
     }
 
     private void handleSetUpdates(List<SetSummary> summaries) {

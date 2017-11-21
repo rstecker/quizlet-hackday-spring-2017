@@ -27,6 +27,9 @@ public interface GameDao {
     @Query("UPDATE game SET game_state = :state")
     void setGameState(String state);
 
+    @Query("UPDATE game SET game_target = :target, game_type = :type")
+    void setGameTypeAndTarget(String type, int target);
+
     @Query("UPDATE game SET set_name = :setName, fact_count = :factCount")
     void updateGameDetails(String setName, int factCount);
 

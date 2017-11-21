@@ -13,7 +13,7 @@ import android.support.annotation.Nullable;
  */
 
 @Entity
-@TypeConverters(Game.State.class)
+@TypeConverters({Game.State.class, Game.Type.class})
 public class Game {
 
     public enum State {
@@ -22,15 +22,45 @@ public class Game {
         START,
         PLAYING;
 
-        State() {}
+        State() {
+        }
 
-        @TypeConverter public static State stringToState(String state) {
+        @TypeConverter
+        public static State stringToState(String state) {
             return State.valueOf(state);
         }
 
-        @TypeConverter public static String stateToString(State data) {
+        @TypeConverter
+        public static String stateToString(State data) {
             return data.name();
         }
+    }
+
+    public enum Type {
+        INFINITE,
+        FIRST_PLAYER_TO_POINTS,
+        ALL_PLAYERS_TO_POINTS,
+        TIMED_GAME;
+
+        Type() {
+        }
+
+        @TypeConverter
+        public static @Nullable Type stringToType(String state) {
+            if (state == null) {
+                return null;
+            }
+            return Type.valueOf(state);
+        }
+
+        @TypeConverter
+        public static @Nullable String typeToString(Type data) {
+            if (data ==null) {
+                return null;
+            }
+            return data.name();
+        }
+
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -38,6 +68,12 @@ public class Game {
 
     @ColumnInfo(name = "q_set_id")
     public long qSetId;
+
+    @ColumnInfo(name = "game_type")
+    public Type gameType;
+
+    @ColumnInfo(name = "game_target")
+    public int gameTarget;
 
     @ColumnInfo(name = "game_state")
     public State gameState;
@@ -79,7 +115,10 @@ public class Game {
     public State getState() {
         return gameState;
     }
-    public void setState(State state) { gameState = state;}
+
+    public void setState(State state) {
+        gameState = state;
+    }
 
     public boolean isHost() {
         return isHost;
@@ -94,14 +133,7 @@ public class Game {
 
     public void initForPlayer(@NonNull String name, int bondState, @NonNull String address) {
         gameState = State.WAITING;
-        this.hostName = "Game ["+name+"] / "+address+" ("+bondState+")";
+        this.hostName = "Game [" + name + "] / " + address + " (" + bondState + ")";
         this.isHost = false;
-    }
-
-    public boolean isCurrentlySelected(@Nullable String optionText) {
-        if (selected_option == null) {
-            return false;
-        }
-        return selected_option.equals(optionText);
     }
 }

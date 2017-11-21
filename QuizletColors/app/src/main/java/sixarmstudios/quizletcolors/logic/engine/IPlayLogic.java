@@ -12,5 +12,5 @@ import com.example.myapplication.bluetooth.QCPlayerMessage;
 public interface IPlayLogic {
     @NonNull QCGameMessage processMessage(@NonNull QCPlayerMessage message);
 
-    @NonNull QCGameMessage startGame();
+    @NonNull QCGameMessage startGame(QCGameMessage.GameType gameType, Integer gameTarget);
 }

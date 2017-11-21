@@ -90,11 +90,11 @@ public class GameEngine implements IGameEngine {
         return null;
     }
 
-    @Override public QCGameMessage startGame() {
+    @Override public QCGameMessage startGame(QCGameMessage.GameType gameType, Integer gameTarget) {
         if (!canStart()) {
             throw new IllegalStateException("Game is not valid to start");
         }
-        return mPlayLogic.startGame();
+        return mPlayLogic.startGame(gameType, gameTarget);
     }
 
     @Override public QCGameMessage processMessage(@NonNull QCPlayerMessage message) {

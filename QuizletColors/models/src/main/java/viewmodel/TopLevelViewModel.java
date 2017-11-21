@@ -151,6 +151,12 @@ public class TopLevelViewModel extends AndroidViewModel {
                     mAppDatabase.optionsDao().insertAll(options);
                     mAppDatabase.gameDao().setGameState(Game.State.stateToString(Game.State.PLAYING));
                     mAppDatabase.applicationStateDao().updatePlayerState(PlayerState.PLAYING.toDBVal());
+
+                    if (state.gameType() != null) {
+                        int target = state.gameTarget() == null ? -1 : state.gameTarget();
+                        mAppDatabase.gameDao().setGameTypeAndTarget(state.gameType().toString(), target);
+                        Log.i(TAG, "Setting game to "+state.gameType()+" : "+target);
+                    }
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())

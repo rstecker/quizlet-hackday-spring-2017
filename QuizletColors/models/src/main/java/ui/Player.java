@@ -23,17 +23,22 @@ public class Player {
     @ColumnInfo(name = "is_you")
     public boolean isYou;
 
-    public Player(@NonNull String username, String color, boolean isHost, boolean isYou) {
+    @ColumnInfo(name = "score")
+    public int score;
+
+    public Player(@NonNull String username, String color, boolean isHost, boolean isYou, int score) {
         this.username = username;
         this.color = color;
         this.isHost = isHost;
         this.isYou = isYou;
+        this.score = score;
     }
 
     public boolean isYou() { return isYou; }
     public boolean isHost() { return isHost; }
+    public int score() { return score; }
 
     @Override public String toString() {
-        return username+" : "+color+" : "+isHost()+" : "+isYou();
+        return username+" : "+color+" : "+isHost()+" : "+isYou()+" : "+ score;
     }
 }

@@ -32,7 +32,16 @@ public abstract class QCMember {
         FAILED_TO_RECEIVE_ANSWER,
 
         CORRECT_ANSWER_RECEIVED,
-        CORRECT_ANSWER_PROVIDED
+        CORRECT_ANSWER_PROVIDED;
+
+        int getScoreImpact() {
+            if (this == CORRECT_ANSWER_PROVIDED) {
+                return 1;
+            } else if (this == WRONG_CHOICE || this == WRONG_USER) {
+                return -1;
+            }
+            return 0;
+        }
     }
 
     @JsonProperty("username") public abstract String username();
@@ -47,6 +56,8 @@ public abstract class QCMember {
 
     @JsonProperty("reaction") @Value.Auxiliary @Nullable public abstract Reaction reaction();
 
+    @JsonProperty("score") @Value.Auxiliary @Nullable public abstract Integer score();
+
     @JsonCreator
     @ParcelFactory
     public static QCMember build(
@@ -55,7 +66,8 @@ public abstract class QCMember {
             @JsonProperty("color") @Nullable String color,
             @JsonProperty("question") @Nullable String question,
             @JsonProperty("options") @Nullable List<String> options,
-            @JsonProperty("reaction") @Nullable Reaction reaction
+            @JsonProperty("reaction") @Nullable Reaction reaction,
+            @JsonProperty("score") @Nullable Integer score
     ) {
         return ImmutableQCMember.builder()
                 .color(color)
@@ -64,6 +76,7 @@ public abstract class QCMember {
                 .question(question)
                 .options(options)
                 .reaction(reaction)
+                .score(score)
                 .build();
     }
 
@@ -74,7 +87,7 @@ public abstract class QCMember {
             @Nullable String question,
             @Nullable List<String> options
     ) {
-        return build(username, isHost, color, question, options, Reaction.NONE);
+        return build(username, isHost, color, question, options, Reaction.NONE, 0);
     }
 
     public static QCMember build(@NonNull String username, boolean isHost) {

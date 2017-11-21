@@ -19,7 +19,7 @@ import ui.SetSummary;
  */
 
 @Database(entities = {Player.class, Game.class, Fact.class, Option.class, GoodMove.class,
-        BadMove.class, AppState.class, SetSummary.class}, version = 5)
+        BadMove.class, AppState.class, SetSummary.class}, version = 6)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayerDao playerDao();
     public abstract GameDao gameDao();

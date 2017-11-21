@@ -3,6 +3,8 @@ package gamelogic;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.myapplication.bluetooth.QCGameMessage;
+
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -23,6 +25,9 @@ public abstract class BoardState {
 
     public abstract List<Player> players();
 
+    @Nullable public abstract QCGameMessage.GameType gameType();
+    @Nullable public abstract Integer gameTarget();
+
     @Nullable public abstract BadMove badMove();
     @Nullable public abstract GoodMove goodMove();
 
@@ -30,12 +35,16 @@ public abstract class BoardState {
                                    @NonNull String question,
                                    @NonNull List<String> options,
                                    @NonNull List<Player> players,
+                                   @Nullable QCGameMessage.GameType gameType,
+                                   @Nullable Integer gameTarget,
                                    @Nullable GoodMove goodMove,
                                    @Nullable BadMove badMove) {
         return ImmutableBoardState.builder()
                 .question(question)
                 .options(options)
                 .players(players)
+                .gameType(gameType)
+                .gameTarget(gameTarget)
                 .goodMove(goodMove)
                 .badMove(badMove)
                 .build();

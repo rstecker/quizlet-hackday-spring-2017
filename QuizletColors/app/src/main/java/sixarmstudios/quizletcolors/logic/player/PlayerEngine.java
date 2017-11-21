@@ -131,7 +131,8 @@ public class PlayerEngine implements IPlayerEngine {
                     member.username(),
                     member.color() == null ? "#000000" : member.color(),
                     member.isHost(),
-                    mUsername.equals(member.username())
+                    mUsername.equals(member.username()),
+                    member.score() == null ? 0 : member.score()
             ));
         }
         return LobbyState.build(message.setName(), message.factCount(), players);
@@ -148,7 +149,8 @@ public class PlayerEngine implements IPlayerEngine {
                     member.username(),
                     member.color(),
                     member.isHost(),
-                    isCurrentPlayer
+                    isCurrentPlayer,
+                    member.score() == null ? 0 : member.score()
             ));
             if (isCurrentPlayer) {
                 question = member.question();
@@ -158,8 +160,10 @@ public class PlayerEngine implements IPlayerEngine {
         }
         // TODO : handle player missing. Either we lost our username or we got kicked
         return BoardState.build(question, options, players,
+                message.gameType(), message.gameTarget(),
                 extractPossibleGoodMove(message, currentPlayer),
-                extractPossibleBadMove(message, currentPlayer));
+                extractPossibleBadMove(message, currentPlayer)
+                );
     }
 
     private BadMove extractPossibleBadMove(@NonNull QCGameMessage message, @NonNull QCMember currentPlayer) {

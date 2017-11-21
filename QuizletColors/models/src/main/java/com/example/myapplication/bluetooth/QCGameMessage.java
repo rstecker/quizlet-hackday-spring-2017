@@ -83,17 +83,32 @@ public abstract class QCGameMessage {
 
     }
 
-    @JsonProperty("action") public abstract Action action();
+    @JsonProperty("action")
+    public abstract Action action();
 
-    @JsonProperty("state") public abstract GameState state();
+    @JsonProperty("state")
+    public abstract GameState state();
 
-    @JsonProperty("members") public abstract List<QCMember> members();
+    @JsonProperty("members")
+    public abstract List<QCMember> members();
+
+    @JsonProperty("type")
+    @Nullable
+    public abstract GameType gameType();
+
+    @JsonProperty("target")
+    @Nullable
+    public abstract Integer gameTarget();
 
     // region Lobby welcome info
 
-    @JsonProperty("set_name") @Nullable public abstract String setName();
+    @JsonProperty("set_name")
+    @Nullable
+    public abstract String setName();
 
-    @JsonProperty("fact_count") @Nullable public abstract Integer factCount();
+    @JsonProperty("fact_count")
+    @Nullable
+    public abstract Integer factCount();
 
     // endregion
 
@@ -102,19 +117,31 @@ public abstract class QCGameMessage {
     /**
      * this is always the "correct" question to the offered answer
      */
-    @JsonProperty("question") @Nullable public abstract String question();
+    @JsonProperty("question")
+    @Nullable
+    public abstract String question();
+
+    @JsonProperty("question_color")
+    @Nullable
+    public abstract String questionColor();
 
     /**
      * this is always the PROVIDED answer, which may or may not be correct
      */
-    @JsonProperty("provided_answer") @Nullable public abstract String providedAnswer();
+    @JsonProperty("provided_answer")
+    @Nullable
+    public abstract String providedAnswer();
 
     /**
      * this is the color the user TRIED to submit to (regardless if correct or not)
      */
-    @JsonProperty("provided_color") @Nullable public abstract String providedColor();
+    @JsonProperty("provided_color")
+    @Nullable
+    public abstract String providedColor();
 
-    @JsonProperty("answerer_color") @Nullable public abstract String answererColor();
+    @JsonProperty("answerer_color")
+    @Nullable
+    public abstract String answererColor();
     // endregion
 
     // region Users messed up submitting an answer, here's the right stuff
@@ -122,12 +149,24 @@ public abstract class QCGameMessage {
     /**
      * this is the "correct" answer (null in the event the user got it right)
      */
-    @JsonProperty("correct_answer") @Nullable public abstract String correctAnswer();
+    @JsonProperty("correct_answer")
+    @Nullable
+    public abstract String correctAnswer();
+
+    @JsonProperty("correct_answer_color")
+    @Nullable
+    public abstract String correctAnswerColor();
 
     /**
      * this is the question to the answer the user provided (null in the event the user got it right, see {@link #question()})
      */
-    @JsonProperty("answered_question") @Nullable public abstract String answeredQuestion();
+    @JsonProperty("answered_question")
+    @Nullable
+    public abstract String answeredQuestion();
+
+    @JsonProperty("answered_question_color")
+    @Nullable
+    public abstract String answeredQuestionColor();
     // endregion
 
     public static QCGameMessage build(Action action, GameState state) {
@@ -165,8 +204,15 @@ public abstract class QCGameMessage {
             return this;
         }
         List<QCMember> newMemberList = new ArrayList<>();
+        int currentScore = member.score() == null ? 0 : member.score();
         newMemberList.addAll(members());
-        newMemberList.set(index, ImmutableQCMember.builder().from(member).reaction(reaction).build());
+        newMemberList.set(index,
+                ImmutableQCMember.builder()
+                        .from(member)
+                        .reaction(reaction)
+                        .score(currentScore + reaction.getScoreImpact())
+                        .build()
+        );
         return ImmutableQCGameMessage.builder()
                 .from(this)
                 .members(newMemberList)
@@ -196,6 +242,14 @@ public abstract class QCGameMessage {
                 .question(question)
                 .correctAnswer(null)
                 .answeredQuestion(null)
+                .build();
+    }
+
+    public QCGameMessage setGameDetails(@NonNull GameType gameType, @Nullable Integer gameTarget) {
+        return ImmutableQCGameMessage.builder()
+                .from(this)
+                .gameTarget(gameTarget)
+                .gameType(gameType)
                 .build();
     }
 

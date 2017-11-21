@@ -160,10 +160,10 @@ public class HostServiceConnection implements ServiceConnection {
         mGameEngine.setContent(setName, content);
     }
 
-    public void startGame() {
+    public void startGame(QCGameMessage.GameType gameType, Integer gameTarget) {
         Completable.defer(
                 () -> {
-                    sendOutResponse(mGameEngine.startGame());
+                    sendOutResponse(mGameEngine.startGame(gameType, gameTarget));
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())

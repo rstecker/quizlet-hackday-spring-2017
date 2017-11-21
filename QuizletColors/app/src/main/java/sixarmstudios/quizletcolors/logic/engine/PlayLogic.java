@@ -22,9 +22,10 @@ public class PlayLogic implements IPlayLogic {
     }
 
     @NonNull @Override
-    public QCGameMessage startGame() {
+    public QCGameMessage startGame(QCGameMessage.GameType gameType, Integer gameTarget) {
         mEngine.allocateContent();
-        return mEngine.generateBasePlayMessage(QCGameMessage.Action.GAME_UPDATE);
+        return mEngine.generateBasePlayMessage(QCGameMessage.Action.GAME_UPDATE)
+                .setGameDetails(gameType, gameTarget);
     }
 
     @Override public @NonNull QCGameMessage processMessage(@NonNull QCPlayerMessage message) {

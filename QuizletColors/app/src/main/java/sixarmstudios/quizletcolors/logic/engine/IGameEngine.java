@@ -20,7 +20,7 @@ import io.reactivex.Observable;
  */
 public interface IGameEngine {
     // region Outside of logic consumable methods
-    public QCGameMessage startGame();
+    public QCGameMessage startGame(QCGameMessage.GameType gameType, Integer gameTarget);
 
     public QCGameMessage processMessage(@NonNull QCPlayerMessage message);
 
