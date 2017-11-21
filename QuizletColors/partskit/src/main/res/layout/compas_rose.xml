@@ -4,9 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:clipToPadding="false"
     android:background="@null"
     android:clipChildren="false"
     android:orientation="horizontal">
+
+    <studioes.arm.six.partskit.TextRing
+        android:id="@+id/compass_rose_host_text_ring"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/compass_rose_lvl_1"
@@ -36,5 +42,12 @@
         android:background="@null"
         android:scaleX="0.5"
         android:scaleY="0.5" />
+
+    <studioes.arm.six.partskit.TextRing
+        android:id="@+id/compass_rose_you_text_ring"
+        android:scaleX="0.85"
+        android:scaleY="0.85"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>

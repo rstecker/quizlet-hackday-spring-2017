@@ -31,4 +31,6 @@
     <color name="orange_earth">#d8832b</color>
     <color name="violet_earth">#7731c2</color>
 
+    <color name="transparent">#00000000</color>
+
 </resources>

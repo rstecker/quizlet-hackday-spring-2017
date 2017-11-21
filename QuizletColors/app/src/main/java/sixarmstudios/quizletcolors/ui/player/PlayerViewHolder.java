@@ -1,8 +1,5 @@
 package sixarmstudios.quizletcolors.ui.player;
 
-import android.support.animation.DynamicAnimation;
-import android.support.animation.SpringAnimation;
-import android.support.animation.SpringForce;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
@@ -10,17 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.concurrent.TimeUnit;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.logic.player.CreatureCreation;
 import sixarmstudios.quizletcolors.ui.board.IUserSelector;
-import studioes.arm.six.creatures.BlobView;
 import studioes.arm.six.partskit.CompasRose;
 import ui.Player;
 
@@ -58,7 +50,14 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
         mName.setBackgroundResource(selected ? R.drawable.border : 0);
 //        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), color));
         itemView.setTag(player.color);
-        mPlayerIcon.setPlayer(randomPlayerColor(), getRandomShape());
+        mPlayerIcon.setPlayer(new studioes.arm.six.partskit.Player(
+                player.username,
+                randomPlayerColor(),
+                0,
+                player.isHost(),
+                player.isYou(),
+                getRandomShape()
+        ));
     }
 
 

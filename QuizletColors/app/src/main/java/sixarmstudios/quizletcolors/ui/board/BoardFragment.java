@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -148,10 +147,17 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
 
     private void handlePlayerUpdates(List<Player> players) {
         Log.w(TAG, "I see players " + players);
-        List<Pair<CompasRose.RoseColor, Integer>> uiPlayers = new ArrayList<>();
+        List<studioes.arm.six.partskit.Player> uiPlayers = new ArrayList<>();
         for (Player p : players) {
             // TODO : they shouldn't ALL be diamond lines... ?
-            uiPlayers.add(new Pair<>(CompasRose.RoseColor.findByColorName(p.color), R.drawable.line_dimond));
+            uiPlayers.add(new studioes.arm.six.partskit.Player(
+                    p.username,
+                    CompasRose.RoseColor.findByColorName(p.color),
+                    0,
+                    p.isHost(),
+                    p.isYou(),
+                    R.drawable.line_dimond
+                    ));
         }
         mBoard.setPlayers(uiPlayers);
     }

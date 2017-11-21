@@ -10,7 +10,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.Pair;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -142,10 +141,11 @@ public class BoardView extends RelativeLayout {
      * @param players a list of pairs.  Max 4. First value is the color of the rose, the second is the
      *                Drawable resource int for the line
      */
-    public void setPlayers(@NonNull List<Pair<CompasRose.RoseColor, Integer>> players) {
+    public void setPlayers(@NonNull List<studioes.arm.six.partskit.Player> players) {
         for(int i = 0; i < players.size(); ++i) {
-            Log.i(TAG, "Setting player "+i+" : "+players.get(i).first);
-            getRose(i+1).setPlayer(players.get(i).first, players.get(i).second);
+            Log.i(TAG, "Setting player "+i+" : "+players.get(i));
+            getRose(i+1).setPlayer(players.get(i));
+//            getRose(i+1).setPlayerMetadata(players.get(i), players.get(i).isHost());
         }
         for (int i = players.size(); i < 4; ++i) {
             Log.i(TAG, "Disabling player "+i);

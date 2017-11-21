@@ -148,9 +148,12 @@ public class LobbyFragment extends Fragment implements IUserSelector {
 
         // TODO : protect against users clicking host before these game type info is set
         // TODO : protect against missing N values (or no N when we don't care)
-        int gameTypeSelected = mGameTypeSelector.getCheckedRadioButtonId();
-        Log.i(TAG, "Starting game, I see selected "+gameType+" ("+gameTypeSelected+") && "+mTargetChoice.getText());
-        mHostConnection.startGame(gameType, Integer.valueOf(mTargetChoice.getText().toString()));
+        String targetStr = mTargetChoice.getText().toString();
+        Log.i(TAG, "Starting game, I see selected "+gameType+"  && "+targetStr);
+        if (StringUtils.isEmpty(targetStr)) {
+            targetStr = "6";
+        }
+        mHostConnection.startGame(gameType, Integer.valueOf(targetStr));
     }
 
     private void handleSetUpdates(List<SetSummary> summaries) {
