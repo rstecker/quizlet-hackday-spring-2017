@@ -44,12 +44,6 @@
             android:textAlignment="center" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/or"
-            android:textAlignment="center" />
-
-        <TextView
             android:id="@+id/start_anonymous_btn"
             style="@style/LobbyButtons"
             android:layout_width="match_parent"
