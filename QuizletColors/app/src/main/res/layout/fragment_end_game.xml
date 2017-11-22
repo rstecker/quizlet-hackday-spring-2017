@@ -15,22 +15,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="The game has finished!"
-            android:textSize="22sp"
+            android:textStyle="bold"
+            android:text="Game Over"
+            android:textSize="26sp"
             android:layout_margin="16dp"/>
 
 
         <TextView
+            android:id="@+id/game_winner_announce"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="BLANK has won the game yahoo!"/>
+            android:layout_gravity="center" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/player_scores_view"
             android:layout_width="match_parent"
             android:layout_gravity="center_horizontal"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>
@@ -39,7 +40,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/white"
         android:id="@+id/score_main_menu_button"
-        android:layout_margin="16dp"
+        android:padding="@dimen/button_padding"
+        android:layout_margin="@dimen/button_margin"
         android:text="Back to Main Menu"/>
 </LinearLayout>

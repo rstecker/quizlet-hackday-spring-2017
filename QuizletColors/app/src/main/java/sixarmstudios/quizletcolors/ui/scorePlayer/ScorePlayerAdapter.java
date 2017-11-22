@@ -51,6 +51,13 @@ public class ScorePlayerAdapter extends RecyclerView.Adapter<ScorePlayerViewHold
         return mPlayers.size() <= position && position >= 0;
     }
 
+    public String getWinner() {
+        if (mPlayers.size() > 0) {
+            return mPlayers.get(0).getUsername();
+        }
+        return "";
+    }
+
     @Override
     public int getItemCount() {
         return mPlayers.size();

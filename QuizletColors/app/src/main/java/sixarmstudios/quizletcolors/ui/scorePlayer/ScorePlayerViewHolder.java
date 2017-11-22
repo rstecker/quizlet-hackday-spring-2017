@@ -28,8 +28,8 @@ public class ScorePlayerViewHolder extends RecyclerView.ViewHolder {
 
     public void setPlayerInfo(String playerName, int order, int points) {
         mPlayerName.setText(playerName);
-        mPlayerOrder.setText(Integer.toString(order));
-        mPlayerPoints.setText(Integer.toString(points));
+        mPlayerOrder.setText(Integer.toString(order) + ")");
+        mPlayerPoints.setText(Integer.toString(points)+ " points");
     }
 
 }

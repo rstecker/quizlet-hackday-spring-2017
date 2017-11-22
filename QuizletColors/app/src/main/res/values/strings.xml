@@ -58,4 +58,7 @@
     <string name="start_oath">Start OAuth</string>
     <string name="join_button_looking">…Looking…</string>
 
+    <!-- End game text -->
+    <string name="game_winner_string">%s has won the game!</string>
+
 </resources>

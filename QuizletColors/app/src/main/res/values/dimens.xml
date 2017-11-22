@@ -8,6 +8,6 @@
 
     <dimen name="button_radius">2dp</dimen>
     <dimen name="button_margin">4dp</dimen>
-    <dimen name="button_padding">16dp</dimen>
+    <dimen name="button_padding">8dp</dimen>
     <dimen name="list_item_padding">6dp</dimen>
 </resources>

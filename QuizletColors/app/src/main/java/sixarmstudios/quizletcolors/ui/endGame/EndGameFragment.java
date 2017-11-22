@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class EndGameFragment extends Fragment {
     @LayoutRes private static final int LAYOUT_RES = R.layout.fragment_end_game;
     public static final String TAG = EndGameFragment.class.getSimpleName();
 
+    @BindView(R.id.game_winner_announce) TextView mGameWinner;
     @BindView(R.id.player_scores_view) RecyclerView mScoreList;
     @BindView(R.id.score_main_menu_button) Button mMainMenuButton;
 
@@ -61,7 +63,6 @@ public class EndGameFragment extends Fragment {
     private void handlePlayers(List<Player> players) {
         List<studioes.arm.six.partskit.Player> uiPlayers = new ArrayList<>();
         for (Player p : players) {
-            // TODO : they shouldn't ALL be diamond lines... ?
             uiPlayers.add(new studioes.arm.six.partskit.Player(
                     p.username,
                     CompasRose.RoseColor.findByColorName(p.color),
@@ -72,6 +73,7 @@ public class EndGameFragment extends Fragment {
             ));
         }
         mAdapter.setPlayers(uiPlayers);
+        mGameWinner.setText(String.format(getResources().getString(R.string.game_winner_string), mAdapter.getWinner()));
     }
 
 
