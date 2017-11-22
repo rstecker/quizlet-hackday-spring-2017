@@ -1,6 +1,5 @@
 package sixarmstudios.quizletcolors.ui.player;
 
-import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
@@ -11,12 +10,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import sixarmstudios.quizletcolors.R;
-import sixarmstudios.quizletcolors.logic.player.CreatureCreation;
 import sixarmstudios.quizletcolors.ui.board.IUserSelector;
 import studioes.arm.six.partskit.CompasRose;
 import ui.Player;
 
 import static studioes.arm.six.partskit.CompasRose.PLAYER_SHAPE_DRAWABLE_RES;
+import static studioes.arm.six.partskit.CompasRose.getShapeBasedOnUsername;
 
 /**
  * Created by rebeccastecker on 6/11/17.
@@ -42,21 +41,18 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setPlayerData(Player player, boolean selected) {
-        final String username = player.username;
         mName.setText(player.username);
-        @ColorRes int color = CreatureCreation.Colors.lookUp(player.color);
         mHost.setVisibility(player.isHost() ? View.VISIBLE : View.INVISIBLE);
         mYou.setVisibility(player.isYou() ? View.VISIBLE : View.INVISIBLE);
         mName.setBackgroundResource(selected ? R.drawable.border : 0);
-//        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), color));
         itemView.setTag(player.color);
         mPlayerIcon.setPlayer(new studioes.arm.six.partskit.Player(
                 player.username,
-                randomPlayerColor(),
+                CompasRose.RoseColor.findByColorName(player.color),
                 0,
                 player.isHost(),
                 player.isYou(),
-                getRandomShape()
+                getShapeBasedOnUsername(player.username)
         ));
     }
 

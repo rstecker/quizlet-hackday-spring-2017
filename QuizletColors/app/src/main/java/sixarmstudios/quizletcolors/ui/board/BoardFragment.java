@@ -33,6 +33,8 @@ import ui.Option;
 import ui.Player;
 import viewmodel.BoardViewModel;
 
+import static studioes.arm.six.partskit.CompasRose.getShapeBasedOnUsername;
+
 /**
  * Created by rebeccastecker on 6/11/17.
  */
@@ -153,22 +155,25 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
                     p.score(),
                     p.isHost(),
                     p.isYou(),
-                    R.drawable.line_dimond
+                    getShapeBasedOnUsername(p.username)
             ));
         }
         mBoard.setPlayers(uiPlayers);
     }
 
-    private void handleOptionUpdates(List<Option> options) {
+    void handleOptionUpdates(List<Option> options) {
         if (options == null) {
             return;
         }
         List<String> strOptions = new ArrayList<>();
+        List<String> curOptions = mBoard.getCurrentOptions();
         for (Option o : options) {
-            Log.i(TAG, "I see options : " + o.index + " :: " + o.option);
+            Log.i(TAG, "I see incoming options : " + o.index + " :: " + o.option);
             strOptions.add(o.option);
         }
-        List<String> curOptions = mBoard.getCurrentOptions();
+        for (String o : curOptions) {
+            Log.i(TAG, "I see existing options : " + o);
+        }
         for (int i = 0; i < strOptions.size(); ++i) {
             String s = strOptions.get(i);
             int preExistingIndex = curOptions.indexOf(s);
@@ -177,9 +182,14 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
                 Log.i(TAG, "Swaping option positions: " + s + " [" + i + "] <->" + temp + " [" + preExistingIndex + "]");
                 strOptions.set(preExistingIndex, s);
                 strOptions.set(i, temp);
+                --i;    // DO IT AGAIN!!!
             } else {
-                Log.i(TAG, "Removed option : " + s);
+                Log.i(TAG, "New value : " + s + " replaces " + curOptions.get(i));
             }
+        }
+
+        for (String o : strOptions) {
+            Log.i(TAG, "I'm ending with options : " + o);
         }
         mBoard.setOptions(strOptions);
     }
@@ -190,6 +200,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
         }
         Game game = games.get(0);
         Log.i(TAG, "I see game update " + game.selected_option + " / " + game.selected_color);
+        // TODO : keep an eye on when one of those is null and the other is non null. That's a wonky state.
         mBoard.setQuestion(game.question);
     }
 

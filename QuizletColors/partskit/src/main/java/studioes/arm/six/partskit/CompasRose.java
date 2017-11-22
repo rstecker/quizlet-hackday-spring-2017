@@ -17,6 +17,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
@@ -67,6 +68,10 @@ public class CompasRose extends FrameLayout {
             Log.e(TAG, "Failed to find a matching rose color to '" + color + "' - going with RED for now");
             return RED;
         }
+    }
+
+    public static @DrawableRes int getShapeBasedOnUsername(@NonNull String username) {
+        return PLAYER_SHAPE_DRAWABLE_RES[username.hashCode() % PLAYER_SHAPE_DRAWABLE_RES.length];
     }
 
     public static final int[] PLAYER_SHAPE_DRAWABLE_RES = {
