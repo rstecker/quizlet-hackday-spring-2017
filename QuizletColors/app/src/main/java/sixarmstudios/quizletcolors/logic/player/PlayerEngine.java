@@ -40,9 +40,9 @@ public class PlayerEngine implements IPlayerEngine {
     }
 
     @Override
-    public void processMessage(@NonNull QCGameMessage message) {
+    public synchronized void processMessage(@NonNull QCGameMessage message) {
         if ((mMessageCount + 1) != message.msgCount()) {
-            Log.w(TAG, "There appears to be skew in our msg handling. Warning. Current count "+mMessageCount+" vs game update "+message.msgCount());
+            Log.w(TAG, "There appears to be skew in our msg handling. Warning. Current count "+mMessageCount+" vs game update "+message.msgCount()+" :: "+message.state());
         }
         mMessageCount = message.msgCount();
         synchronized (TAG) {
