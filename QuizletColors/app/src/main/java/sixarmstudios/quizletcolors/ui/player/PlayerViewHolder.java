@@ -11,11 +11,11 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.ui.board.IUserSelector;
-import studioes.arm.six.partskit.CompasRose;
+import studioes.arm.six.partskit.CompassRose;
 import ui.Player;
 
-import static studioes.arm.six.partskit.CompasRose.PLAYER_SHAPE_DRAWABLE_RES;
-import static studioes.arm.six.partskit.CompasRose.getShapeBasedOnUsername;
+import static studioes.arm.six.partskit.CompassRose.PLAYER_SHAPE_DRAWABLE_RES;
+import static studioes.arm.six.partskit.CompassRose.getShapeBasedOnUsername;
 
 /**
  * Created by rebeccastecker on 6/11/17.
@@ -29,7 +29,8 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.player_name) TextView mName;
     @BindView(R.id.player_is_host) TextView mHost;
     @BindView(R.id.player_is_you) TextView mYou;
-    @BindView(R.id.player_icon) CompasRose mPlayerIcon;
+    @BindView(R.id.player_icon)
+    CompassRose mPlayerIcon;
 
 
     public PlayerViewHolder(View view, IUserSelector selector) {
@@ -48,7 +49,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
         itemView.setTag(player.color);
         mPlayerIcon.setPlayer(new studioes.arm.six.partskit.Player(
                 player.username,
-                CompasRose.RoseColor.findByColorName(player.color),
+                CompassRose.RoseColor.findByColorName(player.color),
                 0,
                 player.isHost(),
                 player.isYou(),
@@ -57,9 +58,9 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    private CompasRose.RoseColor randomPlayerColor() {
-        int i = (int) Math.max(0, Math.min(CompasRose.RoseColor.values().length, Math.random() * CompasRose.RoseColor.values().length));
-        return CompasRose.RoseColor.values()[i];
+    private CompassRose.RoseColor randomPlayerColor() {
+        int i = (int) Math.max(0, Math.min(CompassRose.RoseColor.values().length, Math.random() * CompassRose.RoseColor.values().length));
+        return CompassRose.RoseColor.values()[i];
     }
 
     private @DrawableRes

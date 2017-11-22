@@ -122,7 +122,7 @@
             android:text="Dover" />
     </LinearLayout>
 
-    <studioes.arm.six.partskit.CompasRose
+    <studioes.arm.six.partskit.CompassRose
         android:id="@+id/rose_1"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -135,7 +135,7 @@
         app:lineColor="?playerBlue"
         app:lineType="@drawable/line_dimond" />
 
-    <studioes.arm.six.partskit.CompasRose
+    <studioes.arm.six.partskit.CompassRose
         android:id="@+id/rose_2"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -148,7 +148,7 @@
         app:lineColor="?playerBlue"
         app:lineType="@drawable/line_dimond" />
 
-    <studioes.arm.six.partskit.CompasRose
+    <studioes.arm.six.partskit.CompassRose
         android:id="@+id/rose_3"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -161,7 +161,7 @@
         app:lineColor="?playerBlue"
         app:lineType="@drawable/line_dimond" />
 
-    <studioes.arm.six.partskit.CompasRose
+    <studioes.arm.six.partskit.CompassRose
         android:id="@+id/rose_4"
         android:layout_width="200dp"
         android:layout_height="200dp"

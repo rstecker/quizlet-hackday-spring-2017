@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import studioes.arm.six.partskit.CompasRose;
+import studioes.arm.six.partskit.CompassRose;
 
 /**
  * Created by rebeccastecker on 6/8/17.
@@ -60,8 +60,8 @@ public class LobbyLogic implements ILobbyLogic {
     }
 
     private QCMember generateNewMember(String username, boolean isHost) {
-        List<CompasRose.RoseColor> colors = new ArrayList<>();
-        colors.addAll(Arrays.asList(CompasRose.RoseColor.values()));
+        List<CompassRose.RoseColor> colors = new ArrayList<>();
+        colors.addAll(Arrays.asList(CompassRose.RoseColor.values()));
         Collections.shuffle(colors);
         String color = colors.remove(0).colorName();
         while(mEngine.findMemberByColor(color) != null) {

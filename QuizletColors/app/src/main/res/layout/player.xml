@@ -19,7 +19,7 @@
         tools:text="is host" />
 
 
-    <studioes.arm.six.partskit.CompasRose
+    <studioes.arm.six.partskit.CompassRose
         android:id="@+id/player_icon"
         android:layout_width="75dp"
         android:layout_height="75dp"

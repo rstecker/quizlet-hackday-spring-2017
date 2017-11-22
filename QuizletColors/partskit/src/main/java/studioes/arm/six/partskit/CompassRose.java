@@ -33,8 +33,8 @@ import android.widget.FrameLayout;
  * Created by sithel on 10/22/17.
  */
 
-public class CompasRose extends FrameLayout {
-    public static final String TAG = CompasRose.class.getSimpleName();
+public class CompassRose extends FrameLayout {
+    public static final String TAG = CompassRose.class.getSimpleName();
     @LayoutRes
     private static final int LAYOUT_ID = R.layout.compas_rose;
 
@@ -90,21 +90,21 @@ public class CompasRose extends FrameLayout {
      */
     private float mCurrentEnergy = 0;
 
-    public CompasRose(Context context) {
+    public CompassRose(Context context) {
         super(context);
     }
 
-    public CompasRose(Context context, @Nullable AttributeSet attrs) {
+    public CompassRose(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public CompasRose(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public CompassRose(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
 
-    public CompasRose(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public CompassRose(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
     }
@@ -149,13 +149,13 @@ public class CompasRose extends FrameLayout {
         mPath = new Path();
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.CompasRose,
+                R.styleable.CompassRose,
                 0, 0);
 
         try {
-            mBaseLineColor = a.getResourceId(R.styleable.CompasRose_lineColor, R.color.blue_neon);
-            if (a.hasValue(R.styleable.CompasRose_lineType)) {
-                mBaseDrawable = a.getDrawable(R.styleable.CompasRose_lineType);
+            mBaseLineColor = a.getResourceId(R.styleable.CompassRose_lineColor, R.color.blue_neon);
+            if (a.hasValue(R.styleable.CompassRose_lineType)) {
+                mBaseDrawable = a.getDrawable(R.styleable.CompassRose_lineType);
             }
         } finally {
             a.recycle();

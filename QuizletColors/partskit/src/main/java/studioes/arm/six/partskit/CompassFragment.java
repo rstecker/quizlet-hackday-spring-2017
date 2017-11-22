@@ -34,11 +34,11 @@ public class CompassFragment extends Fragment {
     }
 
     public void onClickShape(View v) {
-        ((CompasRose)getView().findViewById(R.id.rose_1)).setLine(v.getBackground());
+        ((CompassRose)getView().findViewById(R.id.rose_1)).setLine(v.getBackground());
     }
     public void onClick(View v) {
-       if (v instanceof CompasRose) {
-           ((CompasRose)v).boop();
+       if (v instanceof CompassRose) {
+           ((CompassRose)v).boop();
        }
     }
 }

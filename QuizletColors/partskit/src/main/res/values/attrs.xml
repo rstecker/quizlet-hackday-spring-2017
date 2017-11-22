@@ -21,7 +21,7 @@
 
     <attr name="playerText" format="reference" />
 
-    <declare-styleable name="CompasRose">
+    <declare-styleable name="CompassRose">
         <attr name="lineColor" format="reference" />
         <attr name="lineType" format="reference"/>
     </declare-styleable>
