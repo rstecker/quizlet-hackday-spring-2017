@@ -74,8 +74,11 @@ public class GameEngine implements IGameEngine {
             case INFINITE:
                 return false;
             case TIMED_GAME:
-                Log.i(TAG, " >> " + (mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget)) + " vs " + new Date().getTime());
-                return (mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget)) < new Date().getTime();
+                long gameOver = (mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget));
+                long now = new Date().getTime();
+                boolean gameIsOver = gameOver < now;
+                Log.i(TAG, " >> " + gameOver + " < " + now +" = "+gameIsOver);
+                return gameIsOver;
             case ALL_PLAYERS_TO_POINTS:
                 for (QCMember member : mMembers) {
                     Log.i(TAG, " >> " + member.getIntScore() + " vs " + mGameTarget);
@@ -171,7 +174,7 @@ public class GameEngine implements IGameEngine {
     @Override
     public synchronized QCGameMessage processMessage(@NonNull QCPlayerMessage message) {
         if (message.msgCount() != mMessageCount) {
-            Log.w(TAG, "Current game engine message count is " + mMessageCount + ", received " + message.msgCount() + " from " + message.username());
+            Log.w(TAG, "Current game engine message count is " + mMessageCount + ", received " + message.msgCount() + " from " + message.username()+" : "+message.state());
             switch (message.state()) {
                 case LOBBY:
                     return mLobbyLogic.processMessage(message);
@@ -180,7 +183,7 @@ public class GameEngine implements IGameEngine {
                     if (isGameHasEnded()) {
                         return mEndLogic.processMessage(message);
                     }
-                    return generateBaseEndGameMessage(QCGameMessage.Action.OUT_OF_SYNC);
+                    return generateBasePlayMessage(QCGameMessage.Action.OUT_OF_SYNC);
                 default:
                     throw new UnsupportedOperationException("Out of sync msg: I don't know how to handle : " + message.state());
             }

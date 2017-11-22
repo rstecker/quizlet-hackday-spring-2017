@@ -143,7 +143,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
     }
 
     private void handlePlayerUpdates(List<Player> players) {
-        Log.w(TAG, "I see players " + players);
+        Log.i(TAG, "I see players " + players);
         List<studioes.arm.six.partskit.Player> uiPlayers = new ArrayList<>();
         for (Player p : players) {
             // TODO : they shouldn't ALL be diamond lines... ?
@@ -160,7 +160,6 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
     }
 
     private void handleOptionUpdates(List<Option> options) {
-        Log.w(TAG, "I see options " + options);
         if (options == null) {
             return;
         }
@@ -190,7 +189,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             return;
         }
         Game game = games.get(0);
-        Log.w(TAG, "I see game update " + game.selected_option + " / " + game.selected_color);
+        Log.i(TAG, "I see game update " + game.selected_option + " / " + game.selected_color);
         mBoard.setQuestion(game.question);
     }
 
