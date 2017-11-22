@@ -136,6 +136,16 @@ public class BoardView extends RelativeLayout {
                 .start();
     }
 
+
+    public void reward(String color) {
+        CompasRose rose = findViewWithTag(color);
+        if (rose == null) {
+            return;
+        }
+        rose.setEnergy(2);
+
+    }
+
     /**
      * @param players a list of pairs.  Max 4. First value is the color of the rose, the second is the
      *                Drawable resource int for the line
@@ -144,6 +154,7 @@ public class BoardView extends RelativeLayout {
         for(int i = 0; i < players.size(); ++i) {
             Log.i(TAG, "Setting player "+i+" : "+players.get(i));
             getRose(i+1).setPlayer(players.get(i));
+            getRose(i+1).setTag(players.get(i).getColor());
 //            getRose(i+1).setPlayerMetadata(players.get(i), players.get(i).isHost());
         }
         for (int i = players.size(); i < 4; ++i) {
@@ -163,13 +174,6 @@ public class BoardView extends RelativeLayout {
 //        new SpringAnimation(answerView, DynamicAnimation.TRANSLATION_X, getRootView().getWidth())
 //                .setStartVelocity(0)
 //                .start();
-    }
-
-    public void setAnswers(String option1, String option2, String option3, String option4) {
-        prepAnswer(R.id.board_a_1, getRootView().findViewById(R.id.board_a_1));
-        prepAnswer(R.id.board_a_2, getRootView().findViewById(R.id.board_a_2));
-        prepAnswer(R.id.board_a_3, getRootView().findViewById(R.id.board_a_3));
-        prepAnswer(R.id.board_a_4, getRootView().findViewById(R.id.board_a_4));
     }
 
     @SuppressLint("ClickableViewAccessibility")

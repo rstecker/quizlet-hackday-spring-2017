@@ -75,7 +75,9 @@ public class HostServiceConnection implements ServiceConnection {
                             sendOutResponse(mGameEngine.processMessage(msg));
                         },
                         (e) -> {
+                            e.printStackTrace(System.out);
                             Log.e(TAG, "Incoming msg : " + e);
+                            throw new IllegalStateException("Remote Player engine died: "+e);
                         })
 
         ;
@@ -88,6 +90,7 @@ public class HostServiceConnection implements ServiceConnection {
                 (e) -> {
                     e.printStackTrace(System.out);
                     Log.e(TAG, "Error handling outgoing Player msg : " + e);
+                    throw new IllegalStateException("Local Player engine died: "+e);
                 }
         );
         mServerBound = true;

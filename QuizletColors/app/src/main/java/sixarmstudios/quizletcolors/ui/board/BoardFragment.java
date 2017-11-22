@@ -77,7 +77,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
         viewModel.getGame().observe(this, this::handleGameUpdates);
         viewModel.getOptions().observe(this, this::handleOptionUpdates);
         viewModel.getMyBadMoves().observe(this, this::handleBadMoves);
-//        viewModel.getMyGoodMoves().observe(this, this::handleGoodMoves);
+        viewModel.getMyGoodMoves().observe(this, this::handleGoodMoves);
 
 //        mBadMoveView = new BadMoveViewHolder(mWrongQuestionPopup);
         return view;
@@ -139,6 +139,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
         } else if (move.youAnswered) {
             Toast.makeText(this.getContext(), "You answered correctly!", Toast.LENGTH_SHORT).show();
         }
+        mBoard.reward(move.answererColor);
     }
 
     private void handlePlayerUpdates(List<Player> players) {

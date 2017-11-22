@@ -93,7 +93,7 @@ public class GradeBox extends LinearLayout {
     }
 
     private void setBoxDetails(@IdRes int id, @NonNull String text, @Nullable String color) {
-        TextView view = findViewById(R.id.boxCenter);
+        TextView view = findViewById(id);
         view.setText(text);
         int colorAttr = R.attr.gradeNoPlayerBg;
         if (color != null) {

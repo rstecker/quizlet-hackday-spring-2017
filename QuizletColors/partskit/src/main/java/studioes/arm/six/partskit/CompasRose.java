@@ -34,7 +34,8 @@ import android.widget.FrameLayout;
 
 public class CompasRose extends FrameLayout {
     public static final String TAG = CompasRose.class.getSimpleName();
-    @LayoutRes private static final int LAYOUT_ID = R.layout.compas_rose;
+    @LayoutRes
+    private static final int LAYOUT_ID = R.layout.compas_rose;
 
 
     public enum RoseColor {
@@ -43,26 +44,27 @@ public class CompasRose extends FrameLayout {
         BLUE(R.attr.playerBlue, "blue"),
         YELLOW(R.attr.playerYellow, "yellow"),
         ORANGE(R.attr.playerOrange, "orange"),
-        VIOLET(R.attr.playerViolet, "violet"),
-        ;
-        @AttrRes int colorAttr;
+        VIOLET(R.attr.playerViolet, "violet"),;
+        @AttrRes
+        int colorAttr;
         String colorName;
 
         RoseColor(@AttrRes int colorAttr, String colorName) {
             this.colorAttr = colorAttr;
             this.colorName = colorName;
         }
+
         public String colorName() {
             return colorName;
         }
 
         public static RoseColor findByColorName(String color) {
-            for(RoseColor rc : values()) {
+            for (RoseColor rc : values()) {
                 if (rc.colorName.equals(color)) {
                     return rc;
                 }
             }
-            Log.e(TAG, "Failed to find a matching rose color to '"+color+"' - going with RED for now");
+            Log.e(TAG, "Failed to find a matching rose color to '" + color + "' - going with RED for now");
             return RED;
         }
     }
@@ -73,7 +75,8 @@ public class CompasRose extends FrameLayout {
             R.drawable.line_triangle_down, R.drawable.line_triangle_up, R.drawable.line_zig_zag
     };
 
-    private @ColorRes int mBaseLineColor;
+    private @ColorRes
+    int mBaseLineColor;
     private Drawable mBaseDrawable;
     private Paint mPaint;
     private Path mPath;
@@ -105,11 +108,11 @@ public class CompasRose extends FrameLayout {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         mPath.reset();
-        mPath.moveTo((top-bottom)/2f, (right-left)/2f);
+        mPath.moveTo((top - bottom) / 2f, (right - left) / 2f);
         float w = right - left;
         float h = bottom - top;
-        Log.i(TAG, "We see "+w+" , "+h);
-        mPath.addCircle(w/2f, h/2f, Math.min(w/3f, h/3f), Path.Direction.CW );
+        Log.i(TAG, "We see " + w + " , " + h);
+        mPath.addCircle(w / 2f, h / 2f, Math.min(w / 3f, h / 3f), Path.Direction.CW);
     }
 
     @Override
@@ -121,10 +124,10 @@ public class CompasRose extends FrameLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.i(TAG, "REALLY trying to paint! "+mPath);
+        Log.i(TAG, "REALLY trying to paint! " + mPath);
         super.onDraw(canvas);
 
-        Log.i(TAG, "Trying to paint! "+mPath);
+        Log.i(TAG, "Trying to paint! " + mPath);
         canvas.drawPath(mPath, mPaint);
 
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -215,10 +218,14 @@ public class CompasRose extends FrameLayout {
         Resources.Theme theme = getContext().getTheme();
         theme.resolveAttribute(R.attr.gradeNoPlayerBg, typedValue, true);
         @ColorRes int color = typedValue.resourceId;
-        ((TextRing)findViewById(R.id.compass_rose_you_text_ring)).setRing("you", getContext().getColor(mBaseLineColor));
-        findViewById(R.id.compass_rose_you_text_ring).setVisibility(player.isPlayer() ? VISIBLE : GONE);
-        ((TextRing)findViewById(R.id.compass_rose_host_text_ring)).setRing("host", typedValue.data);
-        findViewById(R.id.compass_rose_host_text_ring).setVisibility(player.isHost() ? VISIBLE : GONE);
+        String innerText = player.isPlayer() ? "you" : player.getUsername();
+        ((TextRing) findViewById(R.id.compass_rose_you_text_ring)).setRing(innerText, getContext().getColor(mBaseLineColor));
+        findViewById(R.id.compass_rose_you_text_ring).setVisibility(VISIBLE);
+//        findViewById(R.id.compass_rose_you_text_ring).setVisibility(player.isPlayer() ? VISIBLE : GONE);
+        String outerText = (player.isHost() ? "host " : "") + "[" + player.getScore() + "]";
+        ((TextRing) findViewById(R.id.compass_rose_host_text_ring)).setRing(outerText, typedValue.data);
+        findViewById(R.id.compass_rose_host_text_ring).setVisibility(VISIBLE);
+//        findViewById(R.id.compass_rose_host_text_ring).setVisibility(player.isHost() ? VISIBLE : GONE);
     }
 
     public void setLine(Drawable drawable) {
@@ -250,7 +257,8 @@ public class CompasRose extends FrameLayout {
         shuffleStars(findViewById(R.id.compass_rose_lvl_3), 0, mAni3);
     }
 
-    private @ColorInt int getColorVariant(int lvl) {
+    private @ColorInt
+    int getColorVariant(int lvl) {
         @ColorInt int colorInt = ContextCompat.getColor(getContext(), mBaseLineColor);
         float[] hsl = new float[3];
         ColorUtils.colorToHSL(colorInt, hsl);
@@ -364,7 +372,8 @@ public class CompasRose extends FrameLayout {
         return mBaseDrawable;
     }
 
-    public @ColorRes int getColorRes() {
+    public @ColorRes
+    int getColorRes() {
         return mBaseLineColor;
     }
 
