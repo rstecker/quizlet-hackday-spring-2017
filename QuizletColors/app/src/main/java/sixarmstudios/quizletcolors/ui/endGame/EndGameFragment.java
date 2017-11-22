@@ -1,5 +1,6 @@
 package sixarmstudios.quizletcolors.ui.endGame;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -20,7 +21,9 @@ import butterknife.OnClick;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.ui.scorePlayer.ScorePlayerAdapter;
 import sixarmstudios.quizletcolors.ui.setup.StartFragment;
+import studioes.arm.six.partskit.CompasRose;
 import ui.Player;
+import viewmodel.BoardViewModel;
 
 /**
  * Created by austinrobarts on 11/21/17.
@@ -45,16 +48,30 @@ public class EndGameFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(LAYOUT_RES, container, false);
         ButterKnife.bind(this, view);
-        List<Player> players = new ArrayList<>();
-        players.add(new Player("Aust", null, true, true, 10));
-        players.add(new Player("Bost", null, false, false, 6));
-        players.add(new Player("Faust", null, false, false, 8));
-        players.add(new Player("Joust", null, false, false, 9));
-        mAdapter = new ScorePlayerAdapter(players);
+
+        BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
+        viewModel.getPlayers().observe(this, this::handlePlayers);
+        mAdapter = new ScorePlayerAdapter();
         mScoreList.setAdapter(mAdapter);
         mScoreList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         return view;
+    }
+
+    private void handlePlayers(List<Player> players) {
+        List<studioes.arm.six.partskit.Player> uiPlayers = new ArrayList<>();
+        for (Player p : players) {
+            // TODO : they shouldn't ALL be diamond lines... ?
+            uiPlayers.add(new studioes.arm.six.partskit.Player(
+                    p.username,
+                    CompasRose.RoseColor.findByColorName(p.color),
+                    p.score(),
+                    p.isHost(),
+                    p.isYou(),
+                    R.drawable.line_dimond
+            ));
+        }
+        mAdapter.setPlayers(uiPlayers);
     }
 
 

@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import ui.Player;
+
+import studioes.arm.six.partskit.Player;
 
 /**
  * Created by austinrobarts on 11/21/17.
@@ -18,16 +19,17 @@ import ui.Player;
 
 public class ScorePlayerAdapter extends RecyclerView.Adapter<ScorePlayerViewHolder> {
 
-    private List<Player> mPlayers;
+    private List<Player> mPlayers = new ArrayList<>();
 
-    public ScorePlayerAdapter(@NonNull List<Player> players) {
+    public void setPlayers(@NonNull List<Player> players) {
         Collections.sort(players, new Comparator<Player>() {
             @Override
             public int compare(Player player, Player t1) {
-                return t1.score - player.score;
+                return t1.getScore() - player.getScore();
             }
         });
         this.mPlayers = players;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -42,7 +44,7 @@ public class ScorePlayerAdapter extends RecyclerView.Adapter<ScorePlayerViewHold
             return;
         }
         Player player = mPlayers.get(position);
-        holder.setPlayerInfo(player.username, position + 1, player.score);
+        holder.setPlayerInfo(player.getUsername(), position + 1, player.getScore());
     }
 
     private boolean isValidIdx(int position) {
