@@ -7,6 +7,7 @@
 
 
     <style name="LobbyButtons">
+        <item name="android:textAlignment">center</item>
         <item name="android:textSize">@dimen/button_text_size</item>
         <item name="android:padding">@dimen/button_padding</item>
         <item name="android:textColor">@color/text_color_inverted</item>

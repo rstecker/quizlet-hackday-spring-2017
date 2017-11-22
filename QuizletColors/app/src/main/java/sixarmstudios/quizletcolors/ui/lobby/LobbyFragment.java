@@ -95,7 +95,7 @@ public class LobbyFragment extends Fragment implements IUserSelector {
                 case R.id.infinity_button:
                     //infinity game
                     gameType = QCGameMessage.GameType.INFINITE;
-                    mTargetElements.setVisibility(View.GONE);
+                    mTargetElements.setVisibility(View.INVISIBLE);
                     break;
                 case R.id.to_player_points_button:
                     //first player to target points
