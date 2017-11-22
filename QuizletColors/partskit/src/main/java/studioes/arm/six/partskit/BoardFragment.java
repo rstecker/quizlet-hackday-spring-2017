@@ -26,7 +26,7 @@ import static android.view.DragEvent.ACTION_DRAG_EXITED;
 import static android.view.DragEvent.ACTION_DRAG_LOCATION;
 import static android.view.DragEvent.ACTION_DRAG_STARTED;
 import static android.view.DragEvent.ACTION_DROP;
-import static studioes.arm.six.partskit.CompasRose.PLAYER_SHAPE_DRAWABLE_RES;
+import static studioes.arm.six.partskit.CompassRose.PLAYER_SHAPE_DRAWABLE_RES;
 
 /**
  * Created by sithel on 10/29/17.
@@ -61,7 +61,7 @@ public class BoardFragment extends Fragment {
     private void prepQuad(int quadNum, View view) {
         view.setOnDragListener((v, event) -> {
             Log.d(TAG, "Backing quad " + quadNum + " just received " + event.getAction());
-            CompasRose rose = getRose(quadNum);
+            CompassRose rose = getRose(quadNum);
             int action = event.getAction();
             float elevation;
             switch (action) {
@@ -128,7 +128,7 @@ public class BoardFragment extends Fragment {
         });
     }
 
-    private void prepRose(CompasRose rose) {
+    private void prepRose(CompassRose rose) {
         rose.setEnergy(0.1f);
     }
 
@@ -156,7 +156,7 @@ public class BoardFragment extends Fragment {
         });
     }
 
-    private CompasRose getRose(int i) {
+    private CompassRose getRose(int i) {
         @IdRes int id = R.id.rose_1;
         if (i == 2) {
             id = R.id.rose_2;
@@ -168,9 +168,9 @@ public class BoardFragment extends Fragment {
         return getView().findViewById(id);
     }
 
-    private CompasRose.RoseColor randomPlayerColor() {
-        int i = (int) Math.max(0, Math.min(CompasRose.RoseColor.values().length, Math.random() * CompasRose.RoseColor.values().length));
-        return CompasRose.RoseColor.values()[i];
+    private CompassRose.RoseColor randomPlayerColor() {
+        int i = (int) Math.max(0, Math.min(CompassRose.RoseColor.values().length, Math.random() * CompassRose.RoseColor.values().length));
+        return CompassRose.RoseColor.values()[i];
     }
 
     private @DrawableRes int getRandomShape() {
@@ -179,7 +179,7 @@ public class BoardFragment extends Fragment {
     }
 
 
-    private void handleOptionFocus(View answerView, int quadNum, CompasRose rose, DragEvent event) {
+    private void handleOptionFocus(View answerView, int quadNum, CompassRose rose, DragEvent event) {
         rose.setEnergy(0.75f);
         int bgColor = ContextCompat.getColor(getContext(), rose.getColorRes());
         getView().findViewById(R.id.board_back_board).setBackgroundColor(bgColor);
@@ -188,7 +188,7 @@ public class BoardFragment extends Fragment {
 
     }
 
-    private void handleOptionBlur(View answerView, int quadNum, CompasRose rose, DragEvent event) {
+    private void handleOptionBlur(View answerView, int quadNum, CompassRose rose, DragEvent event) {
         getView().findViewById(R.id.board_back_board).animate().setDuration(100).alpha(0).start();
     }
 

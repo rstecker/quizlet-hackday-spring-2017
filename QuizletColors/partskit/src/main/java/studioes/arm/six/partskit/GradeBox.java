@@ -47,7 +47,7 @@ public class GradeBox extends LinearLayout {
     private void init(Context context, @Nullable AttributeSet attrs) {
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.CompasRose,
+                R.styleable.CompassRose,
                 0, 0);
 
         try {
@@ -97,7 +97,7 @@ public class GradeBox extends LinearLayout {
         view.setText(text);
         int colorAttr = R.attr.gradeNoPlayerBg;
         if (color != null) {
-            colorAttr = CompasRose.RoseColor.findByColorName(color).colorAttr;
+            colorAttr = CompassRose.RoseColor.findByColorName(color).colorAttr;
         }
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = getContext().getTheme();

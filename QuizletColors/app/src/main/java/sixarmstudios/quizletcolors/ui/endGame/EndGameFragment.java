@@ -21,7 +21,7 @@ import butterknife.OnClick;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.ui.scorePlayer.ScorePlayerAdapter;
 import sixarmstudios.quizletcolors.ui.setup.StartFragment;
-import studioes.arm.six.partskit.CompasRose;
+import studioes.arm.six.partskit.CompassRose;
 import ui.Player;
 import viewmodel.BoardViewModel;
 
@@ -64,7 +64,7 @@ public class EndGameFragment extends Fragment {
             // TODO : they shouldn't ALL be diamond lines... ?
             uiPlayers.add(new studioes.arm.six.partskit.Player(
                     p.username,
-                    CompasRose.RoseColor.findByColorName(p.color),
+                    CompassRose.RoseColor.findByColorName(p.color),
                     p.score(),
                     p.isHost(),
                     p.isYou(),

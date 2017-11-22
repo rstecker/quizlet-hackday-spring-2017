@@ -24,7 +24,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import sixarmstudios.quizletcolors.R;
 import studioes.arm.six.partskit.BoardView;
-import studioes.arm.six.partskit.CompasRose;
+import studioes.arm.six.partskit.CompassRose;
 import studioes.arm.six.partskit.GradeBox;
 import ui.BadMove;
 import ui.Game;
@@ -33,7 +33,7 @@ import ui.Option;
 import ui.Player;
 import viewmodel.BoardViewModel;
 
-import static studioes.arm.six.partskit.CompasRose.getShapeBasedOnUsername;
+import static studioes.arm.six.partskit.CompassRose.getShapeBasedOnUsername;
 
 /**
  * Created by rebeccastecker on 6/11/17.
@@ -151,7 +151,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             // TODO : they shouldn't ALL be diamond lines... ?
             uiPlayers.add(new studioes.arm.six.partskit.Player(
                     p.username,
-                    CompasRose.RoseColor.findByColorName(p.color),
+                    CompassRose.RoseColor.findByColorName(p.color),
                     p.score(),
                     p.isHost(),
                     p.isYou(),

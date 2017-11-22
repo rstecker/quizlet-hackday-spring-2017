@@ -138,7 +138,7 @@ public class BoardView extends RelativeLayout {
 
 
     public void reward(String color) {
-        CompasRose rose = findViewWithTag(color);
+        CompassRose rose = findViewWithTag(color);
         if (rose == null) {
             return;
         }
@@ -193,7 +193,7 @@ public class BoardView extends RelativeLayout {
     private void prepQuad(int quadNum, View view) {
         view.setOnDragListener((v, event) -> {
             Log.d(TAG, "Backing quad " + quadNum + " just received " + event.getAction());
-            CompasRose rose = getRose(quadNum);
+            CompassRose rose = getRose(quadNum);
             int action = event.getAction();
             float elevation;
             switch (action) {
@@ -239,7 +239,7 @@ public class BoardView extends RelativeLayout {
         });
     }
 
-    private CompasRose getRose(int i) {
+    private CompassRose getRose(int i) {
         @IdRes int id = R.id.rose_1;
         if (i == 2) {
             id = R.id.rose_2;
@@ -251,18 +251,18 @@ public class BoardView extends RelativeLayout {
         return getRootView().findViewById(id);
     }
 
-    private void prepRose(CompasRose rose) {
+    private void prepRose(CompassRose rose) {
         rose.setEnergy(0.1f);
     }
 
-    private void handleOptionFocus(View answerView, int quadNum, CompasRose rose, DragEvent event) {
+    private void handleOptionFocus(View answerView, int quadNum, CompassRose rose, DragEvent event) {
         rose.setEnergy(0.75f);
         int bgColor = ContextCompat.getColor(getContext(), rose.getColorRes());
         getRootView().findViewById(R.id.board_back_board).setBackgroundColor(bgColor);
         getRootView().findViewById(R.id.board_back_board).animate().setDuration(100).alpha(0.5f).start();
     }
 
-    private void handleOptionBlur(View answerView, int quadNum, CompasRose rose, DragEvent event) {
+    private void handleOptionBlur(View answerView, int quadNum, CompassRose rose, DragEvent event) {
         getRootView().findViewById(R.id.board_back_board).animate().setDuration(100).alpha(0).start();
     }
 }
