@@ -15,7 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +54,7 @@ public class LookingForSetFragment extends LifecycleFragment implements SetSumma
     @BindView(R.id.username_text_field) EditText mUsernameField;
     @BindView(R.id.welcome_host_view) TextView mWelcomeTxtView;
     @BindView(R.id.set_list) RecyclerView mSetList;
-    @BindView(R.id.refresh_overview) View mRefreshList;
+    @BindView(R.id.refresh_overview) ImageView mRefreshList;
     SetSummaryAdapter mAdapter;
     HostServiceConnection mHostConnection;
     IModelRetrievalService mModelService;
@@ -85,6 +88,12 @@ public class LookingForSetFragment extends LifecycleFragment implements SetSumma
 
     @OnClick(R.id.refresh_overview)
     public void handleRefreshList() {
+        //have refresh rotate on click
+        Animation anim = new RotateAnimation(0.0f, 360.0f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setDuration(1000);
+        mRefreshList.startAnimation(anim);
+
         mModelService.refreshSummary();
     }
 
