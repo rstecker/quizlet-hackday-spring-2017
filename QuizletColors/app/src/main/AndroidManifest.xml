@@ -14,7 +14,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".StartActivity"
-            android:theme="@style/Theme.QC.Light.Neon">
+            android:theme="@style/Theme.QC.Light.Neon"
+            android:screenOrientation="portrait">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,8 +25,7 @@
         <activity
             android:name="studioes.arm.six.partskit.PartsActivity"
             android:theme="@style/Theme.QC.Light.Neon"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait">
             <!--<intent-filter>-->
             <!--<action android:name="android.intent.action.MAIN" />-->
             <!--<category android:name="android.intent.category.LAUNCHER" />-->
