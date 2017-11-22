@@ -104,9 +104,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
+    <Button
         android:id="@+id/start_game_button"
-        style="@style/LobbyButtons"
+        style="@style/AustinButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
