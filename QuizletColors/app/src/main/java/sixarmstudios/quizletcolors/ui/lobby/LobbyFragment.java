@@ -89,28 +89,27 @@ public class LobbyFragment extends Fragment implements IUserSelector {
         ButterKnife.bind(this, view);
 
         mStartGameButton.setVisibility(View.INVISIBLE);
-        mGameTypeSelector.check(0);
         mGameTypeSelector.setOnCheckedChangeListener((radioGroup, checkedId) -> {
 
             switch (checkedId) {
-                case 1:
+                case R.id.infinity_button:
                     //infinity game
                     gameType = QCGameMessage.GameType.INFINITE;
                     mTargetElements.setVisibility(View.GONE);
                     break;
-                case 2:
+                case R.id.to_player_points_button:
                     //first player to target points
                     gameType = QCGameMessage.GameType.FIRST_PLAYER_TO_POINTS;
                     mTargetDescription.setText("Player needs to score this many points to win");
                     mTargetElements.setVisibility(View.VISIBLE);
                     break;
-                case 3:
+                case R.id.to_all_points_button:
                     //all players to target points
                     gameType = QCGameMessage.GameType.ALL_PLAYERS_TO_POINTS;
                     mTargetDescription.setText("All players need to score this many points to win");
                     mTargetElements.setVisibility(View.VISIBLE);
                     break;
-                case 4:
+                case R.id.to_minutes_button:
                     //certain number of minutes
                     gameType = QCGameMessage.GameType.TIMED_GAME;
                     mTargetDescription.setText("Game will continue for this many minutes");
@@ -119,6 +118,7 @@ public class LobbyFragment extends Fragment implements IUserSelector {
             }
 
         });
+        mGameTypeSelector.check(R.id.to_player_points_button);
         LobbyViewModel lobbyViewModel = ViewModelProviders.of(this).get(LobbyViewModel.class);
         lobbyViewModel.getPlayers().observe(this, this::handlePlayerUpdates);
         lobbyViewModel.getGame().observe(this, this::handleGameUpdates);
