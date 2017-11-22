@@ -49,20 +49,11 @@ public class BoardViewModel extends AndroidViewModel {
         return mAppDatabase.optionsDao().getAll();
     }
 
-    public void setSubmittedOption(@Nullable String option) {
-        Completable.defer(
-                () -> {
-                    mAppDatabase.gameDao().setSelectedOption(option);
-                    return Completable.complete();
-                })
-                .subscribeOn(Schedulers.newThread())
-                .subscribe();
-    }
-
-    public void setSelectedPlayer(@Nullable String selectedColor) {
+    public void setPlayerMove(@Nullable String selectedColor, @Nullable String option) {
         Completable.defer(
                 () -> {
                     mAppDatabase.gameDao().setSelectedColor(selectedColor);
+                    mAppDatabase.gameDao().setSelectedOption(option);
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.newThread())

@@ -207,9 +207,6 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
     @Override
     public void handleMove(String playerMove, String playerColor) {
         BoardViewModel viewModel = ViewModelProviders.of(this).get(BoardViewModel.class);
-        viewModel.setSubmittedOption(null);
-        viewModel.setSelectedPlayer(null);
-        viewModel.setSubmittedOption(playerMove);
-        viewModel.setSelectedPlayer(playerColor);
+        viewModel.setPlayerMove(playerColor, playerMove);
     }
 }
