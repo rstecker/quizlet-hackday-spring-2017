@@ -42,6 +42,7 @@ public class GameEngine implements IGameEngine {
     private int mGameTarget;
     @Nullable
     private Date mGameStart;
+    private int mMessageCount;
 
     public GameEngine() {
         mLobbyLogic = new LobbyLogic(this);
@@ -68,16 +69,16 @@ public class GameEngine implements IGameEngine {
         if (mGameType == null || mGameStart == null) {
             return false;
         }
-        Log.i(TAG, "Checking for game end... "+mGameType+" : "+mGameTarget);
+        Log.i(TAG, "Checking for game end... " + mGameType + " : " + mGameTarget);
         switch (mGameType) {
             case INFINITE:
                 return false;
             case TIMED_GAME:
-                Log.i(TAG, " >> "+(mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget))+" vs "+new Date().getTime());
+                Log.i(TAG, " >> " + (mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget)) + " vs " + new Date().getTime());
                 return (mGameStart.getTime() + TimeUnit.MINUTES.toMillis(mGameTarget)) < new Date().getTime();
             case ALL_PLAYERS_TO_POINTS:
                 for (QCMember member : mMembers) {
-                    Log.i(TAG, " >> "+member.getIntScore()+" vs "+mGameTarget);
+                    Log.i(TAG, " >> " + member.getIntScore() + " vs " + mGameTarget);
                     if (member.getIntScore() < mGameTarget) {
                         return false;
                     }
@@ -85,7 +86,7 @@ public class GameEngine implements IGameEngine {
                 return true;
             case FIRST_PLAYER_TO_POINTS:
                 for (QCMember member : mMembers) {
-                    Log.i(TAG, " >> "+member.getIntScore()+" vs "+mGameTarget);
+                    Log.i(TAG, " >> " + member.getIntScore() + " vs " + mGameTarget);
                     if (member.getIntScore() >= mGameTarget) {
                         return true;
                     }
@@ -100,6 +101,7 @@ public class GameEngine implements IGameEngine {
     @Override
     public QCGameMessage generateBaseEndGameMessage(@NonNull QCGameMessage.Action action) {
         return ImmutableQCGameMessage.builder()
+                .msgCount(mMessageCount)
                 .action(action)
                 .state(GameState.ENDED)
                 .members(mMembers)
@@ -112,6 +114,7 @@ public class GameEngine implements IGameEngine {
     @Override
     public QCGameMessage generateBaseLobbyMessage(@NonNull QCGameMessage.Action action) {
         return ImmutableQCGameMessage.builder()
+                .msgCount(mMessageCount)
                 .action(action)
                 .state(GameState.LOBBY)
                 .members(mMembers)
@@ -124,6 +127,7 @@ public class GameEngine implements IGameEngine {
     @Override
     public QCGameMessage generateBasePlayMessage(@NonNull QCGameMessage.Action action) {
         return ImmutableQCGameMessage.builder()
+                .msgCount(mMessageCount)
                 .action(action)
                 .state(GameState.PLAYING)
                 .members(mMembers)
@@ -160,29 +164,44 @@ public class GameEngine implements IGameEngine {
         mGameTarget = gameTarget;
         mGameType = gameType;
         mGameStart = new Date();
+        mMessageCount = 1;
         return mPlayLogic.startGame(gameType, gameTarget);
     }
 
     @Override
     public synchronized QCGameMessage processMessage(@NonNull QCPlayerMessage message) {
-        synchronized (TAG) {
+        if (message.msgCount() != mMessageCount) {
+            Log.w(TAG, "Current game engine message count is " + mMessageCount + ", received " + message.msgCount() + " from " + message.username());
             switch (message.state()) {
                 case LOBBY:
                     return mLobbyLogic.processMessage(message);
                 case PLAYING:
-                    if (isGameHasEnded()) {
-                        return mEndLogic.processMessage(message);
-                    }
-                    QCGameMessage outMessage = mPlayLogic.processMessage(message);
-                    if (isGameHasEnded()) {
-                        return mEndLogic.processMessage(message);
-                    }
-                    return outMessage;
                 case ENDED:
-                    return mEndLogic.processMessage(message);
+                    if (isGameHasEnded()) {
+                        return mEndLogic.processMessage(message);
+                    }
+                    return generateBaseEndGameMessage(QCGameMessage.Action.OUT_OF_SYNC);
                 default:
-                    throw new UnsupportedOperationException("I don't know how to handle : " + message.state());
+                    throw new UnsupportedOperationException("Out of sync msg: I don't know how to handle : " + message.state());
             }
+        }
+        ++mMessageCount;
+        switch (message.state()) {
+            case LOBBY:
+                return mLobbyLogic.processMessage(message);
+            case PLAYING:
+                if (isGameHasEnded()) {
+                    return mEndLogic.processMessage(message);
+                }
+                QCGameMessage outMessage = mPlayLogic.processMessage(message);
+                if (isGameHasEnded()) {
+                    return mEndLogic.processMessage(message);
+                }
+                return outMessage;
+            case ENDED:
+                return mEndLogic.processMessage(message);
+            default:
+                throw new UnsupportedOperationException("I don't know how to handle : " + message.state());
         }
     }
 

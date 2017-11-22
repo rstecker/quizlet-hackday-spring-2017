@@ -29,6 +29,7 @@ public abstract class QCPlayerMessage {
 
         PLAYER_MOVE
     }
+    @JsonProperty("msg_count") public abstract int msgCount();
 
     @JsonProperty("action") public abstract Action action();
 
@@ -39,16 +40,18 @@ public abstract class QCPlayerMessage {
     @JsonProperty("move") @Nullable public abstract QCMove move();
 
 
-    public static @NonNull QCPlayerMessage build(@NonNull Action action, @NonNull GameState state) {
+    public static @NonNull QCPlayerMessage build(int msgCount, @NonNull Action action, @NonNull GameState state) {
         return ImmutableQCPlayerMessage.builder()
+                .msgCount(msgCount)
                 .action(action)
                 .state(state)
                 .build();
     }
 
     public static @NonNull
-    QCPlayerMessage build(@NonNull Action action, @NonNull GameState state, @NonNull String username) {
+    QCPlayerMessage build(int msgCount, @NonNull Action action, @NonNull GameState state, @NonNull String username) {
         return ImmutableQCPlayerMessage.builder()
+                .msgCount(msgCount)
                 .action(action)
                 .state(state)
                 .username(username)
@@ -58,11 +61,13 @@ public abstract class QCPlayerMessage {
     @JsonCreator
     @ParcelFactory
     public static @NonNull QCPlayerMessage build(
+            @JsonProperty("msg_count") int msgCount,
             @JsonProperty("action") @NonNull Action action,
             @JsonProperty("state") @NonNull GameState state,
             @JsonProperty("username") @Nullable String username,
             @JsonProperty("move") @Nullable QCMove move) {
         return ImmutableQCPlayerMessage.builder()
+                .msgCount(msgCount)
                 .action(action)
                 .state(state)
                 .username(username)

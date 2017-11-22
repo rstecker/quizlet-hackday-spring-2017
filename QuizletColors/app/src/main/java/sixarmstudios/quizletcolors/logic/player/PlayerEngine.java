@@ -1,6 +1,7 @@
 package sixarmstudios.quizletcolors.logic.player;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.myapplication.bluetooth.GameState;
 import com.example.myapplication.bluetooth.ImmutableQCMove;
@@ -30,15 +31,20 @@ public class PlayerEngine implements IPlayerEngine {
     private final Subject<LobbyState> mLobbyState = BehaviorSubject.create();
     private final Subject<QCPlayerMessage> mOutgoingMsgs = BehaviorSubject.create();
     private String mUsername;
+    private int mMessageCount;
 
     @Override
     public void initializePlayer(@NonNull String username) {
         mUsername = username;
-        mOutgoingMsgs.onNext(QCPlayerMessage.build(QCPlayerMessage.Action.JOIN_GAME, GameState.LOBBY, username));
+        mOutgoingMsgs.onNext(QCPlayerMessage.build(mMessageCount, QCPlayerMessage.Action.JOIN_GAME, GameState.LOBBY, username));
     }
 
     @Override
     public void processMessage(@NonNull QCGameMessage message) {
+        if ((mMessageCount + 1) != message.msgCount()) {
+            Log.w(TAG, "There appears to be skew in our msg handling. Warning. Current count "+mMessageCount+" vs game update "+message.msgCount());
+        }
+        mMessageCount = message.msgCount();
         synchronized (TAG) {
             switch (message.state()) {
                 case PLAYING:
@@ -60,6 +66,7 @@ public class PlayerEngine implements IPlayerEngine {
     public void makeMove(@NonNull String answer, @NonNull String color) {
         mOutgoingMsgs.onNext(
                 QCPlayerMessage.build(
+                        mMessageCount,
                         QCPlayerMessage.Action.PLAYER_MOVE,
                         GameState.PLAYING,
                         mUsername,

@@ -31,6 +31,7 @@ public abstract class QCGameMessage {
     @JsonCreator
     @ParcelFactory
     public static QCGameMessage build(
+            @JsonProperty("msg_count") int msgCount,
             @JsonProperty("action") Action action,
             @JsonProperty("state") GameState state,
             @JsonProperty("set_name") String setName,
@@ -44,6 +45,7 @@ public abstract class QCGameMessage {
             @JsonProperty("answered_question") String answeredQuestion
     ) {
         return ImmutableQCGameMessage.builder()
+                .msgCount(msgCount)
                 .action(action)
                 .state(state)
                 .setName(setName)
@@ -84,6 +86,9 @@ public abstract class QCGameMessage {
 
         GAME_OVER
     }
+
+    @JsonProperty("msg_count")
+    public abstract int msgCount();
 
     @JsonProperty("action")
     public abstract Action action();
