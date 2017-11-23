@@ -58,6 +58,10 @@ public class CompassRose extends FrameLayout {
             return colorName;
         }
 
+        public int colorAttr() {
+            return colorAttr;
+        }
+
         public static RoseColor findByColorName(String color) {
             for (RoseColor rc : values()) {
                 if (rc.colorName.equals(color)) {
