@@ -1,7 +1,9 @@
 package sixarmstudios.quizletcolors.ui.scorePlayer;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import studioes.arm.six.partskit.CompassRose;
 import studioes.arm.six.partskit.Player;
 
 /**
@@ -44,7 +47,7 @@ public class ScorePlayerAdapter extends RecyclerView.Adapter<ScorePlayerViewHold
             return;
         }
         Player player = mPlayers.get(position);
-        holder.setPlayerInfo(player.getUsername(), position + 1, player.getScore());
+        holder.setPlayerInfo(player.getUsername(), position + 1, player.getScore(), player.getColor());
     }
 
     private boolean isValidIdx(int position) {
