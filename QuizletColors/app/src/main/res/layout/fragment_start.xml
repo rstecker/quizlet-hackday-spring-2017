@@ -41,24 +41,25 @@
 
     <LinearLayout
         android:id="@+id/game_start_options"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginTop="12dp"
         android:orientation="vertical"
         android:visibility="invisible"
         tools:visibility="visible">
 
-        <TextView
+        <Button
             android:id="@+id/start_with_quizlet_btn"
-            style="@style/LobbyButtons"
+            style="@style/AustinButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/auth_with_quizlet"
             android:textAlignment="center" />
 
-        <TextView
+        <Button
             android:id="@+id/start_anonymous_btn"
-            style="@style/LobbyButtons"
+            style="@style/AustinButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/play_anonymously"

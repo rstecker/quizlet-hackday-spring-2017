@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,21 +50,14 @@ public class StartFragment extends LifecycleFragment {
     @LayoutRes
     public static final int LAYOUT_ID = R.layout.fragment_start;
 
-    @BindView(R.id.has_permissions)
-    TextView mHasPermissionsTxtView;
-    @BindView(R.id.has_bluetooth)
-    TextView mHasBluetoothTxtView;
-    @BindView(R.id.game_start_options)
-    View mStartGameOptions;
-    @BindView(R.id.start_with_quizlet_btn)
-    TextView mStartQuizletButton;
-    @BindView(R.id.start_anonymous_btn)
-    TextView mStartAnonymousButton;
-    @BindView(R.id.start_compass_rose)
-    CompassRose mRose;
-
     private Disposable mDisposable;
 
+    @BindView(R.id.has_permissions) TextView mHasPermissionsTxtView;
+    @BindView(R.id.has_bluetooth) TextView mHasBluetoothTxtView;
+    @BindView(R.id.game_start_options) View mStartGameOptions;
+    @BindView(R.id.start_with_quizlet_btn) Button mStartQuizletButton;
+    @BindView(R.id.start_anonymous_btn) Button mStartAnonymousButton;
+    @BindView(R.id.start_compass_rose) CompassRose mRose;
 
     String mQuizletUsername = null;
 

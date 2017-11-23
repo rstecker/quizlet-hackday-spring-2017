@@ -2,6 +2,7 @@ package sixarmstudios.quizletcolors;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.Service;
 import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
@@ -84,10 +85,15 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
         setContentView(LAYOUT_ID);
         ButterKnife.bind(this);
 
+        Intent serviceIntent = ModelRetrievalService.startIntent(this);
+        startService(serviceIntent);
+        // if I only JUST bind, the service dies when we background :'(
+        // TODO : inspect these flags, I bet we want a different ont
+        bindService(serviceIntent, mModelConnection, Context.BIND_AUTO_CREATE);
+
         watchAppState();
         debugVMStuff();
 
-        startService(ModelRetrievalService.startIntent(this));
     }
 
     private void debugVMStuff() {
@@ -141,7 +147,9 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
                         case FIND_GAME:
                             if (!mPlayerConnection.isBound()) {
                                 Log.i(TAG, "Requesting the Player Service to bind (find game)");
-                                bindService(new Intent(this, PlayerService.class), mPlayerConnection, Context.BIND_AUTO_CREATE);
+                                Intent playerService = new Intent(this, PlayerService.class);
+                                startService(playerService);
+                                bindService(playerService, mPlayerConnection, Context.BIND_AUTO_CREATE);
                                 initPlayerConnectionObservables();
                             }
                             mPlayerState = dbAppState;
@@ -149,7 +157,9 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
                         case FIND_SET:
                             if (mHostConnection == null || !mHostConnection.isBound()) {
                                 Log.i(TAG, "Requesting the Host Service to bind (find set)");
-                                bindService(new Intent(this, HostService.class), mHostConnection, Context.BIND_AUTO_CREATE);
+                                Intent hostIntent = new Intent(this, HostService.class);
+                                startService(hostIntent);
+                                bindService(hostIntent, mHostConnection, Context.BIND_AUTO_CREATE);
                                 initHostConnectionObservables();
                             }
                             mPlayerState = dbAppState;
@@ -260,9 +270,7 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
     @Override
     protected void onStart() {
         super.onStart();
-        // if I only JUST bind, the service dies when we background :'(
-        // TODO : inspect these flags, I bet we want a different ont
-        bindService(new Intent(this, ModelRetrievalService.class), mModelConnection, Context.BIND_AUTO_CREATE);
+
         TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
         viewModel.getGame().observe(this, this::handleGameUpdates);
     }
@@ -270,12 +278,12 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
     @Override protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy, unbinding all services");
-//        if (mHostConnection.isBound()) {
-//            mHostConnection.unbindService(this);
-//        }
-//        if (mPlayerConnection.isBound()) {
-//            mPlayerConnection.unbindService(this);
-//        }
+        if (mHostConnection.isBound()) {
+            mHostConnection.unbindService(this);
+        }
+        if (mPlayerConnection.isBound()) {
+            mPlayerConnection.unbindService(this);
+        }
         if (mModelBound) {
             this.unbindService(mModelConnection);
         }

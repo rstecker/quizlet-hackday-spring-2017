@@ -183,17 +183,16 @@ public class CompassRose extends FrameLayout {
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = getContext().getTheme();
         theme.resolveAttribute(R.attr.gradeNoPlayerBg, typedValue, true);
-        @ColorRes int color = typedValue.resourceId;
+
         String innerText = player.isPlayer() ? "you" : player.getUsername();
         ((TextRing) findViewById(R.id.compass_rose_you_text_ring)).setRing(innerText, getContext().getColor(mBaseLineColor));
         findViewById(R.id.compass_rose_you_text_ring).setVisibility(VISIBLE);
-//        findViewById(R.id.compass_rose_you_text_ring).setVisibility(player.isPlayer() ? VISIBLE : GONE);
+
         String outerText = (player.isHost() ? "host " : "") + "[" + player.getScore() + "]";
         ((TextRing) findViewById(R.id.compass_rose_host_text_ring)).setRing(outerText, typedValue.data);
         findViewById(R.id.compass_rose_host_text_ring).setVisibility(VISIBLE);
-//        findViewById(R.id.compass_rose_host_text_ring).setVisibility(player.isHost() ? VISIBLE : GONE);
 
-        ((RewardPow)findViewById(R.id.compass_rose_reward_pow)).setDetails(color);
+        ((RewardPow)findViewById(R.id.compass_rose_reward_pow)).setDetails(mBaseLineColor, mBaseDrawable);
     }
 
     public void setLine(Drawable drawable) {
@@ -353,6 +352,6 @@ public class CompassRose extends FrameLayout {
     }
 
     public void reward() {
-
+        ((RewardPow)findViewById(R.id.compass_rose_reward_pow)).pow();
     }
 }

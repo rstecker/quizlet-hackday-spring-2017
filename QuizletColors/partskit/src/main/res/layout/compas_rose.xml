@@ -9,11 +9,6 @@
     android:clipToPadding="false"
     android:orientation="horizontal">
 
-    <studioes.arm.six.partskit.rose.RewardPow
-        android:id="@+id/compass_rose_reward_pow"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <studioes.arm.six.partskit.rose.TextRing
         android:id="@+id/compass_rose_host_text_ring"
         android:layout_width="match_parent"
@@ -54,5 +49,10 @@
         android:layout_height="match_parent"
         android:scaleX="0.85"
         android:scaleY="0.85" />
+
+    <studioes.arm.six.partskit.rose.RewardPow
+        android:id="@+id/compass_rose_reward_pow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>

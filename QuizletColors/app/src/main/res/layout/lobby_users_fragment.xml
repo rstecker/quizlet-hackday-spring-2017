@@ -23,6 +23,14 @@
         android:layout_height="wrap_content"
         tools:text="There will be 5 monkies" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:text="@string/game_type_title"/>
+
     <RadioGroup
         android:id="@+id/game_type_selector"
         android:layout_width="match_parent"
@@ -38,7 +46,7 @@
             android:layout_weight="1"
             android:background="@drawable/button_selector"
             android:button="@null"
-            android:text="Infinity"
+            android:text="@string/game_type_infinity"
             android:textAlignment="center" />
 
         <RadioButton
@@ -48,7 +56,7 @@
             android:layout_weight="1"
             android:background="@drawable/button_selector"
             android:button="@null"
-            android:text="N player points"
+            android:text="@string/game_type_player_points"
             android:textAlignment="center" />
 
         <RadioButton
@@ -58,7 +66,7 @@
             android:layout_weight="1"
             android:background="@drawable/button_selector"
             android:button="@null"
-            android:text="N all points"
+            android:text="@string/game_type_all_points"
             android:textAlignment="center" />
 
         <RadioButton
@@ -68,7 +76,7 @@
             android:layout_weight="1"
             android:background="@drawable/button_selector"
             android:button="@null"
-            android:text="N minutes"
+            android:text="@string/game_type_minutes"
             android:textAlignment="center" />
 
     </RadioGroup>
@@ -77,7 +85,7 @@
         android:id="@+id/target_elements"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/target_entry_description"
@@ -96,12 +104,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/start_game_button"
-        style="@style/LobbyButtons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="START GAME" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/player_list"
@@ -109,5 +111,13 @@
         android:clipChildren="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/start_game_button"
+        style="@style/AustinButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="START GAME" />
 
 </LinearLayout>
