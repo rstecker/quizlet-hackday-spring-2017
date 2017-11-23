@@ -53,6 +53,11 @@
     <string name="host_button_discoverable">…Hosting…</string>
     <string name="host_discoverable_toast">Host mode starting (enabled for %1$d seconds)</string>
 
+    <string name="game_type_title">Game Modes</string>
+    <string name="game_type_infinity">Infinity</string>
+    <string name="game_type_player_points">Player points</string>
+    <string name="game_type_all_points">All points</string>
+    <string name="game_type_minutes">Minutes</string>
 
     <string name="join_button">Join Game</string>
     <string name="start_oath">Start OAuth</string>
