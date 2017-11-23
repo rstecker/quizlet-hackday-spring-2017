@@ -137,13 +137,13 @@ public class BoardView extends RelativeLayout {
     }
 
 
-    public void reward(String color) {
-        CompassRose rose = findViewWithTag(color);
+    public void reward(String roseColor, String powColor, String powUsername) {
+        CompassRose rose = findViewWithTag(roseColor);
         if (rose == null) {
             return;
         }
         rose.setEnergy(2);
-
+        rose.reward(CompassRose.RoseColor.findByColorName(powColor), CompassRose.getShapeBasedOnUsername(powUsername));
     }
 
     /**

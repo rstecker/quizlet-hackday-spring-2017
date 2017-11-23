@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import appstate.AppState;
@@ -231,9 +233,13 @@ public class StartFragment extends LifecycleFragment {
                 CompassRose.RoseColor.BLUE,
                 0,
                 false, false,
-                CompassRose.PLAYER_SHAPE_DRAWABLE_RES[0]
+                CompassRose.PLAYER_SHAPE_DRAWABLE_RES[ThreadLocalRandom.current().nextInt(0,CompassRose.PLAYER_SHAPE_DRAWABLE_RES.length)]
         ));
-        mRose.setOnClickListener((l) -> mRose.boop());
+        mRose.setOnClickListener((l) -> {
+            CompassRose.RoseColor randomColor = CompassRose.RoseColor.values()[ThreadLocalRandom.current().nextInt(0, CompassRose.RoseColor.values().length)];
+            @DrawableRes int randomRes = CompassRose.PLAYER_SHAPE_DRAWABLE_RES[ThreadLocalRandom.current().nextInt(0,CompassRose.PLAYER_SHAPE_DRAWABLE_RES.length)];
+            mRose.reward(randomColor, randomRes);
+        });
         mRose.setEnergy(0.5f);
         mDisposable = Observable.interval(5, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -243,7 +249,9 @@ public class StartFragment extends LifecycleFragment {
                         mRose.boop();
                     }
                     if (Math.random() < 0.3) {
-                        mRose.reward();
+                        CompassRose.RoseColor randomColor = CompassRose.RoseColor.values()[ThreadLocalRandom.current().nextInt(0, CompassRose.RoseColor.values().length)];
+                        @DrawableRes int randomRes = CompassRose.PLAYER_SHAPE_DRAWABLE_RES[ThreadLocalRandom.current().nextInt(0,CompassRose.PLAYER_SHAPE_DRAWABLE_RES.length)];
+                        mRose.reward(randomColor, randomRes);
                     }
                 });
     }

@@ -10,7 +10,9 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 import studioes.arm.six.partskit.R;
 
@@ -24,6 +26,7 @@ public class RewardPow extends View {
     private Path mPath;
     private Drawable mDrawable;
     private float mFloat;
+    private int mPowCount;
 
     public RewardPow(Context context) {
         super(context);
@@ -54,21 +57,25 @@ public class RewardPow extends View {
         mPath = new Path();
     }
 
-    public void pow() {
+    public void pow(@ColorRes int color, Drawable drawable) {
         Log.i(TAG, "I see a POW!");
-        this.animate().setUpdateListener(animation -> {
-            mFloat = animation.getAnimatedFraction();
-            invalidate();
-        })
-                .setInterpolator(new AccelerateInterpolator())
-                .setDuration(5000)
+        mDrawable = drawable.mutate();
+        mDrawable.setTint(getResources().getColor(color));
+        mPowCount = ThreadLocalRandom.current().nextInt(6, 20);
+        this.animate()
+                .setUpdateListener(animation -> {
+                    mFloat = animation.getAnimatedFraction();
+                    invalidate();
+                })
+                .setInterpolator(new DecelerateInterpolator())
+                .setDuration(1500)
                 .start();
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        if (mPath == null || mDrawable == null) {
+        if (mPath == null || mDrawable == null || mPowCount <= 0) {
             return;
         }
         mPath.reset();
@@ -85,29 +92,25 @@ public class RewardPow extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (mDrawable == null || mPaint == null || mPath == null) {
+        if (mDrawable == null || mPaint == null || mPath == null || mPowCount <= 0) {
             return;
         }
-        canvas.drawPath(mPath, mPaint);
+//        canvas.drawPath(mPath, mPaint);
         float centerX = getWidth() / 2f;
         float centerY = getWidth() / 2f;
 
-        int sizeW = (int) getWidth() / 10;
-        int sizeH = (int) getHeight() / 8;
-        int posX = (int) getWidth() / 2 - sizeW / 2;
-        int posY = (int)(getHeight() / 2f * (1-mFloat));
-        Log.i(TAG, "Rebecca [onDraw] w/ "+mFloat+" -> "+posY);
+        int sizeW = getWidth() / 26;
+        int sizeH = getHeight() / 8;
+        int posX = getWidth() / 2 - sizeW / 2;
+        int posY = (int) (getHeight() * 2 / 3f * (1 - mFloat) - (getHeight() / 3f));
 
         mDrawable.setBounds(posX, posY, posX + sizeW, posY + sizeH);
+        mDrawable.setAlpha((int) (255 * (1 - mFloat)));
+        float rotationBy = 350 / mPowCount;
         mDrawable.draw(canvas);
-        canvas.rotate(45, centerX, centerY);
-        mDrawable.setBounds(posX, posY, posX + sizeW, posY + sizeH);
-        mDrawable.draw(canvas);
-        canvas.rotate(45, centerX, centerY);
-        mDrawable.setBounds(posX, posY, posX + sizeW, posY + sizeH);
-        mDrawable.draw(canvas);
-        canvas.rotate(45, centerX, centerY);
-        mDrawable.setBounds(posX, posY, posX + sizeW, posY + sizeH);
-        mDrawable.draw(canvas);
+        for (int i = 0; i < mPowCount; ++i) {
+            canvas.rotate(rotationBy, centerX, centerY);
+            mDrawable.draw(canvas);
+        }
     }
 }
