@@ -1,47 +1,40 @@
 package sixarmstudios.quizletcolors.ui.setup;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.bluetooth.core.IBluetoothClientListener;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import appstate.AppState;
 import appstate.PlayerState;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Completable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import sixarmstudios.quizletcolors.R;
 import sixarmstudios.quizletcolors.StartActivity;
-import sixarmstudios.quizletcolors.ui.endGame.EndGameFragment;
-import sixarmstudios.quizletcolors.ui.lobby.LobbyFragment;
+import studioes.arm.six.partskit.CompassRose;
+import studioes.arm.six.partskit.Player;
 import viewmodel.TopLevelViewModel;
 
 import static sixarmstudios.quizletcolors.StartActivity.REQUEST_ENABLE_BT;
@@ -53,13 +46,24 @@ import static sixarmstudios.quizletcolors.StartActivity.REQUEST_ENABLE_BT;
 
 public class StartFragment extends LifecycleFragment {
     public static final String TAG = StartFragment.class.getSimpleName();
-    @LayoutRes public static final int LAYOUT_ID = R.layout.fragment_start;
+    @LayoutRes
+    public static final int LAYOUT_ID = R.layout.fragment_start;
 
-    @BindView(R.id.has_permissions) TextView mHasPermissionsTxtView;
-    @BindView(R.id.has_bluetooth) TextView mHasBluetoothTxtView;
-    @BindView(R.id.game_start_options) View mStartGameOptions;
-    @BindView(R.id.start_with_quizlet_btn) TextView mStartQuizletButton;
-    @BindView(R.id.start_anonymous_btn) TextView mStartAnonymousButton;
+    @BindView(R.id.has_permissions)
+    TextView mHasPermissionsTxtView;
+    @BindView(R.id.has_bluetooth)
+    TextView mHasBluetoothTxtView;
+    @BindView(R.id.game_start_options)
+    View mStartGameOptions;
+    @BindView(R.id.start_with_quizlet_btn)
+    TextView mStartQuizletButton;
+    @BindView(R.id.start_anonymous_btn)
+    TextView mStartAnonymousButton;
+    @BindView(R.id.start_compass_rose)
+    CompassRose mRose;
+
+    private Disposable mDisposable;
+
 
     String mQuizletUsername = null;
 
@@ -78,7 +82,14 @@ public class StartFragment extends LifecycleFragment {
         return view;
     }
 
-    @Override public void onResume() {
+    @Override
+    public void onPause() {
+        super.onPause();
+        mDisposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
         checkHealth();
         TopLevelViewModel boardViewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
@@ -92,6 +103,8 @@ public class StartFragment extends LifecycleFragment {
             mQuizletUsername = state.qUsername;
             updateQuizletUserInfo();
         }));
+
+        prepRose();
     }
 
     @Override
@@ -117,7 +130,8 @@ public class StartFragment extends LifecycleFragment {
         }
     }
 
-    @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
             Toast.makeText(getContext(), R.string.bluetooth_denied, Toast.LENGTH_LONG).show();
@@ -215,5 +229,28 @@ public class StartFragment extends LifecycleFragment {
     private void kickOffAuthFlow() {
         TopLevelViewModel viewModel = ViewModelProviders.of(this).get(TopLevelViewModel.class);
         viewModel.updatePlayerState(PlayerState.ATTEMPT_OAUTH);
+    }
+
+    private void prepRose() {
+        mRose.setPlayer(new Player(
+                "play now!",
+                CompassRose.RoseColor.BLUE,
+                0,
+                false, false,
+                CompassRose.PLAYER_SHAPE_DRAWABLE_RES[0]
+        ));
+        mRose.setOnClickListener((l) -> mRose.boop());
+        mRose.setEnergy(0.5f);
+        mDisposable = Observable.interval(5, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((l) -> {
+                    mRose.setEnergy((float) Math.random());
+                    if (Math.random() < 0.2) {
+                        mRose.boop();
+                    }
+                    if (Math.random() < 0.3) {
+                        mRose.reward();
+                    }
+                });
     }
 }

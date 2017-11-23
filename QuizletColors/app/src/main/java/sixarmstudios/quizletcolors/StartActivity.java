@@ -485,7 +485,7 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
         if (mPlayerBluetoothListener != null) {
             mPlayerBluetoothListener.onDeviceFound(device, name, bondState, address);
         }
-        Log.e(TAG, "onDeviceFound  : " + name + " : " + bondState + " : " + address);
+        Log.i(TAG, "onDeviceFound  : " + name + " : " + bondState + " : " + address);
     }
 
     @Override
@@ -493,7 +493,7 @@ public class StartActivity extends AppCompatActivity implements IBluetoothPlayer
         if (mPlayerBluetoothListener != null) {
             mPlayerBluetoothListener.isDiscoverable(isDiscoverable);
         }
-        Log.e(TAG, "isDiscoverable  : " + isDiscoverable);
+        Log.i(TAG, "isDiscoverable  : " + isDiscoverable);
     }
 
     //endregion

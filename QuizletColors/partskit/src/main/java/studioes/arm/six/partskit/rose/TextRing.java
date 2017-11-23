@@ -1,4 +1,4 @@
-package studioes.arm.six.partskit;
+package studioes.arm.six.partskit.rose;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import studioes.arm.six.partskit.R;
 
 /**
  * Created by rebeccastecker on 11/20/17.

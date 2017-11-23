@@ -3,10 +3,6 @@ package studioes.arm.six.partskit;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
@@ -28,6 +24,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import studioes.arm.six.partskit.rose.RewardPow;
+import studioes.arm.six.partskit.rose.TextRing;
 
 /**
  * Created by sithel on 10/22/17.
@@ -70,7 +69,8 @@ public class CompassRose extends FrameLayout {
         }
     }
 
-    public static @DrawableRes int getShapeBasedOnUsername(@NonNull String username) {
+    public static @DrawableRes
+    int getShapeBasedOnUsername(@NonNull String username) {
         return PLAYER_SHAPE_DRAWABLE_RES[username.hashCode() % PLAYER_SHAPE_DRAWABLE_RES.length];
     }
 
@@ -83,8 +83,6 @@ public class CompassRose extends FrameLayout {
     private @ColorRes
     int mBaseLineColor;
     private Drawable mBaseDrawable;
-    private Paint mPaint;
-    private Path mPath;
     /**
      * Ranges from 0 - 1
      */
@@ -109,44 +107,7 @@ public class CompassRose extends FrameLayout {
         init(context, attrs);
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        mPath.reset();
-        mPath.moveTo((top - bottom) / 2f, (right - left) / 2f);
-        float w = right - left;
-        float h = bottom - top;
-        Log.i(TAG, "We see " + w + " , " + h);
-        mPath.addCircle(w / 2f, h / 2f, Math.min(w / 3f, h / 3f), Path.Direction.CW);
-    }
-
-    @Override
-    public void onDrawForeground(Canvas canvas) {
-        Log.i(TAG, "on draw foreground? (pre)");
-        super.onDrawForeground(canvas);
-        Log.i(TAG, "on draw foreground? (post)");
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        Log.i(TAG, "REALLY trying to paint! " + mPath);
-        super.onDraw(canvas);
-
-        Log.i(TAG, "Trying to paint! " + mPath);
-        canvas.drawPath(mPath, mPaint);
-
-        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaint.setTextSize(20);
-
-        //drawTextOnPath(text, path, hOffset, vOffset, paint)
-        mPaint.setColor(Color.GRAY);
-        canvas.drawTextOnPath("--- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding ---", mPath, 110, 5, mPaint);
-        mPaint.setColor(Color.GREEN);
-        canvas.drawTextOnPath("--- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding --- --- Android.Coding ---", mPath, 100, 0, mPaint);
-    }
-
     private void init(Context context, @Nullable AttributeSet attrs) {
-        mPath = new Path();
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.CompassRose,
@@ -231,6 +192,8 @@ public class CompassRose extends FrameLayout {
         ((TextRing) findViewById(R.id.compass_rose_host_text_ring)).setRing(outerText, typedValue.data);
         findViewById(R.id.compass_rose_host_text_ring).setVisibility(VISIBLE);
 //        findViewById(R.id.compass_rose_host_text_ring).setVisibility(player.isHost() ? VISIBLE : GONE);
+
+        ((RewardPow)findViewById(R.id.compass_rose_reward_pow)).setDetails(color);
     }
 
     public void setLine(Drawable drawable) {
@@ -364,6 +327,9 @@ public class CompassRose extends FrameLayout {
                 .start();
     }
 
+    /**
+     * @param i how PUMPED are you??  0 - 1, 0 being lame and zZZzZZz and 1 being YEAH! (and 1.5 being on speed)
+     */
     public void setEnergy(float i) {
         mCurrentEnergy = i;
 
@@ -384,5 +350,9 @@ public class CompassRose extends FrameLayout {
 
     public String getPlayerColor() {
         return (String) getTag(R.id.player_color_key);
+    }
+
+    public void reward() {
+
     }
 }

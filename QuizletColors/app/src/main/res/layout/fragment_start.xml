@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
 
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="12dp">
@@ -24,6 +27,16 @@
         android:textAlignment="center"
         android:visibility="invisible"
         tools:visibility="visible" />
+
+    <studioes.arm.six.partskit.CompassRose
+        android:id="@+id/start_compass_rose"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@null"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:lineColor="?playerBlue"
+        app:lineType="@drawable/line_dimond" />
 
 
     <LinearLayout

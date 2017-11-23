@@ -4,12 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:clipToPadding="false"
     android:background="@null"
     android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="horizontal">
 
-    <studioes.arm.six.partskit.TextRing
+    <studioes.arm.six.partskit.rose.RewardPow
+        android:id="@+id/compass_rose_reward_pow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <studioes.arm.six.partskit.rose.TextRing
         android:id="@+id/compass_rose_host_text_ring"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -18,8 +23,8 @@
         android:id="@+id/compass_rose_lvl_1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@null"
         android:layout_gravity="center"
+        android:background="@null"
         android:clipChildren="false" />
 
     <FrameLayout
@@ -27,8 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:clipChildren="false"
         android:background="@null"
+        android:clipChildren="false"
         android:scaleX="0.75"
         android:scaleY="0.75" />
 
@@ -38,16 +43,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:clipChildren="false"
         android:background="@null"
+        android:clipChildren="false"
         android:scaleX="0.5"
         android:scaleY="0.5" />
 
-    <studioes.arm.six.partskit.TextRing
+    <studioes.arm.six.partskit.rose.TextRing
         android:id="@+id/compass_rose_you_text_ring"
-        android:scaleX="0.85"
-        android:scaleY="0.85"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleX="0.85"
+        android:scaleY="0.85" />
 
 </FrameLayout>
