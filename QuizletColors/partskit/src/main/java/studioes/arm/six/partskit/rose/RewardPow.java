@@ -58,7 +58,7 @@ public class RewardPow extends View {
     }
 
     public void pow(@ColorRes int color, Drawable drawable) {
-        Log.i(TAG, "I see a POW!");
+        Log.i(TAG, "I see a POW! "+color+" : "+drawable);
         mDrawable = drawable.mutate();
         mDrawable.setTint(getResources().getColor(color));
         mPowCount = ThreadLocalRandom.current().nextInt(6, 20);

@@ -42,7 +42,7 @@ public class PlayerEngine implements IPlayerEngine {
     @Override
     public synchronized void processMessage(@NonNull QCGameMessage message) {
         if ((mMessageCount + 1) != message.msgCount()) {
-            Log.w(TAG, "There appears to be skew in our msg handling. Warning. Current count "+mMessageCount+" vs game update "+message.msgCount()+" :: "+message.state());
+            Log.w(TAG, "There appears to be skew in our msg handling. Warning. Current count " + mMessageCount + " vs game update " + message.msgCount() + " :: " + message.state());
         }
         mMessageCount = message.msgCount();
         synchronized (TAG) {
@@ -248,6 +248,14 @@ public class PlayerEngine implements IPlayerEngine {
         gm.question = message.question();
         gm.youAnswered = currentPlayer.reaction() == QCMember.Reaction.CORRECT_ANSWER_PROVIDED;
         gm.youAsked = currentPlayer.reaction() == QCMember.Reaction.CORRECT_ANSWER_RECEIVED;
+        gm.askerColor = message.questionColor();
+        if (gm.askerColor != null && message.findPlayerByColor(gm.askerColor) != null) {
+            gm.askerUsername = message.findPlayerByColor(gm.askerColor).username();
+        }
+        gm.answererColor = message.providedColor();
+        if (gm.answererColor != null && message.findPlayerByColor(gm.answererColor) != null) {
+            gm.answererUsername = message.findPlayerByColor(gm.answererColor).username();
+        }
         return gm;
     }
 }

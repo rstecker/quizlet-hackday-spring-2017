@@ -142,7 +142,7 @@ public class BoardFragment extends Fragment implements BoardView.IBoardListener 
             Toast.makeText(this.getContext(), "You answered correctly!", Toast.LENGTH_SHORT).show();
         }
         // TODO : rebecca :: these colors are blank!! wtf
-        mBoard.reward(move.askerColor, move.answererColor, move.answer);
+        mBoard.reward(move.askerColor, move.answererColor, move.answererUsername);
     }
 
     private void handlePlayerUpdates(List<Player> players) {

@@ -138,11 +138,11 @@ public class BoardView extends RelativeLayout {
 
 
     public void reward(String roseColor, String powColor, String powUsername) {
-        CompassRose rose = findViewWithTag(roseColor);
+        CompassRose rose = findViewWithTag(CompassRose.RoseColor.findByColorName(roseColor).colorAttr);
         if (rose == null) {
             return;
         }
-        rose.setEnergy(2);
+        rose.setEnergy(1);
         rose.reward(CompassRose.RoseColor.findByColorName(powColor), CompassRose.getShapeBasedOnUsername(powUsername));
     }
 
@@ -154,12 +154,12 @@ public class BoardView extends RelativeLayout {
         for(int i = 0; i < players.size(); ++i) {
             Log.i(TAG, "Setting player "+i+" : "+players.get(i));
             getRose(i+1).setPlayer(players.get(i));
-            getRose(i+1).setTag(players.get(i).getColor());
-//            getRose(i+1).setPlayerMetadata(players.get(i), players.get(i).isHost());
+            getRose(i+1).setTag(players.get(i).getColor().colorAttr);
         }
         for (int i = players.size(); i < 4; ++i) {
             Log.i(TAG, "Disabling player "+i);
             getRose(i+1).disable();
+            getRose(i+1).setTag("");
         }
     }
 

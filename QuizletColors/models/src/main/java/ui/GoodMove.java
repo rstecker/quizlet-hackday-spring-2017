@@ -24,8 +24,14 @@ public class GoodMove {
     @ColumnInfo(name = "asker_color")
     public String askerColor;
 
+    @ColumnInfo(name = "asker_username")
+    public String askerUsername;
+
     @ColumnInfo(name = "answerer_color")
     public String answererColor;
+
+    @ColumnInfo(name = "answerer_username")
+    public String answererUsername;
 
     @ColumnInfo(name = "you_asked")
     public boolean youAsked;
@@ -33,7 +39,8 @@ public class GoodMove {
     @ColumnInfo(name = "you_answered")
     public boolean youAnswered;
 
-    @Override public String toString() {
-        return uid + " : " + timestamp + " : " + question + " : " + answer + " : " + youAsked + " : " + youAnswered;
+    @Override
+    public String toString() {
+        return uid + " : " + timestamp + " : " + question + " [" + askerColor + "/"+askerUsername+"] : " + answer + "  [" + answererColor + "/"+answererUsername+"]: " + youAsked + " : " + youAnswered;
     }
 }

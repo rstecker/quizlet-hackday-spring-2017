@@ -356,6 +356,7 @@ public class CompassRose extends FrameLayout {
     }
 
     public void reward(RoseColor color, @DrawableRes int drawableRes) {
+        Log.i(TAG, "Attempting to reward w/ "+color);
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = getContext().getTheme();
         theme.resolveAttribute(color.colorAttr, typedValue, true);

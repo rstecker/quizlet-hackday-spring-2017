@@ -319,4 +319,13 @@ public abstract class QCGameMessage {
                 .build();
     }
 
+    public @Nullable QCMember findPlayerByColor(@NonNull String color) {
+        for(QCMember member : members()) {
+            if (color.equals(member.color())) {
+                return member;
+            }
+        }
+        return null;
+    }
+
 }
