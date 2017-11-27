@@ -92,7 +92,7 @@ public class RewardPow extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (mDrawable == null || mPaint == null || mPath == null || mPowCount <= 0) {
+        if (canvas == null || mDrawable == null || mPaint == null || mPath == null || mPowCount <= 0) {
             return;
         }
 //        canvas.drawPath(mPath, mPaint);
